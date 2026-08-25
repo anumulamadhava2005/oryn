@@ -25,6 +25,7 @@ import {
   type MealType,
   type WeekType,
 } from '@/constants/messMenu';
+import { fetchRemoteMessMenu } from '@/services/orynApi';
 import {
   format,
   addDays,
@@ -117,6 +118,7 @@ export function MessMenuCard({ selectedDate: propSelectedDate, onDateChange }: P
 
   const [activeMeal, setActiveMeal] = useState<MealType>(currentMeal);
   const [manualWeekType, setManualWeekType] = useState<WeekType | null>(null);
+  const [remoteMenu, setRemoteMenu] = useState<any>(null);
 
   // When activeDate changes, update activeMeal to currentMeal of that date
   useEffect(() => {
@@ -124,11 +126,22 @@ export function MessMenuCard({ selectedDate: propSelectedDate, onDateChange }: P
     setManualWeekType(null); // reset manual override when date changes
   }, [activeDate]);
 
+  // Fetch remote mess menu from https://api.cruxel.xyz/oryn/mess-menu
+  useEffect(() => {
+    let isMounted = true;
+    fetchRemoteMessMenu().then(data => {
+      if (isMounted && data) {
+        setRemoteMenu(data);
+      }
+    });
+    return () => { isMounted = false; };
+  }, []);
+
   const weekType = manualWeekType ?? defaultWeekType;
 
   const mealData = useMemo(() => {
-    return MESS_MENU[weekType]?.[dayName]?.[activeMeal];
-  }, [weekType, dayName, activeMeal]);
+    return remoteMenu?.[weekType]?.[dayName]?.[activeMeal] || MESS_MENU[weekType]?.[dayName]?.[activeMeal];
+  }, [remoteMenu, weekType, dayName, activeMeal]);
 
   // Scan emails for mess modification announcements on active date
   const messNoticeEmail = useMemo(() => findMessChangeNotice(allEmails, activeDate), [allEmails, activeDate]);
@@ -399,7 +412,7 @@ export function MessMenuCard({ selectedDate: propSelectedDate, onDateChange }: P
                   <Text style={[styles.chipText, styles.dessertText]}>{mealData.dessert}</Text>
                 </View>
               )}
-              {mealData.extras?.map((extra, idx) => (
+              {mealData.extras?.map((extra: string, idx: number) => (
                 <View key={idx} style={styles.chip}>
                   <Ionicons name="sparkles" size={12} color={Colors.systemYellow} />
                   <Text style={styles.chipText}>{extra}</Text>

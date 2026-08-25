@@ -179,6 +179,9 @@ export function getWidgetAcademicData(): WidgetAcademicData {
   };
 }
 
+import { MMKV } from 'react-native-mmkv';
+const apiStorage = new MMKV({ id: 'oryn-api-cache' });
+
 /** Get live mess menu payload for specified or current date */
 export function getWidgetMessData(targetDate: Date = new Date()): WidgetMessData {
   const weekType = getWeekType(targetDate);
@@ -186,19 +189,25 @@ export function getWidgetMessData(targetDate: Date = new Date()): WidgetMessData
   const mealType = getCurrentMealType(targetDate);
   const mealTimeLabel = getMealTimeLabel(mealType);
 
-  const dayMenu = MESS_MENU[weekType][dayName];
-  const meal = dayMenu[mealType];
+  let activeMenu = MESS_MENU;
+  const cachedRaw = apiStorage.getString('cache:mess_menu');
+  if (cachedRaw) {
+    try { activeMenu = JSON.parse(cachedRaw); } catch {}
+  }
+
+  const dayMenu = activeMenu[weekType]?.[dayName] || MESS_MENU[weekType][dayName];
+  const meal = dayMenu?.[mealType] || MESS_MENU[weekType][dayName][mealType];
 
   return {
     weekType,
     dayName,
     mealType,
     mealTimeLabel,
-    main: meal.main,
-    accompaniments: meal.accompaniments,
-    beverage: meal.beverage,
-    dessert: meal.dessert,
-    extras: meal.extras,
+    main: meal?.main || [],
+    accompaniments: meal?.accompaniments || [],
+    beverage: meal?.beverage,
+    dessert: meal?.dessert,
+    extras: meal?.extras,
   };
 }
 
