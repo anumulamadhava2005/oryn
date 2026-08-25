@@ -9,7 +9,7 @@ const API_BASE = window.location.hostname === 'localhost' || window.location.hos
   ? 'http://localhost:3000/api/oryn'
   : 'https://api.cruxel.xyz/oryn';
 
-const GOOGLE_CLIENT_ID = '780775878479-79i2dggv8m721b0q36t7gq33a46e16n3.apps.googleusercontent.com';
+const GOOGLE_CLIENT_ID = '751305008800-1p9h74vutj50jevig8b0c5bpnt9ifat1.apps.googleusercontent.com';
 
 // State
 let jwtToken = localStorage.getItem('oryn_admin_jwt') || null;
