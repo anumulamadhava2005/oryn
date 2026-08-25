@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oryn Admin Dashboard - Mess & Academic Management</title>
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="admin.css">
+  <!-- Google Sign-In SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <div class="background-glow glow-1"></div>
+  <div class="background-glow glow-2"></div>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+
+    <!-- AUTH SECTION (When not logged in) -->
+    <div id="auth-section" style="display: none;">
+      <div class="auth-container">
+        <img src="../logo.png" alt="Oryn Logo" class="auth-logo">
+        <h1 class="auth-title">Oryn Admin Portal</h1>
+        <p class="auth-subtitle">Sign in with your authorized Google Account to manage campus timetables and mess menus.</p>
+
+        <div class="g-signin-wrapper">
+          <div id="g_id_onload"></div>
+        </div>
+
+        <div class="auth-note">
+          🔒 Access is restricted to authorized email addresses configured in the Oryn backend (<code>ORYN_ADMIN_EMAILS</code>).
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD SECTION (When logged in) -->
+    <div id="dashboard-section" style="display: none;">
+
+      <!-- Header & Profile -->
+      <div class="admin-header">
+        <div class="admin-title-group">
+          <h1>Oryn Admin Portal</h1>
+          <p>Campus Intelligence & Operations Management</p>
+        </div>
+
+        <div class="user-profile">
+          <img id="user-avatar" src="" alt="Avatar" class="user-avatar">
+          <div class="user-info">
+            <span id="user-name" class="user-name">Admin User</span>
+            <span id="user-email" class="user-email">admin@oryn.app</span>
+          </div>
+          <button id="btn-logout" class="btn-logout">Logout</button>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <div class="tab-nav">
+        <button class="tab-btn active" data-tab="mess">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+          Mess Menu
+        </button>
+        <button class="tab-btn" data-tab="timetable">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Academic Timetable
+        </button>
+      </div>
+
+      <!-- MESS MENU TAB CONTENT -->
+      <div id="mess-tab-content">
+        <div class="controls-bar">
+          <div class="filter-group">
+            <label style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">Filter Week:</label>
+            <select id="mess-week-filter" class="select-input">
+              <option value="">All Weeks</option>
+              <option value="even">Even Week</option>
+              <option value="odd">Odd Week</option>
+            </select>
+          </div>
+
+          <button id="btn-add-mess" class="btn-add">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Meal Item
+          </button>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Week</th>
+                <th>Day</th>
+                <th>Meal</th>
+                <th>Main Course</th>
+                <th>Accompaniments</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="mess-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ACADEMIC TIMETABLE TAB CONTENT -->
+      <div id="timetable-tab-content" style="display: none;">
+        <div class="controls-bar">
+          <div class="filter-group">
+            <label style="font-size:0.85rem; color:var(--text-muted); font-weight:600;">Filter Day:</label>
+            <select id="tt-day-filter" class="select-input">
+              <option value="">All Days</option>
+              <option value="MONDAY">Monday</option>
+              <option value="TUESDAY">Tuesday</option>
+              <option value="WEDNESDAY">Wednesday</option>
+              <option value="THURSDAY">Thursday</option>
+              <option value="FRIDAY">Friday</option>
+              <option value="SATURDAY">Saturday</option>
+            </select>
+          </div>
+
+          <button id="btn-add-tt" class="btn-add">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Timetable Entry
+          </button>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Day</th>
+                <th>Time Slot</th>
+                <th>Subject & Code</th>
+                <th>Instructor</th>
+                <th>Room</th>
+                <th>Slot</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tt-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- MESS ITEM MODAL -->
+  <div id="mess-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="mess-modal-title">Add Mess Meal Item</h3>
+        <button class="btn-close" onclick="closeModal('mess-modal')">&times;</button>
+      </div>
+
+      <form id="mess-form">
+        <input type="hidden" id="mess-id">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Week Type</label>
+            <select id="mess-week" class="select-input" required>
+              <option value="even">Even Week</option>
+              <option value="odd">Odd Week</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Day of Week</label>
+            <select id="mess-day" class="select-input" required>
+              <option value="SUNDAY">Sunday</option>
+              <option value="MONDAY">Monday</option>
+              <option value="TUESDAY">Tuesday</option>
+              <option value="WEDNESDAY">Wednesday</option>
+              <option value="THURSDAY">Thursday</option>
+              <option value="FRIDAY">Friday</option>
+              <option value="SATURDAY">Saturday</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Meal Type</label>
+          <select id="mess-meal" class="select-input" required>
+            <option value="breakfast">Breakfast</option>
+            <option value="lunch">Lunch</option>
+            <option value="snacks">Snacks</option>
+            <option value="dinner">Dinner</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Main Items (comma separated)</label>
+          <input type="text" id="mess-main" class="text-input" placeholder="e.g. Poori, Aloo Masala" required>
+        </div>
+
+        <div class="form-group">
+          <label>Accompaniments (comma separated)</label>
+          <input type="text" id="mess-accompaniments" class="text-input" placeholder="e.g. Sambar, Coconut Chutney">
+        </div>
+
+        <div class="form-group">
+          <label>Extras (comma separated)</label>
+          <input type="text" id="mess-extras" class="text-input" placeholder="e.g. Boiled Egg (1), Banana">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Beverage</label>
+            <input type="text" id="mess-beverage" class="text-input" placeholder="e.g. Tea / Coffee / Milk">
+          </div>
+
+          <div class="form-group">
+            <label>Dessert</label>
+            <input type="text" id="mess-dessert" class="text-input" placeholder="e.g. Gulab Jamun (2)">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-logout" style="background:transparent; border-color:var(--border-color); color:var(--text-muted);" onclick="closeModal('mess-modal')">Cancel</button>
+          <button type="submit" class="btn-add">Save Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TIMETABLE ENTRY MODAL -->
+  <div id="tt-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="tt-modal-title">Add Timetable Entry</h3>
+        <button class="btn-close" onclick="closeModal('tt-modal')">&times;</button>
+      </div>
+
+      <form id="tt-form">
+        <input type="hidden" id="tt-id">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Day of Week</label>
+            <select id="tt-day" class="select-input" required>
+              <option value="MONDAY">Monday</option>
+              <option value="TUESDAY">Tuesday</option>
+              <option value="WEDNESDAY">Wednesday</option>
+              <option value="THURSDAY">Thursday</option>
+              <option value="FRIDAY">Friday</option>
+              <option value="SATURDAY">Saturday</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Slot Code</label>
+            <input type="text" id="tt-slot" class="text-input" placeholder="e.g. A, B, P1">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Start Time (24h)</label>
+            <input type="text" id="tt-start-time" class="text-input" placeholder="e.g. 08:00" required>
+          </div>
+
+          <div class="form-group">
+            <label>End Time (24h)</label>
+            <input type="text" id="tt-end-time" class="text-input" placeholder="e.g. 08:50" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Subject Name</label>
+          <input type="text" id="tt-subject" class="text-input" placeholder="e.g. Data Structures & Algorithms" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Course Code</label>
+            <input type="text" id="tt-course-code" class="text-input" placeholder="e.g. CS2001">
+          </div>
+
+          <div class="form-group">
+            <label>Instructor</label>
+            <input type="text" id="tt-instructor" class="text-input" placeholder="e.g. Dr. R. Sharma">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Room / Hall</label>
+            <input type="text" id="tt-room" class="text-input" placeholder="e.g. LH-101">
+          </div>
+
+          <div class="form-group">
+            <label>Program & Semester</label>
+            <input type="text" id="tt-program" class="text-input" placeholder="e.g. B.Tech CSE">
+          </div>
+        </div>
+
+        <input type="hidden" id="tt-semester" value="Semester 3">
+
+        <div class="modal-actions">
+          <button type="button" class="btn-logout" style="background:transparent; border-color:var(--border-color); color:var(--text-muted);" onclick="closeModal('tt-modal')">Cancel</button>
+          <button type="submit" class="btn-add">Save Entry</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
