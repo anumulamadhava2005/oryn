@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "751305008800",
+    "project_id": "oryn-cead3",
+    "storage_bucket": "oryn-cead3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:751305008800:android:e5cb125fdcfe4b31134bc5",
+        "android_client_info": {
+          "package_name": "com.mao1729.oryn"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "751305008800-c192vib8ip9lhm0l9mh07ndf9sfj2nda.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mao1729.oryn",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUldBTS2hKU7M8hsuAeNWjILvVUGZ6_68"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

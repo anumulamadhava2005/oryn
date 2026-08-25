@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oryn — Smart Campus Awareness Platform for IIITDM</title>
+  <meta name="description" content="Oryn transforms campus emails into real-time academic timetables, mess menus, and placement updates with 100% on-device ML privacy.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+
+  <!-- Background Animated Blobs -->
+  <div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand-logo">
+        <img src="logo.png" alt="Oryn Logo">
+        <span>Oryn</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#privacy">Privacy</a></li>
+        <li><a href="privacy.html">Privacy Policy</a></li>
+        <li><a href="terms.html">Terms of Service</a></li>
+        <li><a href="privacy.html" class="btn-primary">Download App</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="hero-badge">
+      <span class="pulse"></span>
+      Built Exclusively for IIITDM Campus
+    </div>
+    <h1 class="hero-title">
+      Your Campus Life.<br>
+      <span class="gradient-text">Organized &amp; Automated.</span>
+    </h1>
+    <p class="hero-subtitle">
+      Oryn decodes complex institute emails into instant academic schedules, mess menus, placement alerts, and live home screen widgets with 100% on-device ML privacy.
+    </p>
+    <div class="hero-cta">
+      <a href="privacy.html" class="btn-primary">Explore Privacy Policy</a>
+      <a href="terms.html" class="btn-secondary">View Terms of Service</a>
+    </div>
+  </header>
+
+  <!-- Features Section -->
+  <section id="features" class="features-section">
+    <h2 class="section-title">Designed for Ultimate Student Efficiency</h2>
+    <p class="section-subtitle">Everything you need to navigate IIITDM academic &amp; campus life in one intuitive hub.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="card-icon icon-blue">⚡</div>
+        <h3>On-Device ML Categorization</h3>
+        <p>Uses an on-device TF-IDF Vector Space &amp; Naïve Bayes engine to automatically categorize emails into Placements, Academics, Mess, Hostels, and Events without cloud servers.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="card-icon icon-purple">📅</div>
+        <h3>Live Academic Timetable</h3>
+        <p>Tracks your active lectures, room venues, slot codes (A, B, C, D), and course professors in real-time with instant countdowns.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="card-icon icon-orange">🍱</div>
+        <h3>Smart Mess Menu</h3>
+        <p>Stay updated on today's breakfast, lunch, snacks, and dinner menus, complete with special dessert chips and meal timings.</p>
+      </div>
+
+      <div class="feature-card">
+        <div class="card-icon icon-green">📱</div>
+        <h3>Native Android Widgets</h3>
+        <p>Glanceable home screen widgets for your schedule, mess menu, and urgent placement emails without opening the app.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Privacy Highlight Section -->
+  <section id="privacy" class="features-section">
+    <div class="highlight-box" style="max-width: 900px; margin: 0 auto; text-align: left;">
+      <h3 style="font-family: var(--font-heading); font-size: 1.5rem; margin-bottom: 0.75rem; color: #fff;">🔒 100% Client-Side Privacy Guarantee</h3>
+      <p style="color: #cbd5e1; margin-bottom: 1rem;">
+        Oryn connects directly to your Google Gmail via OAuth 2.0 PKCE. All email processing, entity extraction, and classification happen <strong>exclusively inside your device's memory</strong> using local MMKV binary storage. No personal data, email content, or login credentials are ever sent to an external server.
+      </p>
+      <a href="privacy.html" style="color: var(--primary); font-weight: 600; text-decoration: none;">Read full Google API Limited Use Privacy Policy &rarr;</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-brand">
+        <a href="index.html" class="brand-logo">
+          <img src="logo.png" alt="Oryn Logo">
+          <span>Oryn</span>
+        </a>
+        <p>The privacy-first campus awareness platform built for Indian Institute of Information Technology, Design and Manufacturing (IIITDM).</p>
+      </div>
+
+      <div class="footer-column">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#privacy">Privacy Overview</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h4>Legal &amp; Policy</h4>
+        <ul>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Service</a></li>
+          <li><a href="privacy.html#google-limited-use">Google Limited Use</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h4>Contact &amp; Support</h4>
+        <ul>
+          <li><a href="mailto:support@oryn.app">support@oryn.app</a></li>
+          <li><a href="mailto:oryn.iiitdm@gmail.com">oryn.iiitdm@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 Oryn Platform. All rights reserved.</p>
+      <p>Google OAuth 2.0 Verified &amp; Compliant</p>
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Oryn Campus Platform</title>
+  <meta name="description" content="Official Privacy Policy for Oryn. Detailed information on Google OAuth 2.0 Gmail read-only scope usage, on-device data processing, and Google Limited Use Policy compliance.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body>
+
+  <!-- Background Animated Blobs -->
+  <div class="bg-blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="brand-logo">
+        <img src="logo.png" alt="Oryn Logo">
+        <span>Oryn</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#features">Features</a></li>
+        <li><a href="privacy.html" class="active">Privacy Policy</a></li>
+        <li><a href="terms.html">Terms of Service</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Legal Container -->
+  <main class="legal-container">
+    <article class="legal-box">
+      <h1>Privacy Policy</h1>
+      <p class="last-updated">Effective Date: August 24, 2026 | Last Updated: August 24, 2026</p>
+
+      <div class="highlight-box">
+        <strong>Summary of Key Principles:</strong>
+        <ul style="margin-top: 0.5rem; margin-bottom: 0;">
+          <li>100% On-Device Data Processing: Your email content never leaves your smartphone.</li>
+          <li>Zero Server Storage: We do not operate cloud servers to store, process, or view your emails.</li>
+          <li>Limited Scope Access: We request read-only access exclusively to parse campus communications.</li>
+          <li>Zero Data Sales: We never monetize, sell, or share user data.</li>
+        </ul>
+      </div>
+
+      <h2>1. Overview</h2>
+      <p>
+        Oryn ("we", "us", or "our") operates the Oryn mobile application. This Privacy Policy describes how Oryn handles information accessed through Google OAuth 2.0 services. Oryn is engineered specifically for students and staff of the Indian Institute of Information Technology, Design and Manufacturing (IIITDM) to organize campus information.
+      </p>
+
+      <h2>2. Information We Access</h2>
+      <p>When you authorize Oryn using Google Sign-In, the app requests the following OAuth 2.0 permission scope:</p>
+      <ul>
+        <li><strong>Gmail Read-Only Access (<code>https://www.googleapis.com/auth/gmail.readonly</code>)</strong>: Used strictly to read inbox message headers and body content to extract academic schedules, placement notices, hostel announcements, and mess menus.</li>
+      </ul>
+
+      <h2>3. How We Process &amp; Store Data</h2>
+      <p>
+        All email fetching, parsing, categorization, and entity extraction are performed <strong>locally on your mobile device runtime</strong>:
+      </p>
+      <ul>
+        <li><strong>Local Binary Storage</strong>: Parsed emails and classification results are saved in your device's private binary storage using high-performance MMKV key-value store.</li>
+        <li><strong>On-Device Machine Learning Engine</strong>: Email text is processed using an on-device TF-IDF vector space model and rule classifier inside the client app.</li>
+        <li><strong>No Cloud Transmissions</strong>: Your email content, subject lines, senders, and credentials are <strong>never transmitted</strong> to any central server, backend API, or third-party service.</li>
+      </ul>
+
+      <h2 id="google-limited-use">4. Compliance with Google API Services User Data Policy</h2>
+      <p>
+        Oryn's use and transfer to any other app of information received from Google APIs will adhere to the <a href="https://developers.google.com/terms/api-services-user-data-policy#additional_requirements_for_specific_api_scopes" target="_blank" style="color: var(--primary);">Google API Services User Data Policy</a>, including the <strong>Limited Use requirements</strong>:
+      </p>
+      <ul>
+        <li>We only use Google user data to provide user-facing features that are prominent in the application UI (categorizing campus emails, displaying deadlines, and widget sync).</li>
+        <li>We do not transfer user data to third parties.</li>
+        <li>We do not use user data for serving advertisements, credit reporting, or targeted marketing.</li>
+        <li>No human reads user data, unless required for security purposes, to comply with applicable law, or with explicit user consent for troubleshooting.</li>
+      </ul>
+
+      <h2>5. Third-Party Sharing</h2>
+      <p>
+        Oryn does not sell, rent, trade, or share user data with any commercial third party, advertiser, or data broker under any circumstances.
+      </p>
+
+      <h2>6. Data Retention &amp; User Control</h2>
+      <p>You maintain complete control over your data at all times:</p>
+      <ul>
+        <li><strong>Sign Out &amp; Token Revocation</strong>: Tapping "Sign Out" in app settings revokes your Google OAuth token immediately.</li>
+        <li><strong>Data Deletion</strong>: Uninstalling the app or tapping "Clear Local Cache" in settings permanently deletes all stored email data from your device storage.</li>
+        <li><strong>Google Account Permissions</strong>: You can revoke Oryn's access at any time via your <a href="https://myaccount.google.com/permissions" target="_blank" style="color: var(--primary);">Google Account Third-Party Access settings</a>.</li>
+      </ul>
+
+      <h2>7. Contact Us</h2>
+      <p>If you have any questions or security inquiries regarding this Privacy Policy, please contact us at:</p>
+      <p>
+        <strong>Email:</strong> <a href="mailto:support@oryn.app" style="color: var(--primary);">support@oryn.app</a> | <a href="mailto:oryn.iiitdm@gmail.com" style="color: var(--primary);">oryn.iiitdm@gmail.com</a><br>
+        <strong>Address:</strong> IIITDM Kancheepuram, Off Vandalur-Kelambakkam Road, Chennai - 600127, India
+      </p>
+    </article>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-brand">
+        <a href="index.html" class="brand-logo">
+          <img src="logo.png" alt="Oryn Logo">
+          <span>Oryn</span>
+        </a>
+        <p>The privacy-first campus awareness platform built for IIITDM.</p>
+      </div>
+
+      <div class="footer-column">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="index.html#features">Features</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h4>Legal &amp; Policy</h4>
+        <ul>
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Service</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
+        <h4>Contact</h4>
+        <ul>
+          <li><a href="mailto:support@oryn.app">support@oryn.app</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; 2026 Oryn Platform. All rights reserved.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
