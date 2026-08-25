@@ -1,6 +1,6 @@
 /* Oryn Admin Dashboard CSS - Extends styles.css tokens */
 
-@import url('../styles.css');
+@import url('/styles.css');
 
 .admin-header {
   display: flex;
