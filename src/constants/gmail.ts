@@ -5,8 +5,6 @@ export const GMAIL_BASE_URL = 'https://gmail.googleapis.com/gmail/v1';
 /** OAuth 2.0 scopes requested at sign-in */
 export const GMAIL_SCOPES = [
   'https://www.googleapis.com/auth/gmail.readonly',
-  'https://www.googleapis.com/auth/gmail.labels',
-  'https://www.googleapis.com/auth/gmail.metadata',
   'email',
   'profile',
 ];
