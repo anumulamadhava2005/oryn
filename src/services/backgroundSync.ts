@@ -6,7 +6,11 @@
 import * as TaskManager from 'expo-task-manager';
 import * as BackgroundTask from 'expo-background-task';
 import { incrementalSync } from './sync';
-import { processNewEmailNotifications } from './notifications';
+import {
+  processNewEmailNotifications,
+  scheduleMorningBriefing,
+  scheduleNightlyRadar,
+} from './notifications';
 
 export const BACKGROUND_SYNC_TASK = 'ORYN_BACKGROUND_SYNC_TASK';
 
@@ -16,13 +20,11 @@ TaskManager.defineTask(BACKGROUND_SYNC_TASK, async () => {
     const { newEmails } = await incrementalSync();
 
     if (newEmails.length > 0) {
-      const urgent = newEmails.filter(
-        e => e.priority === 'critical' || e.priority === 'high' || e.deadline != null
-      );
-      if (urgent.length > 0) {
-        await processNewEmailNotifications(urgent, { isBackground: true });
-      }
-      return BackgroundTask.BackgroundTaskResult.Success;
+      await processNewEmailNotifications(newEmails, { isBackground: true });
+    } else {
+      // Refresh briefings even if no new emails arrived
+      await scheduleMorningBriefing().catch(() => {});
+      await scheduleNightlyRadar().catch(() => {});
     }
 
     return BackgroundTask.BackgroundTaskResult.Success;

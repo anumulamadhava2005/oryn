@@ -1,0 +1,52 @@
+diff --git a/node_modules/expo-sharing/android/src/main/java/expo/modules/sharing/SharingModule.kt b/node_modules/expo-sharing/android/src/main/java/expo/modules/sharing/SharingModule.kt
+--- a/node_modules/expo-sharing/android/src/main/java/expo/modules/sharing/SharingModule.kt
++++ b/node_modules/expo-sharing/android/src/main/java/expo/modules/sharing/SharingModule.kt
+@@ -37,7 +37,7 @@ class SharingModule : Module() {
+           ?: URLConnection.guessContentTypeFromName(fileToShare.name)
+           ?: "*/*"
+         val intent = Intent.createChooser(
+-          createSharingIntent(contentUri, mimeType),
++          createSharingIntent(contentUri, mimeType, params.message),
+           params.dialogTitle
+         )
+         val resInfoList = context.packageManager.queryIntentActivities(
+@@ -113,9 +113,12 @@ class SharingModule : Module() {
+       .contains(FilePermissionService.Permission.READ)
+   }
+ 
+-  private fun createSharingIntent(uri: Uri, mimeType: String?) =
++  private fun createSharingIntent(uri: Uri, mimeType: String?, message: String? = null) =
+     Intent(Intent.ACTION_SEND).apply {
+       putExtra(Intent.EXTRA_STREAM, uri)
++      if (!message.isNullOrBlank()) {
++        putExtra(Intent.EXTRA_TEXT, message)
++      }
+       setTypeAndNormalize(mimeType)
+       addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+     }
+diff --git a/node_modules/expo-sharing/android/src/main/java/expo/modules/sharing/SharingOptions.kt b/node_modules/expo-sharing/android/src/main/java/expo/modules/sharing/SharingOptions.kt
+--- a/node_modules/expo-sharing/android/src/main/java/expo/modules/sharing/SharingOptions.kt
++++ b/node_modules/expo-sharing/android/src/main/java/expo/modules/sharing/SharingOptions.kt
+@@ -8,6 +8,7 @@ import expo.modules.kotlin.types.OptimizedRecord
+ data class SharingOptions(
+   @Field val mimeType: String?,
+   @Field val UTI: String?,
+-  @Field val dialogTitle: String?
++  @Field val dialogTitle: String?,
++  @Field val message: String? = null
+ ) : Record
+ 
+diff --git a/node_modules/expo-sharing/build/Sharing.types.d.ts b/node_modules/expo-sharing/build/Sharing.types.d.ts
+--- a/node_modules/expo-sharing/build/Sharing.types.d.ts
++++ b/node_modules/expo-sharing/build/Sharing.types.d.ts
+@@ -18,6 +18,11 @@ export type SharingOptions = {
+     dialogTitle?: string;
+     /**
++     * Sets text message or caption to share alongside the file.
++     * @platform android
++     */
++    message?: string;
++    /**
+      * Sets the anchor point for iPad
+      * @platform ios
+      */

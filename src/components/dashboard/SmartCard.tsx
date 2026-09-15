@@ -1,108 +1,172 @@
 /**
- * SmartCard v2 — Compact inline alert banner for high-priority items.
- * Thin left accent border, single-line preview. Saves vertical space.
+ * SmartBriefingStrip — Compact Apple-style Priority & Deadline pulse.
+ * Uses Gestalt grouping to combine multiple priority alerts into a single,
+ * high-density actionable strip instead of bulky stacked cards.
  */
 
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius, Opacity } from '@/constants/theme';
+import { hapticLight } from '@/utils/haptics';
 import type { ParsedEmail } from '@/types/email';
 
-interface Props {
-  title: string;
+interface PriorityItem {
+  id: string;
+  type: 'critical' | 'deadline' | 'placement';
+  label: string;
+  count: number;
   icon: React.ComponentProps<typeof Ionicons>['name'];
-  emails: ParsedEmail[];
-  accentColor: string;
+  color: string;
   onPress: () => void;
 }
 
-export function SmartCard({
-  title,
-  icon,
-  emails,
-  accentColor,
-  onPress,
-}: Props) {
-  if (emails.length === 0) return null;
+interface Props {
+  criticalAlerts?: ParsedEmail[];
+  upcomingDeadlines?: ParsedEmail[];
+  placementEmails?: ParsedEmail[];
+  onSelectCritical?: () => void;
+  onSelectDeadlines?: () => void;
+  onSelectPlacements?: () => void;
+}
 
-  const firstEmail = emails[0];
+export function SmartCard({
+  criticalAlerts = [],
+  upcomingDeadlines = [],
+  placementEmails = [],
+  onSelectCritical,
+  onSelectDeadlines,
+  onSelectPlacements,
+}: Props) {
+  const items: PriorityItem[] = [];
+
+  if (criticalAlerts.length > 0 && onSelectCritical) {
+    items.push({
+      id: 'critical',
+      type: 'critical',
+      label: `${criticalAlerts.length} Urgent`,
+      count: criticalAlerts.length,
+      icon: 'alert-circle',
+      color: Colors.systemRed,
+      onPress: onSelectCritical,
+    });
+  }
+
+  if (upcomingDeadlines.length > 0 && onSelectDeadlines) {
+    items.push({
+      id: 'deadline',
+      type: 'deadline',
+      label: `${upcomingDeadlines.length} Due Soon`,
+      count: upcomingDeadlines.length,
+      icon: 'alarm',
+      color: Colors.systemOrange,
+      onPress: onSelectDeadlines,
+    });
+  }
+
+  if (placementEmails.length > 0 && onSelectPlacements) {
+    items.push({
+      id: 'placement',
+      type: 'placement',
+      label: `${placementEmails.length} Placement`,
+      count: placementEmails.length,
+      icon: 'briefcase',
+      color: Colors.systemIndigo,
+      onPress: onSelectPlacements,
+    });
+  }
+
+  if (items.length === 0) return null;
 
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.banner,
-        { borderLeftColor: accentColor },
-        pressed && { opacity: Opacity.pressed },
-      ]}
-    >
-      <View style={[styles.iconWrap, { backgroundColor: accentColor + '18' }]}>
-        <Ionicons name={icon} size={15} color={accentColor} />
-      </View>
-
-      <View style={styles.content}>
-        <View style={styles.topRow}>
-          <Text style={styles.title}>{title}</Text>
-          <View style={[styles.countBadge, { backgroundColor: accentColor + '20' }]}>
-            <Text style={[styles.countText, { color: accentColor }]}>
-              {emails.length}
-            </Text>
-          </View>
+    <View style={styles.container}>
+      <View style={styles.strip}>
+        <View style={styles.labelGroup}>
+          <View style={styles.pulseDot} />
+          <Text style={styles.briefingTitle}>FOCUS</Text>
         </View>
-        <Text style={styles.preview} numberOfLines={1}>
-          {firstEmail.subject}
-        </Text>
-      </View>
 
-      <Ionicons name="chevron-forward" size={14} color={Colors.textMuted} />
-    </Pressable>
+        <View style={styles.itemsRow}>
+          {items.map((item) => (
+            <Pressable
+              key={item.id}
+              onPress={() => {
+                hapticLight();
+                item.onPress();
+              }}
+              style={({ pressed }) => [
+                styles.itemPill,
+                { backgroundColor: item.color + '15', borderColor: item.color + '35' },
+                pressed && { opacity: Opacity.pressed },
+              ]}
+              hitSlop={6}
+            >
+              <Ionicons name={item.icon} size={12} color={item.color} />
+              <Text style={[styles.itemText, { color: item.color }]}>
+                {item.label}
+              </Text>
+              <Ionicons name="chevron-forward" size={10} color={item.color + '90'} />
+            </Pressable>
+          ))}
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  banner: {
+  container: {
+    paddingHorizontal: Spacing[4],
+    paddingVertical: 2,
+  },
+  strip: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: Colors.card,
-    borderRadius: Radius.md,
-    borderLeftWidth: 3,
-    paddingVertical: 10,
+    borderRadius: Radius.lg,
     paddingHorizontal: Spacing[3],
-    gap: Spacing[3],
-  },
-  iconWrap: {
-    width: 28,
-    height: 28,
-    borderRadius: Radius.sm,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    flex: 1,
-    gap: 2,
-  },
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: Colors.borderMuted,
     gap: Spacing[2],
   },
-  title: {
-    fontSize: Typography.size.sm,
-    fontWeight: Typography.weight.semibold,
-    color: Colors.text,
+  labelGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
-  countBadge: {
-    paddingHorizontal: 6,
-    paddingVertical: 1,
-    borderRadius: Radius.full,
+  pulseDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.systemRed,
   },
-  countText: {
-    fontSize: 11,
+  briefingTitle: {
+    fontSize: 10,
     fontWeight: Typography.weight.bold,
-  },
-  preview: {
-    fontSize: Typography.size.xs,
     color: Colors.textMuted,
+    letterSpacing: 0.8,
+  },
+  itemsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
+    flex: 1,
+  },
+  itemPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: Radius.full,
+    borderWidth: 1,
+  },
+  itemText: {
+    fontSize: Typography.size.xs,
+    fontWeight: Typography.weight.semibold,
   },
 });

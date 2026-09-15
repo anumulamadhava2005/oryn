@@ -32,7 +32,7 @@ export default function LoginScreen() {
         >
           <OrynLogo size={76} borderRadius={Radius.xl} style={styles.logoRing} />
           <Text style={styles.appName}>Oryn</Text>
-          <Text style={styles.tagline}>Your Intelligent Academic Inbox</Text>
+          <Text style={styles.tagline}>Your Intelligent Academic Workspace</Text>
         </MotiView>
 
         {/* Feature bullets */}
@@ -105,7 +105,7 @@ const FEATURES: Array<{
   {
     icon: 'cube-outline',
     title: 'Smart Classification',
-    desc: 'Categorizes academic, hostel, & placement notices',
+    desc: 'Categorizes academic, hostel, & placement',
     color: Colors.systemBlue,
   },
   {

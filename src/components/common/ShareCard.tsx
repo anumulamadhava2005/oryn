@@ -33,7 +33,7 @@ export function ShareCardButton({ email }: Props) {
         await Share.share({
           url: uri,
           title: `Oryn Notice: ${email.subject}`,
-          message: `📢 Campus Alert via Oryn\n\n${email.subject}\n\nFrom: ${email.sender}\n${email.deadlineLabel ? `⏰ Deadline: ${email.deadlineLabel}\n` : ''}\nShared via Oryn Campus Inbox`,
+          message: `[Campus Notice via Oryn]\n\n${email.subject}\n\nFrom: ${email.sender}\n${email.deadlineLabel ? `Deadline: ${email.deadlineLabel}\n` : ''}\nShared via Oryn Campus Inbox`,
         });
       }
     } catch (error) {

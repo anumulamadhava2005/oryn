@@ -15,7 +15,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius, Shadows } from '@/constants/theme';
 import { usePreferredSendersStore } from '@/store/preferredSenders';
@@ -28,6 +28,7 @@ interface Props {
 }
 
 export function PreferredSendersModal({ visible, onClose }: Props) {
+  const insets = useSafeAreaInsets();
   const { frequentSenders } = useEmails();
   const {
     selectedSenders,
@@ -131,20 +132,28 @@ export function PreferredSendersModal({ visible, onClose }: Props) {
   );
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" statusBarTranslucent onRequestClose={onClose}>
-      <SafeAreaView style={styles.modalSafe} edges={['top', 'left', 'right', 'bottom']}>
-        {/* Header */}
-        <View style={styles.modalHeader}>
-          <View style={styles.modalHeaderTitleWrap}>
-            <Text style={styles.modalTitle}>Preferred Senders</Text>
-            <Text style={styles.modalSubtitle}>
-              Choose prominent senders to prioritize in your inbox view.
-            </Text>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <Pressable style={styles.modalBackdrop} onPress={onClose} />
+        <View style={[styles.modalSheet, { maxHeight: '80%', paddingBottom: Math.max(insets.bottom, 20) }]}>
+          <View style={styles.grabHandle} />
+          {/* Header */}
+          <View style={styles.modalHeader}>
+            <View style={styles.modalHeaderTitleWrap}>
+              <Text style={styles.modalTitle}>Preferred Senders</Text>
+              <Text style={styles.modalSubtitle}>
+                Choose prominent senders to prioritize in your inbox view.
+              </Text>
+            </View>
+            <Pressable onPress={onClose} style={styles.closeBtn} hitSlop={12}>
+              <Ionicons name="close" size={20} color={Colors.textSecondary} />
+            </Pressable>
           </View>
-          <Pressable onPress={onClose} style={styles.closeBtn} hitSlop={12}>
-            <Ionicons name="close" size={20} color={Colors.textSecondary} />
-          </Pressable>
-        </View>
 
         {/* Master App Open Filter Switch Card */}
         <View style={styles.switchCard}>
@@ -172,7 +181,7 @@ export function PreferredSendersModal({ visible, onClose }: Props) {
         <View style={styles.presetSection}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.presetsRow}>
             <Pressable onPress={handleSelectTop5} style={styles.presetChip}>
-              <Ionicons name="sparkles-outline" size={13} color={Colors.systemBlue} />
+              <Ionicons name="star-outline" size={13} color={Colors.systemBlue} />
               <Text style={styles.presetChipText}>Top 5 Frequent</Text>
             </Pressable>
 
@@ -241,15 +250,38 @@ export function PreferredSendersModal({ visible, onClose }: Props) {
             </Text>
           </Pressable>
         </View>
-      </SafeAreaView>
+        </View>
+      </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  modalSafe: {
+  modalOverlay: {
     flex: 1,
+    justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  },
+  modalSheet: {
     backgroundColor: Colors.background,
+    borderTopLeftRadius: Radius['2xl'],
+    borderTopRightRadius: Radius['2xl'],
+    maxHeight: '80%',
+    borderWidth: 1,
+    borderColor: Colors.border,
+    overflow: 'hidden',
+  },
+  grabHandle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: Colors.surfaceHigh,
+    alignSelf: 'center',
+    marginTop: 8,
+    marginBottom: 4,
   },
   modalHeader: {
     flexDirection: 'row',

@@ -13,7 +13,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
 import {
@@ -37,6 +37,7 @@ export function AcademicProfileModal({
   onClose,
   onOpenTimetable,
 }: AcademicProfileModalProps) {
+  const insets = useSafeAreaInsets();
   const {
     program,
     semester,
@@ -67,10 +68,18 @@ export function AcademicProfileModal({
 
   return (
     <>
-      <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" statusBarTranslucent onRequestClose={onClose}>
-        <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
-          {/* Header */}
-          <View style={styles.header}>
+      <Modal
+        visible={visible}
+        animationType="slide"
+        transparent
+        onRequestClose={onClose}
+      >
+        <View style={styles.modalOverlay}>
+          <Pressable style={styles.modalBackdrop} onPress={onClose} />
+          <View style={[styles.modalSheet, { maxHeight: '80%', paddingBottom: Math.max(insets.bottom, 20) }]}>
+            <View style={styles.grabHandle} />
+            {/* Header */}
+            <View style={styles.header}>
             <Pressable onPress={onClose} hitSlop={10} style={styles.closeBtn}>
               <Ionicons name="close" size={22} color={Colors.textSecondary} />
             </Pressable>
@@ -168,7 +177,7 @@ export function AcademicProfileModal({
                 >
                   <View style={styles.electiveLeft}>
                     <View style={styles.electiveIconBox}>
-                      <Ionicons name="sparkles" size={18} color={Colors.systemPurple} />
+                      <Ionicons name="bookmarks-outline" size={18} color={Colors.systemPurple} />
                     </View>
                     <View style={styles.electiveTexts}>
                       <Text style={styles.electiveTitle}>Choose Semester Electives</Text>
@@ -206,7 +215,8 @@ export function AcademicProfileModal({
               </Pressable>
             )}
           </ScrollView>
-        </SafeAreaView>
+          </View>
+        </View>
       </Modal>
 
       <ElectiveSelectionModal
@@ -218,9 +228,31 @@ export function AcademicProfileModal({
 }
 
 const styles = StyleSheet.create({
-  container: {
+  modalOverlay: {
     flex: 1,
+    justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  },
+  modalSheet: {
     backgroundColor: Colors.background,
+    borderTopLeftRadius: Radius['2xl'],
+    borderTopRightRadius: Radius['2xl'],
+    maxHeight: '80%',
+    borderWidth: 1,
+    borderColor: Colors.border,
+    overflow: 'hidden',
+  },
+  grabHandle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: Colors.surfaceHigh,
+    alignSelf: 'center',
+    marginTop: 8,
+    marginBottom: 4,
   },
   header: {
     flexDirection: 'row',

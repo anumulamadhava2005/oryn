@@ -233,7 +233,7 @@ export const EmailCard = React.memo(function EmailCard({
           >
             {/* Avatar */}
             <View style={styles.avatarWrap}>
-              <View style={[styles.avatar, { backgroundColor: avatarColor + '18' }]}>
+              <View style={[styles.avatar, { backgroundColor: avatarColor + '20' }]}>
                 <Text style={[styles.avatarText, { color: avatarColor }]}>{initial}</Text>
               </View>
               {email.isUnread && <View style={styles.unreadDot} />}
@@ -241,7 +241,7 @@ export const EmailCard = React.memo(function EmailCard({
 
             {/* Content */}
             <View style={styles.content}>
-              {/* Row 1: Sender + date */}
+              {/* Row 1: Sender + date + star */}
               <View style={styles.topRow}>
                 <Text
                   style={[styles.sender, email.isUnread && styles.senderUnread]}
@@ -259,7 +259,7 @@ export const EmailCard = React.memo(function EmailCard({
                 </View>
               </View>
 
-              {/* Row 2: Subject + priority */}
+              {/* Row 2: Subject + priority indicator + category tag */}
               <View style={styles.subjectRow}>
                 <Text
                   style={[styles.subject, email.isUnread && styles.subjectUnread]}
@@ -267,24 +267,25 @@ export const EmailCard = React.memo(function EmailCard({
                 >
                   {email.subject}
                 </Text>
-                <PriorityDot priority={email.priority} size={6} />
+                {email.priority === 'critical' || email.priority === 'high' ? (
+                  <PriorityDot priority={email.priority} size={6} />
+                ) : null}
               </View>
 
-              {/* Row 3: Snippet — 2 lines for better scannability */}
-              <Text style={styles.snippet} numberOfLines={2}>
-                {email.snippet}
-              </Text>
-
-              {/* Row 4: Inline metadata — category + deadline */}
-              <View style={styles.metaRow}>
-                <CategoryBadge category={email.category} />
-                {email.deadline && (
+              {/* Row 3: Single-line snippet + inline category / deadline pill */}
+              <View style={styles.snippetRow}>
+                <Text style={styles.snippet} numberOfLines={1}>
+                  {email.snippet}
+                </Text>
+                {email.deadline ? (
                   <View style={styles.deadlineTag}>
-                    <Ionicons name="alarm-outline" size={11} color={Colors.systemOrange} />
+                    <Ionicons name="alarm-outline" size={10} color={Colors.systemOrange} />
                     <Text style={styles.deadlineTagText}>
-                      {email.deadlineLabel ?? 'Due soon'}
+                      {email.deadlineLabel ?? 'Due'}
                     </Text>
                   </View>
+                ) : (
+                  <CategoryBadge category={email.category} />
                 )}
               </View>
             </View>
@@ -431,28 +432,32 @@ const styles = StyleSheet.create({
     color: Colors.text,
     fontWeight: Typography.weight.semibold,
   },
+  snippetRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: Spacing[2],
+    marginTop: 1,
+  },
   snippet: {
     fontSize: Typography.size.xs,
     color: Colors.textMuted,
-    lineHeight: Typography.size.xs * 1.45,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing[2],
-    marginTop: 2,
+    flex: 1,
   },
   deadlineTag: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
-    backgroundColor: 'rgba(255, 149, 0, 0.12)',
+    backgroundColor: 'rgba(255, 149, 0, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 149, 0, 0.35)',
     paddingHorizontal: 6,
-    paddingVertical: 2,
+    paddingVertical: 1,
     borderRadius: Radius.sm,
+    flexShrink: 0,
   },
   deadlineTagText: {
-    fontSize: 11,
+    fontSize: 10,
     color: Colors.systemOrange,
     fontWeight: Typography.weight.semibold,
   },

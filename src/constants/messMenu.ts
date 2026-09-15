@@ -368,7 +368,7 @@ export function getWeekNumber(date: Date = new Date()): number {
 
 export function getWeekType(date: Date = new Date()): WeekType {
   const weekNum = getWeekNumber(date);
-  return weekNum % 2 === 0 ? 'even' : 'odd';
+  return weekNum % 2 === 0 ? 'odd' : 'even';
 }
 
 export function getDayName(date: Date = new Date()): DayName {

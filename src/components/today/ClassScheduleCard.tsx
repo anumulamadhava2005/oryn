@@ -28,7 +28,7 @@ export function ClassScheduleCard({
   selectedDate = new Date(),
   onOpenTimetable,
 }: ClassScheduleCardProps) {
-  const { program, semester, getWeeklySchedule } = useAcademicStore();
+  const { program, semester, timetableVersion, getWeeklySchedule } = useAcademicStore();
 
   const dayOfWeek = selectedDate.getDay();
   const dayKey = DAY_MAP[dayOfWeek] ?? 'MON';

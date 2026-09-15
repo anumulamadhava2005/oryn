@@ -414,7 +414,7 @@ export function MessMenuCard({ selectedDate: propSelectedDate, onDateChange }: P
               )}
               {mealData.extras?.map((extra: string, idx: number) => (
                 <View key={idx} style={styles.chip}>
-                  <Ionicons name="sparkles" size={12} color={Colors.systemYellow} />
+                  <Ionicons name="star-outline" size={12} color={Colors.systemYellow} />
                   <Text style={styles.chipText}>{extra}</Text>
                 </View>
               ))}

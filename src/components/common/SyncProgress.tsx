@@ -16,7 +16,7 @@ import { OrynLogo } from '@/components/common/OrynLogo';
 const PHASE_META: Record<string, { label: string; icon: React.ComponentProps<typeof Ionicons>['name']; color: string }> = {
   fetching_ids:      { label: 'Connecting to Gmail…',     icon: 'cloud-outline',      color: Colors.systemBlue },
   fetching_messages: { label: 'Fetching your emails…',    icon: 'download-outline',   color: Colors.systemIndigo },
-  parsing:           { label: 'Analyzing priorities…',     icon: 'sparkles-outline',   color: Colors.systemPurple },
+  parsing:           { label: 'Analyzing priorities…',     icon: 'pulse-outline',      color: Colors.systemPurple },
   done:              { label: 'All done!',                 icon: 'checkmark-circle',   color: Colors.systemGreen },
 };
 
@@ -127,9 +127,12 @@ export function SyncProgressScreen() {
         </View>
 
         {/* Privacy note */}
-        <Text style={styles.privacyNote}>
-          🔒 All processing happens on your device
-        </Text>
+        <View style={styles.privacyWrap}>
+          <Ionicons name="lock-closed-outline" size={13} color={Colors.textMuted} />
+          <Text style={styles.privacyNote}>
+            All processing happens on your device
+          </Text>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -230,10 +233,16 @@ const styles = StyleSheet.create({
     color: Colors.text,
     fontWeight: Typography.weight.semibold,
   },
+  privacyWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: Spacing[6],
+  },
   privacyNote: {
     fontSize: Typography.size.xs,
     color: Colors.textMuted,
     textAlign: 'center',
-    marginTop: Spacing[6],
   },
 });

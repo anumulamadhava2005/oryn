@@ -180,18 +180,1271 @@ export const FIRST_SEM_SLOTS: Record<string, Record<string, string>> = {
 
 export const ALL_COURSES: Course[] = [
   {
-    "id": "25MA1000-74",
+    "code": "25MA1002",
+    "name": "Linear Algebra",
+    "slot": "E",
+    "hall": "H21",
+    "faculty": "Dr. Nachiketa Mishra",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25MA1002-1"
+  },
+  {
+    "code": "25MA1002",
+    "name": "Linear Algebra",
+    "slot": "E",
+    "hall": "H22",
+    "faculty": "Prof. Shalu M A",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25MA1002-2"
+  },
+  {
+    "code": "25CS2000",
+    "name": "Introduction to AI with Python",
+    "slot": "G / L3 X5",
+    "hall": "H44 / L512, L209",
+    "faculty": "Dr Jagadeesh K",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2000-3"
+  },
+  {
+    "code": "25CS2001",
+    "name": "Object Oriented Programming",
+    "slot": "F (Except Wed) / H, X1",
+    "hall": "H15 / L509",
+    "faculty": "Prof. B Sivaselvan",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2001-4"
+  },
+  {
+    "code": "25CS2002",
+    "name": "Digital Systems Design",
+    "slot": "A / J3, X3",
+    "hall": "H01 / L515",
+    "faculty": "Dr K Kannadasan",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2002-5"
+  },
+  {
+    "code": "25CS2003",
+    "name": "Design & Analysis of Algorithms",
+    "slot": "C (Fri), B / Thu D & B",
+    "hall": "H25 / L509",
+    "faculty": "Dr Syed Shahul Hameed",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2003-6"
+  },
+  {
+    "code": "25CS2004",
+    "name": "Database Systems Design",
+    "slot": "C (Tue), D / Wed D & B",
+    "hall": "H15 / L512",
+    "faculty": "Dr M Ratna Raju",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2004-7"
+  },
+  {
+    "code": "25CS2005",
+    "name": "Computing Paradigms",
+    "slot": "C (Wed & Thur)",
+    "hall": "H15",
+    "faculty": "Dr Preeth",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2005-8"
+  },
+  {
+    "code": "25MA1002",
+    "name": "Linear Algebra",
+    "slot": "E",
+    "hall": "H22",
+    "faculty": "Prof. Shalu M A",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25MA1002-9"
+  },
+  {
+    "code": "25CS2000",
+    "name": "Introduction to AI with Python",
+    "slot": "G / L3 X5",
+    "hall": "H44 / L512, L209",
+    "faculty": "Dr Jagadeesh K",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2000-10"
+  },
+  {
+    "code": "25CS2000",
+    "name": "Introduction to AI with Python",
+    "slot": "G / Wed A & F",
+    "hall": "H15 / L509, L507",
+    "faculty": "Dr Preeth",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2000-11"
+  },
+  {
+    "code": "25CS2001",
+    "name": "Object Oriented Programming",
+    "slot": "F (Except Wed) / H, X1",
+    "hall": "H15 / L509",
+    "faculty": "Prof. B Sivaselvan",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2001-12"
+  },
+  {
+    "code": "25CS2001",
+    "name": "Object Oriented Programming",
+    "slot": "F (Except Wed) / H, X1",
+    "hall": "H15 / L512",
+    "faculty": "Dr B Sivaselvan + Dr NSG",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2001-13"
+  },
+  {
+    "code": "25CS2002",
+    "name": "Digital Systems Design",
+    "slot": "A / J3, X3",
+    "hall": "H01 / L515",
+    "faculty": "Dr K Kannadasan",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2002-14"
+  },
+  {
+    "code": "25CS2002",
+    "name": "Digital Systems Design",
+    "slot": "A (Except Wed) / J1, J2",
+    "hall": "H15 / L515",
+    "faculty": "Dr B Krishna Priya",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2002-15"
+  },
+  {
+    "code": "25CS2003",
+    "name": "Design & Analysis of Algorithms",
+    "slot": "C (Fri), B / Thu D & B",
+    "hall": "H25 / L509",
+    "faculty": "Dr Syed Shahul Hameed",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2003-16"
+  },
+  {
+    "code": "25CS2003",
+    "name": "Design & Analysis of Algorithms",
+    "slot": "C (Tue), D / Wed D & B",
+    "hall": "H15 / L509",
+    "faculty": "Dr Syed Shahul Hameed",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2003-17"
+  },
+  {
+    "code": "25CS2004",
+    "name": "Database Systems Design",
+    "slot": "C (Tue), D / Wed D & B",
+    "hall": "H15 / L512",
+    "faculty": "Dr M Ratna Raju",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2004-18"
+  },
+  {
+    "code": "25CS2004",
+    "name": "Database Systems Design",
+    "slot": "C (Fri), B / Thu D & B",
+    "hall": "H25 / L512",
+    "faculty": "Dr M Ratna Raju",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2004-19"
+  },
+  {
+    "code": "25CS2005",
+    "name": "Computing Paradigms",
+    "slot": "C (Wed & Thur)",
+    "hall": "H15",
+    "faculty": "Dr Preeth",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2005-20"
+  },
+  {
+    "code": "25CS2005",
+    "name": "Computing Paradigms",
+    "slot": "C (Wed & Thur)",
+    "hall": "H25",
+    "faculty": "Dr Raghavan",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2005-21"
+  },
+  {
+    "code": "25MA1002",
+    "name": "Linear Algebra",
+    "slot": "E",
+    "hall": "H22",
+    "faculty": "Prof. Shalu M A",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25MA1002-22"
+  },
+  {
+    "code": "25MA1002",
+    "name": "Linear Algebra",
+    "slot": "E",
+    "hall": "H23",
+    "faculty": "Dr. Subhasis Ghora",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25MA1002-23"
+  },
+  {
+    "code": "25CS2000",
+    "name": "Introduction to AI with Python",
+    "slot": "G / Wed A & F",
+    "hall": "H15 / L509",
+    "faculty": "Dr Preeth",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2000-24"
+  },
+  {
+    "code": "25CS2001",
+    "name": "Object Oriented Programming",
+    "slot": "F (Except Wed) / H, X1",
+    "hall": "H15 / L512",
+    "faculty": "Dr B Sivaselvan + Dr NSG",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2001-25"
+  },
+  {
+    "code": "25CS2002",
+    "name": "Digital Systems Design",
+    "slot": "A (Except Wed) / J1, J2",
+    "hall": "H15 / L515",
+    "faculty": "Dr B Krishna Priya",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2002-26"
+  },
+  {
+    "code": "25CS2003",
+    "name": "Design & Analysis of Algorithms",
+    "slot": "C (Tue), D / Wed D & B",
+    "hall": "H15 / L509",
+    "faculty": "Dr Syed Shahul Hameed",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2003-27"
+  },
+  {
+    "code": "25CS2004",
+    "name": "Database Systems Design",
+    "slot": "C (Fri), B / Thu D & B",
+    "hall": "H25 / L512",
+    "faculty": "Dr M Ratna Raju",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2004-28"
+  },
+  {
+    "code": "25CS2005",
+    "name": "Computing Paradigms",
+    "slot": "C (Wed & Thur)",
+    "hall": "H25",
+    "faculty": "Dr Raghavan",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2005-29"
+  },
+  {
+    "code": "CS3006",
+    "name": "Introduction to Data Science for Engineers",
+    "slot": "E / L1, L2",
+    "hall": "H44 / L509",
+    "faculty": "Dr Jagadeesh K",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3006-30"
+  },
+  {
+    "code": "DS3000",
+    "name": "Entrepreneurship and Management Functions",
+    "slot": "H",
+    "hall": "H01",
+    "faculty": "Dr. Siddhant",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "DS3000-31"
+  },
+  {
+    "code": "DS3000",
+    "name": "Entrepreneurship and Management Functions",
+    "slot": "H",
+    "hall": "H02",
+    "faculty": "Dr. Sadhasivam",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "DS3000-32"
+  },
+  {
+    "code": "CS3000",
+    "name": "Operating Systems",
+    "slot": "B",
+    "hall": "H41",
+    "faculty": "Dr Raghavan",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3000-33"
+  },
+  {
+    "code": "CS3001",
+    "name": "Computer Networks",
+    "slot": "D",
+    "hall": "H41",
+    "faculty": "Dr Sanjeet Kumar Nayak",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3001-34"
+  },
+  {
+    "code": "CS3002",
+    "name": "Compiler Design",
+    "slot": "G, X1",
+    "hall": "H41",
+    "faculty": "Dr Mailthilee",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3002-35"
+  },
+  {
+    "code": "CS3003",
+    "name": "Operating Systems practice",
+    "slot": "J, X3",
+    "hall": "L509",
+    "faculty": "Dr Raghavan",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3003-36"
+  },
+  {
+    "code": "CS3004",
+    "name": "Computers Networks practice",
+    "slot": "I, X2",
+    "hall": "L509",
+    "faculty": "Dr Sanjeet Kumar Nayak",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3004-37"
+  },
+  {
+    "code": "CS3005",
+    "name": "Compiler Design Practice",
+    "slot": "K, X4",
+    "hall": "L509",
+    "faculty": "Dr Maithilee",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3005-38"
+  },
+  {
+    "code": "CS3007",
+    "name": "Pattern Recognition and Machine Learning",
+    "slot": "F / L3, X5",
+    "hall": "H41 / L509",
+    "faculty": "Dr J Umarani",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3007-39"
+  },
+  {
+    "code": "DS3000",
+    "name": "Entrepreneurship and Management Functions",
+    "slot": "H",
+    "hall": "H02",
+    "faculty": "Dr. Sadhasivam",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "DS3000-40"
+  },
+  {
+    "code": "CS3000",
+    "name": "Operating Systems",
+    "slot": "B",
+    "hall": "H41",
+    "faculty": "Dr Raghavan",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3000-41"
+  },
+  {
+    "code": "CS3000",
+    "name": "Operating Systems",
+    "slot": "B",
+    "hall": "H44",
+    "faculty": "Dr K Rajesh",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3000-42"
+  },
+  {
+    "code": "CS3001",
+    "name": "Computer Networks",
+    "slot": "D",
+    "hall": "H41",
+    "faculty": "Dr Sanjeet Kumar Nayak",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3001-43"
+  },
+  {
+    "code": "CS3001",
+    "name": "Computer Networks",
+    "slot": "D",
+    "hall": "H44",
+    "faculty": "Dr K Gnanambikai",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3001-44"
+  },
+  {
+    "code": "CS3002",
+    "name": "Compiler Design",
+    "slot": "G, X1",
+    "hall": "H41",
+    "faculty": "Dr Maithilee",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3002-45"
+  },
+  {
+    "code": "CS3002",
+    "name": "Compiler Design",
+    "slot": "G, X1",
+    "hall": "H42",
+    "faculty": "Dr Om Prakash",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3002-46"
+  },
+  {
+    "code": "CS3003",
+    "name": "Operating Systems practice",
+    "slot": "J, X3",
+    "hall": "L509",
+    "faculty": "Dr Raghavan",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3003-47"
+  },
+  {
+    "code": "CS3003",
+    "name": "Operating Systems practice",
+    "slot": "J, X3",
+    "hall": "L512",
+    "faculty": "Dr K Rajesh",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3003-48"
+  },
+  {
+    "code": "CS3004",
+    "name": "Computers Networks practice",
+    "slot": "I, X2",
+    "hall": "L509",
+    "faculty": "Dr Sanjeet Kumar Nayak",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3004-49"
+  },
+  {
+    "code": "CS3004",
+    "name": "Computers Networks practice",
+    "slot": "I, X2",
+    "hall": "L512",
+    "faculty": "Dr K Gnanambikai",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3004-50"
+  },
+  {
+    "code": "CS3005",
+    "name": "Compiler Design Practice",
+    "slot": "K, X4",
+    "hall": "L509",
+    "faculty": "Dr Maithilee",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3005-51"
+  },
+  {
+    "code": "CS3005",
+    "name": "Compiler Design Practice",
+    "slot": "K, X4",
+    "hall": "L512",
+    "faculty": "Dr Om Prakash",
+    "program": "B.Tech CSE",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3005-52"
+  },
+  {
+    "code": "CS3006",
+    "name": "Introduction to Data Science for Engineers",
+    "slot": "E / L1, L2",
+    "hall": "H44 / L509, L512",
+    "faculty": "Dr Jagadeesh K",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3006-53"
+  },
+  {
+    "code": "CS3006",
+    "name": "Introduction to Data Science for Engineers",
+    "slot": "E / L1, L2",
+    "hall": "H42 / L512, L507",
+    "faculty": "Dr S Vijaya Kumar",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3006-54"
+  },
+  {
+    "code": "DS3000",
+    "name": "Entrepreneurship and Management Functions",
+    "slot": "H",
+    "hall": "H02",
+    "faculty": "Dr. Sadhasivam",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "DS3000-55"
+  },
+  {
+    "code": "DS3000",
+    "name": "Entrepreneurship and Management Functions",
+    "slot": "H",
+    "hall": "H04",
+    "faculty": "Dr. Sudhir V",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "DS3000-56"
+  },
+  {
+    "code": "CS3000",
+    "name": "Operating Systems",
+    "slot": "B",
+    "hall": "H44",
+    "faculty": "Dr K Rajesh",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3000-57"
+  },
+  {
+    "code": "CS3001",
+    "name": "Computer Networks",
+    "slot": "D",
+    "hall": "H44",
+    "faculty": "Dr K Gnanambikai",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3001-58"
+  },
+  {
+    "code": "CS3002",
+    "name": "Compiler Design",
+    "slot": "G, X1",
+    "hall": "H42",
+    "faculty": "Dr Om Prakash",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3002-59"
+  },
+  {
+    "code": "CS3003",
+    "name": "Operating Systems practice",
+    "slot": "J, X3",
+    "hall": "L512",
+    "faculty": "Dr K Rajesh",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3003-60"
+  },
+  {
+    "code": "CS3004",
+    "name": "Computers Networks practice",
+    "slot": "I, X2",
+    "hall": "L512",
+    "faculty": "Dr K Gnanambikai",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3004-61"
+  },
+  {
+    "code": "CS3005",
+    "name": "Compiler Design Practice",
+    "slot": "K, X4",
+    "hall": "L512",
+    "faculty": "Dr Om Prakash",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 5",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS3005-62"
+  },
+  {
+    "code": "CS5010",
+    "name": "Analytics and Systems of Big Data",
+    "slot": "B / K1, K2",
+    "hall": "H01 / L515",
+    "faculty": "Prof. B Sivaselvan",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 7",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS5010-63"
+  },
+  {
+    "code": "CS5011",
+    "name": "Information Security",
+    "slot": "G, X3",
+    "hall": "H13",
+    "faculty": "Dr Sanjeet Kumar Nayak",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 7",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS5011-64"
+  },
+  {
+    "code": "CS5012",
+    "name": "Interactive Computer Graphics",
+    "slot": "E / K3, X4",
+    "hall": "H01 / L209",
+    "faculty": "Dr Nishanth Kartheek",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 7",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "CS5012-65"
+  },
+  {
+    "code": "25CS5000",
+    "name": "Mathematical Foundations of Computer Science",
+    "slot": "D",
+    "hall": "H13",
+    "faculty": "Dr N Sadagopan",
+    "program": "M.Tech CSE",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS5000-66"
+  },
+  {
+    "code": "25CS5001",
+    "name": "Advanced Data Strucures & Algorithms",
+    "slot": "A X7",
+    "hall": "H41",
+    "faculty": "Dr Pandiri Venkatesh",
+    "program": "M.Tech CSE",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS5001-67"
+  },
+  {
+    "code": "25CS5002",
+    "name": "Analaytics & Systems of Big Data",
+    "slot": "B",
+    "hall": "H01",
+    "faculty": "Prof. B Sivaselvan",
+    "program": "M.Tech CSE",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS5002-68"
+  },
+  {
+    "code": "25CS5004",
+    "name": "Advanced Data Strucures & Algorithms Practice",
+    "slot": "H, X1",
+    "hall": "L515",
+    "faculty": "Dr Pandiri Venkatesh",
+    "program": "M.Tech CSE",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS5004-69"
+  },
+  {
+    "code": "25CS5003",
+    "name": "Analytics & Systems of Big Data Practice",
+    "slot": "K, X4",
+    "hall": "L515",
+    "faculty": "Prof. B Sivaselvan",
+    "program": "M.Tech CSE",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS5003-70"
+  },
+  {
+    "code": "25CS5001",
+    "name": "Advanced Data Structure and Algorithms",
+    "slot": "A (Except Friday) X7",
+    "hall": "H41",
+    "faculty": "Dr Pandiri Venkatesh",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "25CS5001-71"
+  },
+  {
+    "code": "25CS5002",
+    "name": "Analytics and Systems of Big Data",
+    "slot": "B",
+    "hall": "H01",
+    "faculty": "Dr B Sivaselvan",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "25CS5002-72"
+  },
+  {
+    "code": "CS5105",
+    "name": "Machine Learning",
+    "slot": "F X10/ L3, X5",
+    "hall": "H01 / L515",
+    "faculty": "Dr Rahul Raman",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "CS5105-73"
+  },
+  {
+    "code": "CS6102",
+    "name": "Computer Architecture",
+    "slot": "A (Except Friday) / J1, J2",
+    "hall": "H42 / L515",
+    "faculty": "Dr Shak Noor Mahammad",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "CS6102-74"
+  },
+  {
+    "code": "CS5012",
+    "name": "Interactive Computer Graphics",
+    "slot": "E / K3, X4",
+    "hall": "H01 / L209",
+    "faculty": "Dr Nishanth Kartheek",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "CS5012-75"
+  },
+  {
+    "code": "CS3007",
+    "name": "Pattern Recognition and Machine Learning",
+    "slot": "F / L3, X5",
+    "hall": "H41 / L509",
+    "faculty": "Dr Umarani",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "CS3007-76"
+  },
+  {
+    "code": "CS6103",
+    "name": "Computer Network Security",
+    "slot": "C / L1, L2",
+    "hall": "H42 / L209",
+    "faculty": "Dr Pradeep Kumar",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "CS6103-77"
+  },
+  {
+    "code": "CS5100",
+    "name": "Computer Vision",
+    "slot": "C (Except Friday) / Fri C & A",
+    "hall": "H41 / L509",
+    "faculty": "Dr V Masilamani",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "CS5100-78"
+  },
+  {
+    "code": "CS5109",
+    "name": "Brain Computer Interface",
+    "slot": "C / L1, L2",
+    "hall": "H01 / L515",
+    "faculty": "Dr Kannadasan K",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "CS5109-79"
+  },
+  {
+    "code": "25EC5010",
+    "name": "Advanced EMFT",
+    "slot": "E, X3",
+    "hall": "H43",
+    "faculty": "Dr Yuvaraj",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "25EC5010-80"
+  },
+  {
+    "code": "25EC5009",
+    "name": "Advanced Microwave Engineering",
+    "slot": "G, X5",
+    "hall": "H14",
+    "faculty": "Dr Sreenath Reddy",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "25EC5009-81"
+  },
+  {
+    "code": "EC5014",
+    "name": "Digital IC Design",
+    "slot": "A",
+    "hall": "H16",
+    "faculty": "Dr Binsu J Kailath",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "EC5014-82"
+  },
+  {
+    "code": "EC5028",
+    "name": "Mathematics for Communication",
+    "slot": "A",
+    "hall": "H14",
+    "faculty": "Dr Badri",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "EC5028-83"
+  },
+  {
+    "code": "EC5029",
+    "name": "Modeling and Simulation",
+    "slot": "C, H",
+    "hall": "H14,L211",
+    "faculty": "Dr Premkumar K",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "EC5029-84"
+  },
+  {
+    "code": "EC5030",
+    "name": "Data Communication Networks",
+    "slot": "G, X5",
+    "hall": "H16",
+    "faculty": "Dr R Sri Prakash",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "EC5030-85"
+  },
+  {
+    "code": "EC4100",
+    "name": "RF and Microwave Circuit Design",
+    "slot": "C",
+    "hall": "H11",
+    "faculty": "Dr Sreenath Reddy",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "EC4100-86"
+  },
+  {
+    "code": "EC5101",
+    "name": "Introduction to Photonics",
+    "slot": "C",
+    "hall": "H12",
+    "faculty": "Dr Srijith",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "EC5101-87"
+  },
+  {
+    "code": "ID6100",
+    "name": "Energy Harvesting Technology",
+    "slot": "F, X4",
+    "hall": "H16",
+    "faculty": "Dr Pandiyarasan Veluswamy",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "ID6100-88"
+  },
+  {
+    "code": "EC5107",
+    "name": "Medical Imaging Systems",
+    "slot": "A",
+    "hall": "H43",
+    "faculty": "Dr Uttam Pal",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "EC5107-89"
+  },
+  {
+    "code": "EC5105",
+    "name": "Biosignal Processing and Analysis",
+    "slot": "F, X4",
+    "hall": "H43",
+    "faculty": "Dr Rohini",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "EC5105-90"
+  },
+  {
+    "code": "ME5127",
+    "name": "Multiscale Modeling of Materials using Machine Learning",
+    "slot": "F, X4",
+    "hall": "H36",
+    "faculty": "Arul Kumar M",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "ME5127-91"
+  },
+  {
+    "code": "25ME5000",
+    "name": "Data Science (Only for PhD)",
+    "slot": "B/H1,H2",
+    "hall": "H17/L110",
+    "faculty": "Kalpana P",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "25ME5000-92"
+  },
+  {
+    "code": "25ME5005",
+    "name": "Manufacturing Systems Engineering",
+    "slot": "D/L3, X5",
+    "hall": "H17/L507",
+    "faculty": "Kishor Kumar Gajrani",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "25ME5005-93"
+  },
+  {
+    "code": "25ME5008",
+    "name": "Additive and Hybrid Manufacturing Processes",
+    "slot": "G/J1, J2",
+    "hall": "H17/TLC",
+    "faculty": "P. Pandithevan",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "25ME5008-94"
+  },
+  {
+    "code": "ME5113",
+    "name": "Gas Dynamics and Propulsive Systems",
+    "slot": "C",
+    "hall": "H17",
+    "faculty": "Dr. Shubhankar Chakraborty",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "ME5113-95"
+  },
+  {
+    "code": "ME5124",
+    "name": "Vibration Control",
+    "slot": "A",
+    "hall": "H17",
+    "faculty": "Dr. Venkatramani",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "ME5124-96"
+  },
+  {
+    "code": "ME5103",
+    "name": "Design of Heat Exchangers",
+    "slot": "F, X4",
+    "hall": "H34",
+    "faculty": "Dr. S. Jayavel",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "ME5103-97"
+  },
+  {
+    "code": "25ME5001",
+    "name": "Multibody System Dynamics",
+    "slot": "E, X1",
+    "hall": "H04",
+    "faculty": "Nagamanikandan G",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "25ME5001-98"
+  },
+  {
+    "code": "25ME5003",
+    "name": "Structural Anaysis and Design Optimization",
+    "slot": "D",
+    "hall": "H36",
+    "faculty": "S Gowthaman",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "25ME5003-99"
+  },
+  {
+    "code": "25ME5002",
+    "name": "Engineering Design with Advanced Materials",
+    "slot": "G, X3",
+    "hall": "H34",
+    "faculty": "Dr. Venkatramani",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "25ME5002-100"
+  },
+  {
+    "code": "ME5114",
+    "name": "Thermal Turbomachines",
+    "slot": "A",
+    "hall": "H13",
+    "faculty": "Vikash Kumar",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "ME5114-101"
+  },
+  {
+    "code": "DS5105",
+    "name": "Model based design and manufacturing",
+    "slot": "A",
+    "hall": "A",
+    "faculty": "Dr. Rajnish & Dr. Sudhir V",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "DS5105-102"
+  },
+  {
+    "code": "DS5107",
+    "name": "Design of non-invasive systems",
+    "slot": "C",
+    "hall": "H13",
+    "faculty": "Dr. Bingi & Dr. Anudeep",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "DS5107-103"
+  },
+  {
+    "code": "DS5106",
+    "name": "Simulation Driven Design",
+    "slot": "F",
+    "hall": "L407B",
+    "faculty": "Dr. Raguraman",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "DS5106-104"
+  },
+  {
+    "code": "DS5104",
+    "name": "Wearable Technologies",
+    "slot": "A",
+    "hall": "H12",
+    "faculty": "Dr. Karthic G",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "DS5104-105"
+  },
+  {
+    "code": "PH5102",
+    "name": "Materials Fabrication and Characterization Techniques",
+    "slot": "C",
+    "hall": "H41",
+    "faculty": "Dr. Y. Ashok Kumar Reddy",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "PH5102-106"
+  },
+  {
+    "code": "MA6102",
+    "name": "Algebraic Number Theory (Only for PhD)",
+    "slot": "B",
+    "hall": "H13",
+    "faculty": "Dr Jagannath Bhanja",
+    "program": "Electives & Minors",
+    "semester": "Semester 3",
+    "sourceFile": "Timetable_Electives.md",
+    "id": "MA6102-107"
+  },
+  {
     "code": "25MA1000",
     "name": "Calculus (3 1 0 4)",
     "slot": "B, J3",
     "hall": "H21",
-    "faculty": "Dr.\u00a0 M Subramani",
+    "faculty": "Dr.  M Subramani",
     "program": "Common (First Sem)",
     "semester": "Semester 1",
-    "sourceFile": "First sem-Aug 2026.xlsx"
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25MA1000-108"
   },
   {
-    "id": "25PH1000-75",
+    "code": "25MA1000",
+    "name": "Calculus (3 1 0 4)",
+    "slot": "A, K1",
+    "hall": "H22",
+    "faculty": "Dr. Sarbendu Rakshkit",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25MA1000-109"
+  },
+  {
+    "code": "25MA1000",
+    "name": "Calculus (3 1 0 4)",
+    "slot": "A, I3",
+    "hall": "H23",
+    "faculty": "Dr. Jagannath Bhanja",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25MA1000-110"
+  },
+  {
+    "code": "25MA1000",
+    "name": "Calculus (3 1 0 4)",
+    "slot": "A, I1",
+    "hall": "H24",
+    "faculty": "Dr. Samriddho Roy",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25MA1000-111"
+  },
+  {
+    "code": "25MA1000",
+    "name": "Calculus (3 1 0 4)",
+    "slot": "A, I2",
+    "hall": "H26",
+    "faculty": "Dr. Vijayakumar S",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25MA1000-112"
+  },
+  {
+    "code": "25MA1000",
+    "name": "Calculus (3 1 0 4)",
+    "slot": "A, I1",
+    "hall": "H27",
+    "faculty": "Dr. Subhasis Ghora",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25MA1000-113"
+  },
+  {
+    "code": "25MA1000",
+    "name": "Calculus (3 1 0 4)",
+    "slot": "A, I3",
+    "hall": "H31",
+    "faculty": "Dr. Dheeraj Goel",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25MA1000-114"
+  },
+  {
+    "code": "25MA1000",
+    "name": "Calculus (3 1 0 4)",
+    "slot": "A, I1",
+    "hall": "H32",
+    "faculty": "Dr.  M Subramani",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25MA1000-115"
+  },
+  {
     "code": "25PH1000",
     "name": "Physics for Engineers (3 0 2 4)",
     "slot": "F / I1, I2",
@@ -199,10 +1452,87 @@ export const ALL_COURSES: Course[] = [
     "faculty": "Dr. Y. Ashok Kumar Reddy",
     "program": "Common (First Sem)",
     "semester": "Semester 1",
-    "sourceFile": "First sem-Aug 2026.xlsx"
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25PH1000-116"
   },
   {
-    "id": "25EC1000-76",
+    "code": "25PH1000",
+    "name": "Physics for Engineers (3 0 2 4)",
+    "slot": "F / I3, I4",
+    "hall": "H22 / L117",
+    "faculty": "Dr. Debolina Misra",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25PH1000-117"
+  },
+  {
+    "code": "25PH1000",
+    "name": "Physics for Engineers (3 0 2 4)",
+    "slot": "F / J1, J2",
+    "hall": "H23 / L117",
+    "faculty": "Prof. Naveen Kumar",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25PH1000-118"
+  },
+  {
+    "code": "25PH1000",
+    "name": "Physics for Engineers (3 0 2 4)",
+    "slot": "F / L1, L2",
+    "hall": "H24 / L117",
+    "faculty": "Dr. Tapas Sil",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25PH1000-119"
+  },
+  {
+    "code": "25PH1000",
+    "name": "Physics for Engineers (3 0 2 4)",
+    "slot": "F / L3, L4",
+    "hall": "H26 / L117",
+    "faculty": "Dr. Manjusha Battabyal",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25PH1000-120"
+  },
+  {
+    "code": "25PH1000",
+    "name": "Physics for Engineers (3 0 2 4)",
+    "slot": "F / J3, J4",
+    "hall": "H27 / L117",
+    "faculty": "Dr. Vivek Kumar",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25PH1000-121"
+  },
+  {
+    "code": "25PH1000",
+    "name": "Physics for Engineers (3 0 2 4)",
+    "slot": "F / K1, K2",
+    "hall": "H31 / L117",
+    "faculty": "Dr. Sai Prashanth",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25PH1000-122"
+  },
+  {
+    "code": "25PH1000",
+    "name": "Physics for Engineers (3 0 2 4)",
+    "slot": "B (Except Monday), H1 / K3, K4",
+    "hall": "H32 / L117",
+    "faculty": "Dr. Debolina/Dr. Manjusha/ Dr. Vivek/Dr. Y. Ashok Kumar Reddy",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25PH1000-123"
+  },
+  {
     "code": "25EC1000",
     "name": "Basic Electrical Engineering (3 1 0 4)",
     "slot": "D, I3",
@@ -210,10 +1540,87 @@ export const ALL_COURSES: Course[] = [
     "faculty": "Dr B. Chitti Babu",
     "program": "Common (First Sem)",
     "semester": "Semester 1",
-    "sourceFile": "First sem-Aug 2026.xlsx"
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25EC1000-124"
   },
   {
-    "id": "25CS1000-77",
+    "code": "25EC1000",
+    "name": "Basic Electrical Engineering (3 1 0 4)",
+    "slot": "C, H1",
+    "hall": "H22",
+    "faculty": "Dr B. Chitti Babu",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25EC1000-125"
+  },
+  {
+    "code": "25EC1000",
+    "name": "Basic Electrical Engineering (3 1 0 4)",
+    "slot": "D, L3",
+    "hall": "H23",
+    "faculty": "Dr Vijayakumar K",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25EC1000-126"
+  },
+  {
+    "code": "25EC1000",
+    "name": "Basic Electrical Engineering (3 1 0 4)",
+    "slot": "C, H3",
+    "hall": "H24",
+    "faculty": "Dr Vijayakumar K",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25EC1000-127"
+  },
+  {
+    "code": "25EC1000",
+    "name": "Basic Electrical Engineering (3 1 0 4)",
+    "slot": "D, I1",
+    "hall": "H26",
+    "faculty": "Dr K Srijith",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25EC1000-128"
+  },
+  {
+    "code": "25EC1000",
+    "name": "Basic Electrical Engineering (3 1 0 4)",
+    "slot": "C, H3",
+    "hall": "H27",
+    "faculty": "Dr Sundeep Kumar",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25EC1000-129"
+  },
+  {
+    "code": "25EC1000",
+    "name": "Basic Electrical Engineering (3 1 0 4)",
+    "slot": "D, L3",
+    "hall": "H31",
+    "faculty": "Dr K. Selvajyothi",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25EC1000-130"
+  },
+  {
+    "code": "25EC1000",
+    "name": "Basic Electrical Engineering (3 1 0 4)",
+    "slot": "C, H3",
+    "hall": "H32",
+    "faculty": "Dr P. Damodharan",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25EC1000-131"
+  },
+  {
     "code": "25CS1000",
     "name": "Problem Solving and Programming (3 0 2 4)",
     "slot": "C, A (Mon) / E+C (Fri)",
@@ -221,10 +1628,87 @@ export const ALL_COURSES: Course[] = [
     "faculty": "Dr Noor Mahammad",
     "program": "Common (First Sem)",
     "semester": "Semester 1",
-    "sourceFile": "First sem-Aug 2026.xlsx"
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25CS1000-132"
   },
   {
-    "id": "25DS1000-78",
+    "code": "25CS1000",
+    "name": "Problem Solving and Programming (3 0 2 4)",
+    "slot": "D, B (Tue) / D+B (Thu)",
+    "hall": "H22 / L209",
+    "faculty": "Dr Amalan J Antony",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25CS1000-133"
+  },
+  {
+    "code": "25CS1000",
+    "name": "Problem Solving and Programming (3 0 2 4)",
+    "slot": "C, B (Mon) / E+C (Tue)",
+    "hall": "H23 / L512",
+    "faculty": "Dr Amalan J Antony",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25CS1000-134"
+  },
+  {
+    "code": "25CS1000",
+    "name": "Problem Solving and Programming (3 0 2 4)",
+    "slot": "D, B (Tue) / D+B (Mon)",
+    "hall": "H24 / L209",
+    "faculty": "Dr Dinesh R",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25CS1000-135"
+  },
+  {
+    "code": "25CS1000",
+    "name": "Problem Solving and Programming (3 0 2 4)",
+    "slot": "C, B (Thu) / E+C (Tue)",
+    "hall": "H26 / L209",
+    "faculty": "Dr Dinesh R",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25CS1000-136"
+  },
+  {
+    "code": "25CS1000",
+    "name": "Problem Solving and Programming (3 0 2 4)",
+    "slot": "D, B (Tue) / D+B (Mon)",
+    "hall": "H27 / L509",
+    "faculty": "Dr Umarani(T)+ Dr Preeth(Lab)",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25CS1000-137"
+  },
+  {
+    "code": "25CS1000",
+    "name": "Problem Solving and Programming (3 0 2 4)",
+    "slot": "C, B (Mon) / E+C (Tue)",
+    "hall": "H31 / L509",
+    "faculty": "Dr B Krishna Priya",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25CS1000-138"
+  },
+  {
+    "code": "25CS1000",
+    "name": "Problem Solving and Programming (3 0 2 4)",
+    "slot": "D, F (Fri) / D+B (Mon)",
+    "hall": "H32 / L512",
+    "faculty": "Dr A V Siva Prasad",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25CS1000-139"
+  },
+  {
     "code": "25DS1000",
     "name": "Concepts in Engineering Design (2 0 2 3)",
     "slot": "G / J1, J2",
@@ -232,10 +1716,87 @@ export const ALL_COURSES: Course[] = [
     "faculty": "Dr. Rino",
     "program": "Common (First Sem)",
     "semester": "Semester 1",
-    "sourceFile": "First sem-Aug 2026.xlsx"
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25DS1000-140"
   },
   {
-    "id": "25HS1000-79",
+    "code": "25DS1000",
+    "name": "Concepts in Engineering Design (2 0 2 3)",
+    "slot": "G / J3, J4",
+    "hall": "H22",
+    "faculty": "Dr. Monisha",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25DS1000-141"
+  },
+  {
+    "code": "25DS1000",
+    "name": "Concepts in Engineering Design (2 0 2 3)",
+    "slot": "G / I1, I2",
+    "hall": "H23",
+    "faculty": "Dr. Rajnish",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25DS1000-142"
+  },
+  {
+    "code": "25DS1000",
+    "name": "Concepts in Engineering Design (2 0 2 3)",
+    "slot": "G / K1, K2",
+    "hall": "H24",
+    "faculty": "Dr. Anudeep",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25DS1000-143"
+  },
+  {
+    "code": "25DS1000",
+    "name": "Concepts in Engineering Design (2 0 2 3)",
+    "slot": "G / K3, K4",
+    "hall": "H26",
+    "faculty": "Dr. Karthik C",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25DS1000-144"
+  },
+  {
+    "code": "25DS1000",
+    "name": "Concepts in Engineering Design (2 0 2 3)",
+    "slot": "G / I3, I4",
+    "hall": "H27",
+    "faculty": "Dr. Karthick G",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25DS1000-145"
+  },
+  {
+    "code": "25DS1000",
+    "name": "Concepts in Engineering Design (2 0 2 3)",
+    "slot": "G / L1, L2",
+    "hall": "H31",
+    "faculty": "Dr. Narendran",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25DS1000-146"
+  },
+  {
+    "code": "25DS1000",
+    "name": "Concepts in Engineering Design (2 0 2 3)",
+    "slot": "G / L3, L4",
+    "hall": "H32",
+    "faculty": "Dr. Bingi",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25DS1000-147"
+  },
+  {
     "code": "25HS1000",
     "name": "Effective Language and Communication Skills (1 0 2 2)",
     "slot": "A (Wed) / K1, K2",
@@ -243,10 +1804,87 @@ export const ALL_COURSES: Course[] = [
     "faculty": "Dr. Parvathy Das",
     "program": "Common (First Sem)",
     "semester": "Semester 1",
-    "sourceFile": "First sem-Aug 2026.xlsx"
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25HS1000-148"
   },
   {
-    "id": "25ME1000-80",
+    "code": "25HS1000",
+    "name": "Effective Language and Communication Skills (1 0 2 2)",
+    "slot": "B (Mon) / K3, K4",
+    "hall": "L507 / H22",
+    "faculty": "Dr. Arya Suresh",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25HS1000-149"
+  },
+  {
+    "code": "25HS1000",
+    "name": "Effective Language and Communication Skills (1 0 2 2)",
+    "slot": "E (Thu) / L1, L2",
+    "hall": "L512 / H23",
+    "faculty": "Dr. Parvathy Das",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25HS1000-150"
+  },
+  {
+    "code": "25HS1000",
+    "name": "Effective Language and Communication Skills (1 0 2 2)",
+    "slot": "E (Thu) / J1, J2",
+    "hall": "L209 / H24",
+    "faculty": "Dr. Kandharaja KMC",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25HS1000-151"
+  },
+  {
+    "code": "25HS1000",
+    "name": "Effective Language and Communication Skills (1 0 2 2)",
+    "slot": "E (Fri) / J3, J4",
+    "hall": "L509 / H26",
+    "faculty": "Dr. Parvathy Das",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25HS1000-152"
+  },
+  {
+    "code": "25HS1000",
+    "name": "Effective Language and Communication Skills (1 0 2 2)",
+    "slot": "E (Fri) / L3, L4",
+    "hall": "L512 / H27",
+    "faculty": "Dr. Arya Suresh",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25HS1000-153"
+  },
+  {
+    "code": "25HS1000",
+    "name": "Effective Language and Communication Skills (1 0 2 2)",
+    "slot": "E (Fri) / I1, I2",
+    "hall": "L209 / H31",
+    "faculty": "Dr. Kandharaja KMC",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25HS1000-154"
+  },
+  {
+    "code": "25HS1000",
+    "name": "Effective Language and Communication Skills (1 0 2 2)",
+    "slot": "E (Thu) / I3, I4",
+    "hall": "L509 / H32",
+    "faculty": "Dr. Arya Suresh",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25HS1000-155"
+  },
+  {
     "code": "25ME1000",
     "name": "Engineering Skills Practice (0 0 2 1)",
     "slot": "L1, L2",
@@ -254,10 +1892,88 @@ export const ALL_COURSES: Course[] = [
     "faculty": "Dr Pilgar C. M.",
     "program": "Common (First Sem)",
     "semester": "Semester 1",
-    "sourceFile": "First sem-Aug 2026.xlsx"
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25ME1000-156"
   },
   {
-    "id": "25PH2000-81",
+    "code": "25ME1000",
+    "name": "Engineering Skills Practice (0 0 2 1)",
+    "slot": "L3, L4",
+    "hall": "L013",
+    "faculty": "Dr Karthick S",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25ME1000-157"
+  },
+  {
+    "code": "25ME1000",
+    "name": "Engineering Skills Practice (0 0 2 1)",
+    "slot": "K1, K2",
+    "hall": "L013",
+    "faculty": "Dr Nagaraj M",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25ME1000-158"
+  },
+  {
+    "code": "25ME1000",
+    "name": "Engineering Skills Practice (0 0 2 1)",
+    "slot": "H1, H2",
+    "hall": "L013",
+    "faculty": "Dr P Pandithevan",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25ME1000-159"
+  },
+  {
+    "code": "25ME1000",
+    "name": "Engineering Skills Practice (0 0 2 1)",
+    "slot": "H3, H4",
+    "hall": "L013",
+    "faculty": "Dr S Gowthaman",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25ME1000-160"
+  },
+  {
+    "code": "25ME1000",
+    "name": "Engineering Skills Practice (0 0 2 1)",
+    "slot": "K3, K4",
+    "hall": "L013",
+    "faculty": "Dr Shahul Hamid Khan",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25ME1000-161"
+  },
+  {
+    "code": "25ME1000",
+    "name": "Engineering Skills Practice (0 0 2 1)",
+    "slot": "J1, J2",
+    "hall": "L013",
+    "faculty": "Dr Nagamanikandan",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25ME1000-162"
+  },
+  {
+    "code": "25ME1000",
+    "name": "Engineering Skills Practice (0 0 2 1)",
+    "slot": "J3, J4",
+    "hall": "L013",
+    "faculty": "Dr Vikas Kumar",
+    "program": "Common (First Sem)",
+    "semester": "Semester 1",
+    "sourceFile": "Timetable_First_Semester.md",
+    "id": "25ME1000-163"
+  },
+  {
+    "id": "25PH2000-164",
     "code": "25PH2000",
     "name": "Mathematical Physics",
     "slot": "E",
@@ -268,7 +1984,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "EP_Aug 2026.xlsx"
   },
   {
-    "id": "25CS2000-82",
+    "id": "25CS2000-165",
     "code": "25CS2000",
     "name": "Introduction to AI with Python",
     "slot": "G",
@@ -279,7 +1995,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "EP_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2000-83",
+    "id": "25EC2000-166",
     "code": "25EC2000",
     "name": "Electronic Devices and Circuits (with ECE)",
     "slot": "B",
@@ -290,7 +2006,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "EP_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2001-84",
+    "id": "25EC2001-167",
     "code": "25EC2001",
     "name": "Digital Circuit Design (with ECE)",
     "slot": "D",
@@ -301,7 +2017,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "EP_Aug 2026.xlsx"
   },
   {
-    "id": "25PH2001-85",
+    "id": "25PH2001-168",
     "code": "25PH2001",
     "name": "General Physics",
     "slot": "A / H1, H2",
@@ -312,7 +2028,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "EP_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2002-86",
+    "id": "25EC2002-169",
     "code": "25EC2002",
     "name": "Signals and Systems (with ECE)",
     "slot": "C",
@@ -323,7 +2039,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "EP_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2004-87",
+    "id": "25EC2004-170",
     "code": "25EC2004",
     "name": "Digital Circuit Design Practice (with ECE)",
     "slot": "J",
@@ -334,7 +2050,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "EP_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2003-88",
+    "id": "25EC2003-171",
     "code": "25EC2003",
     "name": "Electronic Devices and Circuits Practice (with ECE)",
     "slot": "I",
@@ -345,7 +2061,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "EP_Aug 2026.xlsx"
   },
   {
-    "id": "25MA1002-89",
+    "id": "25MA1002-172",
     "code": "25MA1002",
     "name": "Linear Algebra",
     "slot": "E",
@@ -356,7 +2072,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25CS2000-90",
+    "id": "25CS2000-173",
     "code": "25CS2000",
     "name": "Introduction to AI with Python",
     "slot": "G",
@@ -367,7 +2083,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS2000-91",
+    "id": "25DS2000-174",
     "code": "25DS2000",
     "name": "Mechanics and Mechanisms",
     "slot": "B / I1, I2",
@@ -378,7 +2094,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS2001-92",
+    "id": "25DS2001-175",
     "code": "25DS2001",
     "name": "Instrumentation and Control systems",
     "slot": "A / H1, H2",
@@ -389,7 +2105,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS2002-93",
+    "id": "25DS2002-176",
     "code": "25DS2002",
     "name": "Sociology of Design",
     "slot": "C / K1, K2",
@@ -400,7 +2116,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS2003-94",
+    "id": "25DS2003-177",
     "code": "25DS2003",
     "name": "Human Centered Design",
     "slot": "D / J1, J2",
@@ -411,7 +2127,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS2004-95",
+    "id": "25DS2004-178",
     "code": "25DS2004",
     "name": "Techno-asthetics in Product Detailing",
     "slot": "F / L1, L2",
@@ -422,7 +2138,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS5000-96",
+    "id": "25DS5000-179",
     "code": "25DS5000",
     "name": "Foundation for integrated product design",
     "slot": "Full ID26M1",
@@ -433,7 +2149,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS5001-97",
+    "id": "25DS5001-180",
     "code": "25DS5001",
     "name": "Aesthetics, Forms and Sketching",
     "slot": "Tuesday 10 am to 1 pm",
@@ -444,7 +2160,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS5002-98",
+    "id": "25DS5002-181",
     "code": "25DS5002",
     "name": "Design, Technology and Society",
     "slot": "Monday 10 am to 1 pm",
@@ -455,7 +2171,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS5003-99",
+    "id": "25DS5003-182",
     "code": "25DS5003",
     "name": "Design Research: Theory and Methods",
     "slot": "Wednesday 10 am to 1 pm",
@@ -466,7 +2182,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS5004-100",
+    "id": "25DS5004-183",
     "code": "25DS5004",
     "name": "Material selection for product designers",
     "slot": "Thursday 10 am to 1 pm",
@@ -477,7 +2193,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS5005-101",
+    "id": "25DS5005-184",
     "code": "25DS5005",
     "name": "Design Realization Skills Practice",
     "slot": "Monday 2 to 5 pm",
@@ -488,7 +2204,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS5006-102",
+    "id": "25DS5006-185",
     "code": "25DS5006",
     "name": "Visual Communication Design",
     "slot": "Friday 10 am to 1 pm",
@@ -499,7 +2215,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS5007-103",
+    "id": "25DS5007-186",
     "code": "25DS5007",
     "name": "Concept Design Project",
     "slot": "Tuesday and Friday 2 to 5 pm",
@@ -510,7 +2226,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS6000-104",
+    "id": "25DS6000-187",
     "code": "25DS6000",
     "name": "Capstone Project",
     "slot": "Full ID25M1",
@@ -521,7 +2237,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS6001-105",
+    "id": "25DS6001-188",
     "code": "25DS6001",
     "name": "Strategic Management of Design and Innovation",
     "slot": "Online",
@@ -532,7 +2248,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25DS6002-106",
+    "id": "25DS6002-189",
     "code": "25DS6002",
     "name": "Sustainable Product Service Systems",
     "slot": "Online",
@@ -543,7 +2259,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "SIDI_Aug 2026.xlsx"
   },
   {
-    "id": "25MA1002-107",
+    "id": "25MA1002-190",
     "code": "25MA1002",
     "name": "Linear Algebra",
     "slot": "E",
@@ -554,7 +2270,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25MA1002-108",
+    "id": "25MA1002-191",
     "code": "25MA1002",
     "name": "Linear Algebra",
     "slot": "E",
@@ -565,7 +2281,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25MA1002-109",
+    "id": "25MA1002-192",
     "code": "25MA1002",
     "name": "Linear Algebra",
     "slot": "E",
@@ -576,7 +2292,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25CS2000-110",
+    "id": "25CS2000-193",
     "code": "25CS2000",
     "name": "Introduction to AI with Python",
     "slot": "G,(A+F-Wednesday)",
@@ -587,7 +2303,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25CS2000-111",
+    "id": "25CS2000-194",
     "code": "25CS2000",
     "name": "Introduction to AI with Python",
     "slot": "G,(A+F-Wednesday)",
@@ -598,7 +2314,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2000-112",
+    "id": "25EC2000-195",
     "code": "25EC2000",
     "name": "Electronic Devices and Circuits",
     "slot": "B",
@@ -609,7 +2325,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2000-113",
+    "id": "25EC2000-196",
     "code": "25EC2000",
     "name": "Electronic Devices and Circuits",
     "slot": "B",
@@ -620,7 +2336,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2001-114",
+    "id": "25EC2001-197",
     "code": "25EC2001",
     "name": "Digital Circuit Design",
     "slot": "D",
@@ -631,7 +2347,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2001-115",
+    "id": "25EC2001-198",
     "code": "25EC2001",
     "name": "Digital Circuit Design",
     "slot": "D",
@@ -642,7 +2358,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2002-116",
+    "id": "25EC2002-199",
     "code": "25EC2002",
     "name": "Signals and Systems",
     "slot": "C",
@@ -653,7 +2369,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2002-117",
+    "id": "25EC2002-200",
     "code": "25EC2002",
     "name": "Signals and Systems",
     "slot": "C",
@@ -664,7 +2380,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2004-118",
+    "id": "25EC2004-201",
     "code": "25EC2004",
     "name": "Digital Circuit Design Practice",
     "slot": "H",
@@ -675,7 +2391,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2004-119",
+    "id": "25EC2004-202",
     "code": "25EC2004",
     "name": "Digital Circuit Design Practice",
     "slot": "I",
@@ -686,7 +2402,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2003-120",
+    "id": "25EC2003-203",
     "code": "25EC2003",
     "name": "Electronic Devices and Circuits Practice",
     "slot": "J",
@@ -697,7 +2413,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2003-121",
+    "id": "25EC2003-204",
     "code": "25EC2003",
     "name": "Electronic Devices and Circuits Practice",
     "slot": "H",
@@ -708,7 +2424,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25MA1002-122",
+    "id": "25MA1002-205",
     "code": "25MA1002",
     "name": "Linear Algebra",
     "slot": "E",
@@ -719,7 +2435,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25CS2000-123",
+    "id": "25CS2000-206",
     "code": "25CS2000",
     "name": "Introduction to AI with Python",
     "slot": "G",
@@ -730,7 +2446,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2000-124",
+    "id": "25EC2000-207",
     "code": "25EC2000",
     "name": "Electronic Devices and Circuits",
     "slot": "B",
@@ -741,7 +2457,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2001-125",
+    "id": "25EC2001-208",
     "code": "25EC2001",
     "name": "Digital Circuit Design",
     "slot": "D",
@@ -752,7 +2468,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2002-126",
+    "id": "25EC2002-209",
     "code": "25EC2002",
     "name": "Signals and Systems",
     "slot": "C",
@@ -763,7 +2479,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2004-127",
+    "id": "25EC2004-210",
     "code": "25EC2004",
     "name": "Digital Circuit Design Practice",
     "slot": "J",
@@ -774,7 +2490,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2003-128",
+    "id": "25EC2003-211",
     "code": "25EC2003",
     "name": "Electronic Devices and Circuits Practice",
     "slot": "I",
@@ -785,7 +2501,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25MA1002-129",
+    "id": "25MA1002-212",
     "code": "25MA1002",
     "name": "Linear Algebra",
     "slot": "E",
@@ -796,7 +2512,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25CS2000-130",
+    "id": "25CS2000-213",
     "code": "25CS2000",
     "name": "Introduction to AI with Python",
     "slot": "G",
@@ -807,7 +2523,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2000-131",
+    "id": "25EC2000-214",
     "code": "25EC2000",
     "name": "Electronic Devices and Circuits",
     "slot": "B",
@@ -818,7 +2534,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2001-132",
+    "id": "25EC2001-215",
     "code": "25EC2001",
     "name": "Digital Circuit Design",
     "slot": "D",
@@ -829,7 +2545,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2002-133",
+    "id": "25EC2002-216",
     "code": "25EC2002",
     "name": "Signals and Systems",
     "slot": "C",
@@ -840,7 +2556,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2004-134",
+    "id": "25EC2004-217",
     "code": "25EC2004",
     "name": "Digital Circuit Design Practice",
     "slot": "J",
@@ -851,7 +2567,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC2003-135",
+    "id": "25EC2003-218",
     "code": "25EC2003",
     "name": "Electronic Devices and Circuits Practice",
     "slot": "I",
@@ -862,7 +2578,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "CS3006-136",
+    "id": "CS3006-219",
     "code": "CS3006",
     "name": "Introduction to Data Science for Engineers",
     "slot": "E,I1,I2",
@@ -873,7 +2589,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "CS3006-137",
+    "id": "CS3006-220",
     "code": "CS3006",
     "name": "Introduction to Data Science for Engineers",
     "slot": "B,I1,I2",
@@ -884,7 +2600,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "DS3000-138",
+    "id": "DS3000-221",
     "code": "DS3000",
     "name": "Entrepreneurship and Management Functions",
     "slot": "H",
@@ -895,7 +2611,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "DS3000-139",
+    "id": "DS3000-222",
     "code": "DS3000",
     "name": "Entrepreneurship and Management Functions",
     "slot": "H",
@@ -906,7 +2622,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3000-140",
+    "id": "EC3000-223",
     "code": "EC3000",
     "name": "Control Systems",
     "slot": "B",
@@ -917,7 +2633,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3000-141",
+    "id": "EC3000-224",
     "code": "EC3000",
     "name": "Control Systems",
     "slot": "D",
@@ -928,7 +2644,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3001-142",
+    "id": "EC3001-225",
     "code": "EC3001",
     "name": "Communication Systems",
     "slot": "D",
@@ -939,7 +2655,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3001-143",
+    "id": "EC3001-226",
     "code": "EC3001",
     "name": "Communication Systems",
     "slot": "E,X3",
@@ -950,7 +2666,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3002-144",
+    "id": "EC3002-227",
     "code": "EC3002",
     "name": "Digital Signal Processing Practice",
     "slot": "K",
@@ -961,7 +2677,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3002-145",
+    "id": "EC3002-228",
     "code": "EC3002",
     "name": "Digital Signal Processing Practice",
     "slot": "L",
@@ -972,7 +2688,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3002-146",
+    "id": "EC3002-229",
     "code": "EC3002",
     "name": "Digital Signal Processing Practice",
     "slot": "J",
@@ -983,7 +2699,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3003-147",
+    "id": "EC3003-230",
     "code": "EC3003",
     "name": "Analog Circuits Practice",
     "slot": "J",
@@ -994,7 +2710,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3003-148",
+    "id": "EC3003-231",
     "code": "EC3003",
     "name": "Analog Circuits Practice",
     "slot": "K",
@@ -1005,7 +2721,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3003-149",
+    "id": "EC3003-232",
     "code": "EC3003",
     "name": "Analog Circuits Practice",
     "slot": "L",
@@ -1016,7 +2732,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "CS3006-150",
+    "id": "CS3006-233",
     "code": "CS3006",
     "name": "Introduction to Data Science for Engineers",
     "slot": "B, I1, I2",
@@ -1027,7 +2743,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "DS3000-151",
+    "id": "DS3000-234",
     "code": "DS3000",
     "name": "Entrepreneurship and Management Functions",
     "slot": "H",
@@ -1038,7 +2754,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "DS3000-152",
+    "id": "DS3000-235",
     "code": "DS3000",
     "name": "Entrepreneurship and Management Functions",
     "slot": "H",
@@ -1049,7 +2765,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3000-153",
+    "id": "EC3000-236",
     "code": "EC3000",
     "name": "Control Systems",
     "slot": "D",
@@ -1060,7 +2776,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3001-154",
+    "id": "EC3001-237",
     "code": "EC3001",
     "name": "Communication Systems",
     "slot": "E,X3",
@@ -1071,7 +2787,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3002-155",
+    "id": "EC3002-238",
     "code": "EC3002",
     "name": "Digital Signal Processing Practice",
     "slot": "J",
@@ -1082,7 +2798,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3003-156",
+    "id": "EC3003-239",
     "code": "EC3003",
     "name": "Analog Circuits Practice",
     "slot": "L",
@@ -1093,7 +2809,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "CS3006-157",
+    "id": "CS3006-240",
     "code": "CS3006",
     "name": "Introduction to Data Science for Engineers",
     "slot": "B, I1, I2",
@@ -1104,7 +2820,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "DS3000-158",
+    "id": "DS3000-241",
     "code": "DS3000",
     "name": "Entrepreneurship and Management Functions",
     "slot": "H",
@@ -1115,7 +2831,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3000-159",
+    "id": "EC3000-242",
     "code": "EC3000",
     "name": "Control Systems",
     "slot": "D",
@@ -1126,7 +2842,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3001-160",
+    "id": "EC3001-243",
     "code": "EC3001",
     "name": "Communication Systems",
     "slot": "E,X3",
@@ -1137,7 +2853,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3002-161",
+    "id": "EC3002-244",
     "code": "EC3002",
     "name": "Digital Signal Processing Practice",
     "slot": "J",
@@ -1148,7 +2864,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC3003-162",
+    "id": "EC3003-245",
     "code": "EC3003",
     "name": "Analog Circuits Practice",
     "slot": "L",
@@ -1159,7 +2875,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC5028-163",
+    "id": "EC5028-246",
     "code": "EC5028",
     "name": "Mathematics for Communication",
     "slot": "A",
@@ -1170,7 +2886,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC5029-164",
+    "id": "EC5029-247",
     "code": "EC5029",
     "name": "Modeling and Simulation",
     "slot": "C,L",
@@ -1181,7 +2897,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC5030-165",
+    "id": "EC5030-248",
     "code": "EC5030",
     "name": "Data Communication Networks",
     "slot": "G,X5",
@@ -1192,7 +2908,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC5032-166",
+    "id": "EC5032-249",
     "code": "EC5032",
     "name": "Data Communication Networks Practice",
     "slot": "K",
@@ -1203,7 +2919,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC5014-167",
+    "id": "EC5014-250",
     "code": "EC5014",
     "name": "Digital IC Design",
     "slot": "A",
@@ -1214,7 +2930,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC5009-168",
+    "id": "EC5009-251",
     "code": "EC5009",
     "name": "MOSFET Modeling for VLSI Circuits",
     "slot": "D",
@@ -1225,7 +2941,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC5011-169",
+    "id": "EC5011-252",
     "code": "EC5011",
     "name": "VLSI Testing and Testable Design",
     "slot": "C",
@@ -1236,7 +2952,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC5033-170",
+    "id": "EC5033-253",
     "code": "EC5033",
     "name": "Device Modeling and Simulation Practice",
     "slot": "H",
@@ -1247,7 +2963,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC5034-171",
+    "id": "EC5034-254",
     "code": "EC5034",
     "name": "VLSI Testing Practice",
     "slot": "I",
@@ -1258,7 +2974,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC5004-172",
+    "id": "25EC5004-255",
     "code": "25EC5004",
     "name": "Random Processes",
     "slot": "B",
@@ -1269,7 +2985,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC5005-173",
+    "id": "25EC5005-256",
     "code": "25EC5005",
     "name": "Advanced Digital Communication",
     "slot": "E,X3",
@@ -1280,7 +2996,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC5006-174",
+    "id": "25EC5006-257",
     "code": "25EC5006",
     "name": "Advanced Digital Signal Processing",
     "slot": "D",
@@ -1291,7 +3007,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC5007-175",
+    "id": "25EC5007-258",
     "code": "25EC5007",
     "name": "Advanced Digital Communication Practice",
     "slot": "I",
@@ -1302,7 +3018,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC5008-176",
+    "id": "25EC5008-259",
     "code": "25EC5008",
     "name": "Advanced Digital Signal Processing Practice",
     "slot": "H",
@@ -1313,7 +3029,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC5000-177",
+    "id": "25EC5000-260",
     "code": "25EC5000",
     "name": "MOS Modeling for VLSI Circuits",
     "slot": "D",
@@ -1324,7 +3040,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC5001-178",
+    "id": "25EC5001-261",
     "code": "25EC5001",
     "name": "VLSI System Design",
     "slot": "B",
@@ -1335,7 +3051,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC5002-179",
+    "id": "25EC5002-262",
     "code": "25EC5002",
     "name": "VLSI Testing and Testable Design",
     "slot": "E,I",
@@ -1346,7 +3062,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC5003-180",
+    "id": "25EC5003-263",
     "code": "25EC5003",
     "name": "Device Modeling and Simulation Practice",
     "slot": "H",
@@ -1357,7 +3073,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC5009-181",
+    "id": "25EC5009-264",
     "code": "25EC5009",
     "name": "Advanced Microwave Engineering",
     "slot": "G,X5",
@@ -1368,7 +3084,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC5010-182",
+    "id": "25EC5010-265",
     "code": "25EC5010",
     "name": "Advanced EMFT",
     "slot": "E,X3",
@@ -1379,7 +3095,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC5011-183",
+    "id": "25EC5011-266",
     "code": "25EC5011",
     "name": "Advanced Microwave Engineering Practice",
     "slot": "J",
@@ -1390,7 +3106,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "EC4000-184",
+    "id": "EC4000-267",
     "code": "EC4000",
     "name": "BT-EC-Summer Internship",
     "slot": "Full EC23B1",
@@ -1401,7 +3117,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC6000-185",
+    "id": "25EC6000-268",
     "code": "25EC6000",
     "name": "M Tech Dissertation (MTD) Phase I (CMS)",
     "slot": "Full EC26M1",
@@ -1412,7 +3128,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC6003-186",
+    "id": "25EC6003-269",
     "code": "25EC6003",
     "name": "M Tech Dissertation (MTD) Phase I (MVS)",
     "slot": "Full EC26M2",
@@ -1423,7 +3139,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC6006-187",
+    "id": "25EC6006-270",
     "code": "25EC6006",
     "name": "M Tech Dissertation (MTD) Phase I (RFM)",
     "slot": "Full EC26M3",
@@ -1434,7 +3150,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC6001-188",
+    "id": "25EC6001-271",
     "code": "25EC6001",
     "name": "M Tech Dissertation (MTD) Phase II (CMS)",
     "slot": "Full EC26M1",
@@ -1445,7 +3161,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC6004-189",
+    "id": "25EC6004-272",
     "code": "25EC6004",
     "name": "M Tech Dissertation (MTD) Phase II (MVS)",
     "slot": "Full EC26M2",
@@ -1456,7 +3172,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25EC6007-190",
+    "id": "25EC6007-273",
     "code": "25EC6007",
     "name": "M Tech Dissertation (MTD) Phase II (RFM)",
     "slot": "Full EC26M3",
@@ -1467,7 +3183,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ECE_Aug 2026.xlsx"
   },
   {
-    "id": "25MA1002-236",
+    "id": "25MA1002-274",
     "code": "25MA1002",
     "name": "Linear Algebra",
     "slot": "E",
@@ -1478,7 +3194,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25CS2000-237",
+    "id": "25CS2000-275",
     "code": "25CS2000",
     "name": "Introduction to AI with Python",
     "slot": "G (Tue, Thus) / H1-H2",
@@ -1489,7 +3205,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2000-238",
+    "id": "25ME2000-276",
     "code": "25ME2000",
     "name": "Engineering Thermodynamics",
     "slot": "C",
@@ -1500,7 +3216,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2000-239",
+    "id": "25ME2000-277",
     "code": "25ME2000",
     "name": "Engineering Thermodynamics",
     "slot": "C",
@@ -1511,7 +3227,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2001-240",
+    "id": "25ME2001-278",
     "code": "25ME2001",
     "name": "Mechanics of Materials",
     "slot": "G (Mon), B (Tue, Wed, Thus)",
@@ -1522,7 +3238,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2001-241",
+    "id": "25ME2001-279",
     "code": "25ME2001",
     "name": "Mechanics of Materials",
     "slot": "B",
@@ -1533,7 +3249,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2002-242",
+    "id": "25ME2002-280",
     "code": "25ME2002",
     "name": "Fluid Mechanics and Machinery",
     "slot": "A",
@@ -1544,7 +3260,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2002-243",
+    "id": "25ME2002-281",
     "code": "25ME2002",
     "name": "Fluid Mechanics and Machinery",
     "slot": "F,X4",
@@ -1555,7 +3271,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2003-244",
+    "id": "25ME2003-282",
     "code": "25ME2003",
     "name": "Casting, Forming and Joining",
     "slot": "D",
@@ -1566,7 +3282,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2004-245",
+    "id": "25ME2004-283",
     "code": "25ME2004",
     "name": "Manufacturing Processes Practice",
     "slot": "I1 (Tutorial), I2-I3 (Practice)",
@@ -1577,7 +3293,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2004-246",
+    "id": "25ME2004-284",
     "code": "25ME2004",
     "name": "Manufacturing Processes Practice",
     "slot": "J1 (Tutorial), J2-J3 (Practice)",
@@ -1588,7 +3304,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25MA1002-247",
+    "id": "25MA1002-285",
     "code": "25MA1002",
     "name": "Linear Algebra",
     "slot": "E",
@@ -1599,7 +3315,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25MA1002-248",
+    "id": "25MA1002-286",
     "code": "25MA1002",
     "name": "Linear Algebra",
     "slot": "E",
@@ -1610,7 +3326,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25CS2000-249",
+    "id": "25CS2000-287",
     "code": "25CS2000",
     "name": "Introduction to AI with Python",
     "slot": "G, AF for Lab (Wednesday)",
@@ -1621,7 +3337,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25CS2000-250",
+    "id": "25CS2000-288",
     "code": "25CS2000",
     "name": "Introduction to AI with Python",
     "slot": "G (Tue, Thus), H1-H2",
@@ -1632,7 +3348,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25CS2006-251",
+    "id": "25CS2006-289",
     "code": "25CS2006",
     "name": "Database Management Systems",
     "slot": "A, L3-X5",
@@ -1643,7 +3359,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2005-252",
+    "id": "25ME2005-290",
     "code": "25ME2005",
     "name": "Applied Mechanics",
     "slot": "B",
@@ -1654,7 +3370,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2003-253",
+    "id": "25ME2003-291",
     "code": "25ME2003",
     "name": "Casting, Forming and Joining",
     "slot": "D",
@@ -1665,7 +3381,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2006-254",
+    "id": "25ME2006-292",
     "code": "25ME2006",
     "name": "Sensors and Controls",
     "slot": "C",
@@ -1676,7 +3392,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2007-255",
+    "id": "25ME2007-293",
     "code": "25ME2007",
     "name": "Production Drawing",
     "slot": "I, X2",
@@ -1687,7 +3403,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2004-256",
+    "id": "25ME2004-294",
     "code": "25ME2004",
     "name": "Manufacturing Processes Practice",
     "slot": "K1/H1 (Tutorial), K2-K3/H2-H3 (Practice)",
@@ -1698,7 +3414,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25MA1002-257",
+    "id": "25MA1002-295",
     "code": "25MA1002",
     "name": "Linear Algebra",
     "slot": "E",
@@ -1709,7 +3425,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25CS2000-258",
+    "id": "25CS2000-296",
     "code": "25CS2000",
     "name": "Introduction to AI with Python",
     "slot": "G (Tue, Thus), H1-H2",
@@ -1720,7 +3436,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2000-259",
+    "id": "25ME2000-297",
     "code": "25ME2000",
     "name": "Engineering Thermodynamics",
     "slot": "C",
@@ -1731,7 +3447,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2001-260",
+    "id": "25ME2001-298",
     "code": "25ME2001",
     "name": "Mechanics of Materials",
     "slot": "B",
@@ -1742,7 +3458,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2002-261",
+    "id": "25ME2002-299",
     "code": "25ME2002",
     "name": "Fluid Mechanics and Machinery",
     "slot": "F,X4",
@@ -1753,7 +3469,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2003-262",
+    "id": "25ME2003-300",
     "code": "25ME2003",
     "name": "Casting, Forming and Joining",
     "slot": "D",
@@ -1764,7 +3480,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME2004-263",
+    "id": "25ME2004-301",
     "code": "25ME2004",
     "name": "Manufacturing Processes Practice",
     "slot": "K1/L1 (Tutorial), K2-K3/L2-L3 (Practice)",
@@ -1775,7 +3491,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "CS3006-264",
+    "id": "CS3006-302",
     "code": "CS3006",
     "name": "Introduction to Data Science for Engineers",
     "slot": "B, L1-L2",
@@ -1786,7 +3502,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "CS3006-265",
+    "id": "CS3006-303",
     "code": "CS3006",
     "name": "Introduction to Data Science for Engineers",
     "slot": "E, I3-X2",
@@ -1797,7 +3513,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "DS3000-266",
+    "id": "DS3000-304",
     "code": "DS3000",
     "name": "Entrepreneurship and Management Functions",
     "slot": "H",
@@ -1808,7 +3524,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "DS3000-267",
+    "id": "DS3000-305",
     "code": "DS3000",
     "name": "Entrepreneurship and Management Functions",
     "slot": "H",
@@ -1819,7 +3535,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "ME3000-268",
+    "id": "ME3000-306",
     "code": "ME3000",
     "name": "Design of Machine Elements",
     "slot": "G, X3",
@@ -1830,7 +3546,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "ME3001-269",
+    "id": "ME3001-307",
     "code": "ME3001",
     "name": "Measurement and Automation",
     "slot": "D",
@@ -1841,7 +3557,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "ME3002-270",
+    "id": "ME3002-308",
     "code": "ME3002",
     "name": "Thermal Engineering Practice",
     "slot": "K (ME24B1001-55) / J (ME24B1056-79)",
@@ -1852,7 +3568,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "ME3003-271",
+    "id": "ME3003-309",
     "code": "ME3003",
     "name": "Production Drawing and Inspection Practice",
     "slot": "J (ME24B1001-55) / K (ME24B1056-79)",
@@ -1863,7 +3579,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "CS3006-272",
+    "id": "CS3006-310",
     "code": "CS3006",
     "name": "Introduction to Data Science for Engineers",
     "slot": "E, I3-X2",
@@ -1874,7 +3590,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "DS3000-273",
+    "id": "DS3000-311",
     "code": "DS3000",
     "name": "Entrepreneurship and Management Functions",
     "slot": "H",
@@ -1885,7 +3601,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "ME3004-274",
+    "id": "ME3004-312",
     "code": "ME3004",
     "name": "Operations and Supply Chain Management",
     "slot": "B",
@@ -1896,7 +3612,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "ME3005-275",
+    "id": "ME3005-313",
     "code": "ME3005",
     "name": "Robotics and Automation",
     "slot": "D",
@@ -1907,7 +3623,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "ME3006-276",
+    "id": "ME3006-314",
     "code": "ME3006",
     "name": "Quality Engineering",
     "slot": "G, L1-L2 (ME24B21001-29) / K1-K2 (ME24B2030-55)",
@@ -1918,7 +3634,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "ME3007-277",
+    "id": "ME3007-315",
     "code": "ME3007",
     "name": "Robotics and Automation Practice",
     "slot": "K1, K2 (ME24B21001-29) / L1, L2 (ME24B2030-55)",
@@ -1929,7 +3645,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "DS3006-278",
+    "id": "DS3006-316",
     "code": "DS3006",
     "name": "Introduction to Data Science for Engineers",
     "slot": "E, I3-X2",
@@ -1940,7 +3656,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "DS3000-279",
+    "id": "DS3000-317",
     "code": "DS3000",
     "name": "Entrepreneurship and Management Functions",
     "slot": "H",
@@ -1951,7 +3667,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "ME3000-280",
+    "id": "ME3000-318",
     "code": "ME3000",
     "name": "Design of Machine Elements",
     "slot": "G, X3",
@@ -1962,7 +3678,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "ME3001-281",
+    "id": "ME3001-319",
     "code": "ME3001",
     "name": "Measurement and Automation",
     "slot": "D",
@@ -1973,7 +3689,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "ME3002-282",
+    "id": "ME3002-320",
     "code": "ME3002",
     "name": "Thermal Engineering Practice",
     "slot": "J",
@@ -1984,7 +3700,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "ME3003-283",
+    "id": "ME3003-321",
     "code": "ME3003",
     "name": "Production Drawing and Inspection Practice",
     "slot": "K",
@@ -1995,7 +3711,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME5000-284",
+    "id": "25ME5000-322",
     "code": "25ME5000",
     "name": "Data Science",
     "slot": "B/K3-X4",
@@ -2006,7 +3722,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME5001-285",
+    "id": "25ME5001-323",
     "code": "25ME5001",
     "name": "Multibody System Dynamics",
     "slot": "A",
@@ -2017,7 +3733,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME5002-286",
+    "id": "25ME5002-324",
     "code": "25ME5002",
     "name": "Engineering Design with Advanced Materials",
     "slot": "G, X3",
@@ -2028,7 +3744,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME5004-287",
+    "id": "25ME5004-325",
     "code": "25ME5004",
     "name": "Multibody System Dynamics Practice",
     "slot": "J, X2",
@@ -2039,7 +3755,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME5003-288",
+    "id": "25ME5003-326",
     "code": "25ME5003",
     "name": "Structural Analysis and Design Optimization",
     "slot": "D",
@@ -2050,7 +3766,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME5000-289",
+    "id": "25ME5000-327",
     "code": "25ME5000",
     "name": "Data Science",
     "slot": "B/K3-X4",
@@ -2061,7 +3777,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME5005-290",
+    "id": "25ME5005-328",
     "code": "25ME5005",
     "name": "Manufacturing Systems Engineering",
     "slot": "D/L3-X5",
@@ -2072,7 +3788,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME5006-291",
+    "id": "25ME5006-329",
     "code": "25ME5006",
     "name": "Manufacturing Automation",
     "slot": "E, X3",
@@ -2083,7 +3799,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME5007-292",
+    "id": "25ME5007-330",
     "code": "25ME5007",
     "name": "Manufacturing Automation Practice",
     "slot": "H, X1",
@@ -2094,7 +3810,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME5008-293",
+    "id": "25ME5008-331",
     "code": "25ME5008",
     "name": "Additive and Hybrid Manufacturing Processes",
     "slot": "G/I1-I2",
@@ -2105,7 +3821,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "ME4000-294",
+    "id": "ME4000-332",
     "code": "ME4000",
     "name": "BT-ME-Summer Internship",
     "slot": "",
@@ -2116,7 +3832,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "ME4001-295",
+    "id": "ME4001-333",
     "code": "ME4001",
     "name": "BT-SM-Summer Internship",
     "slot": "",
@@ -2127,7 +3843,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME6000-296",
+    "id": "25ME6000-334",
     "code": "25ME6000",
     "name": "M Tech Dissertation (MTD) Phase I (IMSD)",
     "slot": "",
@@ -2138,7 +3854,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME6003-297",
+    "id": "25ME6003-335",
     "code": "25ME6003",
     "name": "M Tech Dissertation (MTD) Phase I (SM)",
     "slot": "",
@@ -2149,7 +3865,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME6001-298",
+    "id": "25ME6001-336",
     "code": "25ME6001",
     "name": "M Tech Dissertation (MTD) Phase II (IMSD)",
     "slot": "",
@@ -2160,7 +3876,7 @@ export const ALL_COURSES: Course[] = [
     "sourceFile": "ME_Aug 2026.xlsx"
   },
   {
-    "id": "25ME6004-299",
+    "id": "25ME6004-337",
     "code": "25ME6004",
     "name": "M Tech Dissertation (MTD) Phase II (SM)",
     "slot": "",
@@ -2169,1182 +3885,5 @@ export const ALL_COURSES: Course[] = [
     "program": "B.Tech ME",
     "semester": "Semester 3",
     "sourceFile": "ME_Aug 2026.xlsx"
-  },
-  {
-    "id": "25MA1002-cse-0",
-    "code": "25MA1002",
-    "name": "Linear Algebra",
-    "slot": "E",
-    "hall": "H21",
-    "faculty": "Dr.\u00a0Nachiketa Mishra",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25MA1002-cse-1",
-    "code": "25MA1002",
-    "name": "Linear Algebra",
-    "slot": "E",
-    "hall": "H22",
-    "faculty": "Prof. Shalu M A",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2000-cse-2",
-    "code": "25CS2000",
-    "name": "Introduction to AI with Python",
-    "slot": "G / L3 X5",
-    "hall": "H44 / L512, L209",
-    "faculty": "Dr Jagadeesh K",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2001-cse-3",
-    "code": "25CS2001",
-    "name": "Object Oriented Programming",
-    "slot": "F (Except Wed) / H, X1",
-    "hall": "H15 / L509",
-    "faculty": "Prof. B Sivaselvan",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2002-cse-4",
-    "code": "25CS2002",
-    "name": "Digital Systems Design",
-    "slot": "A / J3, X3",
-    "hall": "H01 / L515",
-    "faculty": "Dr K Kannadasan",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2003-cse-5",
-    "code": "25CS2003",
-    "name": "Design & Analysis of Algorithms",
-    "slot": "C (Fri), B / Thu D & B",
-    "hall": "H25 / L509",
-    "faculty": "Dr Syed Shahul Hameed",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2004-cse-6",
-    "code": "25CS2004",
-    "name": "Database Systems Design",
-    "slot": "C (Tue), D / Wed D & B",
-    "hall": "H15 / L512",
-    "faculty": "Dr M Ratna Raju",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2005-cse-7",
-    "code": "25CS2005",
-    "name": "Computing Paradigms",
-    "slot": "C (Wed & Thur)",
-    "hall": "H15",
-    "faculty": "Dr Preeth",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25MA1002-cse-8",
-    "code": "25MA1002",
-    "name": "Linear Algebra",
-    "slot": "E",
-    "hall": "H22",
-    "faculty": "Prof. Shalu M A",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2000-cse-9",
-    "code": "25CS2000",
-    "name": "Introduction to AI with Python",
-    "slot": "G / L3 X5",
-    "hall": "H44 / L512, L209",
-    "faculty": "Dr Jagadeesh K",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2000-cse-10",
-    "code": "25CS2000",
-    "name": "Introduction to AI with Python",
-    "slot": "G / Wed A & F",
-    "hall": "H15 / L509, L507",
-    "faculty": "Dr Preeth",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2001-cse-11",
-    "code": "25CS2001",
-    "name": "Object Oriented Programming",
-    "slot": "F (Except Wed) / H, X1",
-    "hall": "H15 / L509",
-    "faculty": "Prof. B Sivaselvan",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2001-cse-12",
-    "code": "25CS2001",
-    "name": "Object Oriented Programming",
-    "slot": "F (Except Wed) / H, X1",
-    "hall": "H15 / L512",
-    "faculty": "Dr B Sivaselvan + Dr NSG",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2002-cse-13",
-    "code": "25CS2002",
-    "name": "Digital Systems Design",
-    "slot": "A / J3, X3",
-    "hall": "H01 / L515",
-    "faculty": "Dr K Kannadasan",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2002-cse-14",
-    "code": "25CS2002",
-    "name": "Digital Systems Design",
-    "slot": "A (Except Wed) / J1, J2",
-    "hall": "H15 / L515",
-    "faculty": "Dr B Krishna Priya",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2003-cse-15",
-    "code": "25CS2003",
-    "name": "Design & Analysis of Algorithms",
-    "slot": "C (Fri), B / Thu D & B",
-    "hall": "H25 / L509",
-    "faculty": "Dr Syed Shahul Hameed",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2003-cse-16",
-    "code": "25CS2003",
-    "name": "Design & Analysis of Algorithms",
-    "slot": "C (Tue), D / Wed D & B",
-    "hall": "H15 / L509",
-    "faculty": "Dr Syed Shahul Hameed",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2004-cse-17",
-    "code": "25CS2004",
-    "name": "Database Systems Design",
-    "slot": "C (Tue), D / Wed D & B",
-    "hall": "H15 / L512",
-    "faculty": "Dr M Ratna Raju",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2004-cse-18",
-    "code": "25CS2004",
-    "name": "Database Systems Design",
-    "slot": "C (Fri), B / Thu D & B",
-    "hall": "H25 / L512",
-    "faculty": "Dr M Ratna Raju",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2005-cse-19",
-    "code": "25CS2005",
-    "name": "Computing Paradigms",
-    "slot": "C (Wed & Thur)",
-    "hall": "H15",
-    "faculty": "Dr Preeth",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2005-cse-20",
-    "code": "25CS2005",
-    "name": "Computing Paradigms",
-    "slot": "C (Wed & Thur)",
-    "hall": "H25",
-    "faculty": "Dr Raghavan",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25MA1002-cse-21",
-    "code": "25MA1002",
-    "name": "Linear Algebra",
-    "slot": "E",
-    "hall": "H22",
-    "faculty": "Prof. Shalu M A",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25MA1002-cse-22",
-    "code": "25MA1002",
-    "name": "Linear Algebra",
-    "slot": "E",
-    "hall": "H23",
-    "faculty": "Dr. Subhasis Ghora",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2000-cse-23",
-    "code": "25CS2000",
-    "name": "Introduction to AI with Python",
-    "slot": "G / Wed A & F",
-    "hall": "H15 / L509",
-    "faculty": "Dr Preeth",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2001-cse-24",
-    "code": "25CS2001",
-    "name": "Object Oriented Programming",
-    "slot": "F (Except Wed) / H, X1",
-    "hall": "H15 / L512",
-    "faculty": "Dr B Sivaselvan + Dr NSG",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2002-cse-25",
-    "code": "25CS2002",
-    "name": "Digital Systems Design",
-    "slot": "A (Except Wed) / J1, J2",
-    "hall": "H15 / L515",
-    "faculty": "Dr B Krishna Priya",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2003-cse-26",
-    "code": "25CS2003",
-    "name": "Design & Analysis of Algorithms",
-    "slot": "C (Tue), D / Wed D & B",
-    "hall": "H15 / L509",
-    "faculty": "Dr Syed Shahul Hameed",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2004-cse-27",
-    "code": "25CS2004",
-    "name": "Database Systems Design",
-    "slot": "C (Fri), B / Thu D & B",
-    "hall": "H25 / L512",
-    "faculty": "Dr M Ratna Raju",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS2005-cse-28",
-    "code": "25CS2005",
-    "name": "Computing Paradigms",
-    "slot": "C (Wed & Thur)",
-    "hall": "H25",
-    "faculty": "Dr Raghavan",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 3",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3006-cse-29",
-    "code": "CS3006",
-    "name": "Introduction to Data Science for Engineers",
-    "slot": "E / L1, L2",
-    "hall": "H44 / L509",
-    "faculty": "Dr Jagadeesh K",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "DS3000-cse-30",
-    "code": "DS3000",
-    "name": "Entrepreneurship and Management Functions",
-    "slot": "H",
-    "hall": "H01",
-    "faculty": "Dr. Siddhant",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "DS3000-cse-31",
-    "code": "DS3000",
-    "name": "Entrepreneurship and Management Functions",
-    "slot": "H",
-    "hall": "H02",
-    "faculty": "Dr. Sadhasivam",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3000-cse-32",
-    "code": "CS3000",
-    "name": "Operating Systems",
-    "slot": "B",
-    "hall": "H41",
-    "faculty": "Dr Raghavan",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3001-cse-33",
-    "code": "CS3001",
-    "name": "Computer Networks",
-    "slot": "D",
-    "hall": "H41",
-    "faculty": "Dr Sanjeet Kumar Nayak",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3002-cse-34",
-    "code": "CS3002",
-    "name": "Compiler Design",
-    "slot": "G, X1",
-    "hall": "H41",
-    "faculty": "Dr Mailthilee",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3003-cse-35",
-    "code": "CS3003",
-    "name": "Operating Systems practice",
-    "slot": "J, X3",
-    "hall": "L509",
-    "faculty": "Dr Raghavan",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3004-cse-36",
-    "code": "CS3004",
-    "name": "Computers Networks practice",
-    "slot": "I, X2",
-    "hall": "L509",
-    "faculty": "Dr Sanjeet Kumar Nayak",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3005-cse-37",
-    "code": "CS3005",
-    "name": "Compiler Design Practice",
-    "slot": "K, X4",
-    "hall": "L509",
-    "faculty": "Dr Maithilee",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3007-cse-38",
-    "code": "CS3007",
-    "name": "Pattern Recognition and Machine Learning",
-    "slot": "F / L3, X5",
-    "hall": "H41 / L509",
-    "faculty": "Dr J Umarani",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "DS3000-cse-39",
-    "code": "DS3000",
-    "name": "Entrepreneurship and Management Functions",
-    "slot": "H",
-    "hall": "H02",
-    "faculty": "Dr. Sadhasivam",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3000-cse-40",
-    "code": "CS3000",
-    "name": "Operating Systems",
-    "slot": "B",
-    "hall": "H41",
-    "faculty": "Dr Raghavan",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3000-cse-41",
-    "code": "CS3000",
-    "name": "Operating Systems",
-    "slot": "B",
-    "hall": "H44",
-    "faculty": "Dr K Rajesh",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3001-cse-42",
-    "code": "CS3001",
-    "name": "Computer Networks",
-    "slot": "D",
-    "hall": "H41",
-    "faculty": "Dr Sanjeet Kumar Nayak",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3001-cse-43",
-    "code": "CS3001",
-    "name": "Computer Networks",
-    "slot": "D",
-    "hall": "H44",
-    "faculty": "Dr K Gnanambikai",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3002-cse-44",
-    "code": "CS3002",
-    "name": "Compiler Design",
-    "slot": "G, X1",
-    "hall": "H41",
-    "faculty": "Dr Maithilee",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3002-cse-45",
-    "code": "CS3002",
-    "name": "Compiler Design",
-    "slot": "G, X1",
-    "hall": "H42",
-    "faculty": "Dr Om Prakash",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3003-cse-46",
-    "code": "CS3003",
-    "name": "Operating Systems practice",
-    "slot": "J, X3",
-    "hall": "L509",
-    "faculty": "Dr Raghavan",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3003-cse-47",
-    "code": "CS3003",
-    "name": "Operating Systems practice",
-    "slot": "J, X3",
-    "hall": "L512",
-    "faculty": "Dr K Rajesh",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3004-cse-48",
-    "code": "CS3004",
-    "name": "Computers Networks practice",
-    "slot": "I, X2",
-    "hall": "L509",
-    "faculty": "Dr Sanjeet Kumar Nayak",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3004-cse-49",
-    "code": "CS3004",
-    "name": "Computers Networks practice",
-    "slot": "I, X2",
-    "hall": "L512",
-    "faculty": "Dr K Gnanambikai",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3005-cse-50",
-    "code": "CS3005",
-    "name": "Compiler Design Practice",
-    "slot": "K, X4",
-    "hall": "L509",
-    "faculty": "Dr Maithilee",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3005-cse-51",
-    "code": "CS3005",
-    "name": "Compiler Design Practice",
-    "slot": "K, X4",
-    "hall": "L512",
-    "faculty": "Dr Om Prakash",
-    "program": "B.Tech CSE",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3006-cse-52",
-    "code": "CS3006",
-    "name": "Introduction to Data Science for Engineers",
-    "slot": "E / L1, L2",
-    "hall": "H44 / L509, L512",
-    "faculty": "Dr Jagadeesh K",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3006-cse-53",
-    "code": "CS3006",
-    "name": "Introduction to Data Science for Engineers",
-    "slot": "E / L1, L2",
-    "hall": "H42 / L512, L507",
-    "faculty": "Dr S Vijaya Kumar",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "DS3000-cse-54",
-    "code": "DS3000",
-    "name": "Entrepreneurship and Management Functions",
-    "slot": "H",
-    "hall": "H02",
-    "faculty": "Dr. Sadhasivam",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "DS3000-cse-55",
-    "code": "DS3000",
-    "name": "Entrepreneurship and Management Functions",
-    "slot": "H",
-    "hall": "H04",
-    "faculty": "Dr. Sudhir V",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3000-cse-56",
-    "code": "CS3000",
-    "name": "Operating Systems",
-    "slot": "B",
-    "hall": "H44",
-    "faculty": "Dr K Rajesh",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3001-cse-57",
-    "code": "CS3001",
-    "name": "Computer Networks",
-    "slot": "D",
-    "hall": "H44",
-    "faculty": "Dr K Gnanambikai",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3002-cse-58",
-    "code": "CS3002",
-    "name": "Compiler Design",
-    "slot": "G, X1",
-    "hall": "H42",
-    "faculty": "Dr Om Prakash",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3003-cse-59",
-    "code": "CS3003",
-    "name": "Operating Systems practice",
-    "slot": "J, X3",
-    "hall": "L512",
-    "faculty": "Dr K Rajesh",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3004-cse-60",
-    "code": "CS3004",
-    "name": "Computers Networks practice",
-    "slot": "I, X2",
-    "hall": "L512",
-    "faculty": "Dr K Gnanambikai",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3005-cse-61",
-    "code": "CS3005",
-    "name": "Compiler Design Practice",
-    "slot": "K, X4",
-    "hall": "L512",
-    "faculty": "Dr Om Prakash",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 5",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS5010-cse-62",
-    "code": "CS5010",
-    "name": "Analytics and Systems of Big Data",
-    "slot": "B / K1, K2",
-    "hall": "H01 / L515",
-    "faculty": "Prof. B Sivaselvan",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 7",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS5011-cse-63",
-    "code": "CS5011",
-    "name": "Information Security",
-    "slot": "G, X3",
-    "hall": "H13",
-    "faculty": "Dr Sanjeet Kumar Nayak",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 7",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS5012-cse-64",
-    "code": "CS5012",
-    "name": "Interactive Computer Graphics",
-    "slot": "E / K3, X4",
-    "hall": "H01 / L209",
-    "faculty": "Dr Nishanth Kartheek",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 7",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS5000-cse-65",
-    "code": "25CS5000",
-    "name": "Mathematical Foundations of Computer Science",
-    "slot": "D",
-    "hall": "H13",
-    "faculty": "Dr N Sadagopan",
-    "program": "M.Tech CSE",
-    "semester": "Semester 1",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS5001-cse-66",
-    "code": "25CS5001",
-    "name": "Advanced Data Strucures & Algorithms",
-    "slot": "A X7",
-    "hall": "H41",
-    "faculty": "Dr Pandiri Venkatesh",
-    "program": "M.Tech CSE",
-    "semester": "Semester 1",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS5002-cse-67",
-    "code": "25CS5002",
-    "name": "Analaytics & Systems of Big Data",
-    "slot": "B",
-    "hall": "H01",
-    "faculty": "Prof. B Sivaselvan",
-    "program": "M.Tech CSE",
-    "semester": "Semester 1",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS5004-cse-68",
-    "code": "25CS5004",
-    "name": "Advanced Data Strucures & Algorithms Practice",
-    "slot": "H, X1",
-    "hall": "L515",
-    "faculty": "Dr Pandiri Venkatesh",
-    "program": "M.Tech CSE",
-    "semester": "Semester 1",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS5003-cse-69",
-    "code": "25CS5003",
-    "name": "Analytics & Systems of Big Data Practice",
-    "slot": "K, X4",
-    "hall": "L515",
-    "faculty": "Prof. B Sivaselvan",
-    "program": "M.Tech CSE",
-    "semester": "Semester 1",
-    "sourceFile": "CSE_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS5001-el-70",
-    "code": "25CS5001",
-    "name": "Advanced Data Structure and Algorithms",
-    "slot": "A (Except Friday) X7",
-    "hall": "H41",
-    "faculty": "Dr Pandiri Venkatesh",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25CS5002-el-71",
-    "code": "25CS5002",
-    "name": "Analytics and Systems of Big Data",
-    "slot": "B",
-    "hall": "H01",
-    "faculty": "Dr B Sivaselvan",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS5105-el-72",
-    "code": "CS5105",
-    "name": "Machine Learning",
-    "slot": "F X10/ L3, X5",
-    "hall": "H01 / L515",
-    "faculty": "Dr Rahul Raman",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS6102-el-73",
-    "code": "CS6102",
-    "name": "Computer Architecture",
-    "slot": "A (Except Friday) / J1, J2",
-    "hall": "H42 / L515",
-    "faculty": "Dr Shak Noor Mahammad",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS5012-el-74",
-    "code": "CS5012",
-    "name": "Interactive Computer Graphics",
-    "slot": "E / K3, X4",
-    "hall": "H01 / L209",
-    "faculty": "Dr Nishanth Kartheek",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS3007-el-75",
-    "code": "CS3007",
-    "name": "Pattern Recognition and Machine Learning",
-    "slot": "F / L3, X5",
-    "hall": "H41 / L509",
-    "faculty": "Dr Umarani",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS6103-el-76",
-    "code": "CS6103",
-    "name": "Computer Network Security",
-    "slot": "C / L1, L2",
-    "hall": "H42 / L209",
-    "faculty": "Dr Pradeep Kumar",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS5100-el-77",
-    "code": "CS5100",
-    "name": "Computer Vision",
-    "slot": "C (Except Friday) / Fri C & A",
-    "hall": "H41 / L509",
-    "faculty": "Dr V Masilamani",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "CS5109-el-78",
-    "code": "CS5109",
-    "name": "Brain Computer Interface",
-    "slot": "C / L1, L2",
-    "hall": "H01 / L515",
-    "faculty": "Dr Kannadasan K",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25EC5010-el-79",
-    "code": "25EC5010",
-    "name": "Advanced EMFT",
-    "slot": "E, X3",
-    "hall": "H43",
-    "faculty": "Dr Yuvaraj",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25EC5009-el-80",
-    "code": "25EC5009",
-    "name": "Advanced Microwave Engineering",
-    "slot": "G, X5",
-    "hall": "H14",
-    "faculty": "Dr Sreenath Reddy",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "EC5014-el-81",
-    "code": "EC5014",
-    "name": "Digital IC Design",
-    "slot": "A",
-    "hall": "H16",
-    "faculty": "Dr Binsu J Kailath",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "EC5028-el-82",
-    "code": "EC5028",
-    "name": "Mathematics for Communication",
-    "slot": "A",
-    "hall": "H14",
-    "faculty": "Dr Badri",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "EC5029-el-83",
-    "code": "EC5029",
-    "name": "Modeling and Simulation",
-    "slot": "C, H",
-    "hall": "H14,L211",
-    "faculty": "Dr Premkumar K",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "EC5030-el-84",
-    "code": "EC5030",
-    "name": "Data Communication Networks",
-    "slot": "G, X5",
-    "hall": "H16",
-    "faculty": "Dr R Sri Prakash",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "EC4100-el-85",
-    "code": "EC4100",
-    "name": "RF and Microwave Circuit Design",
-    "slot": "C",
-    "hall": "H11",
-    "faculty": "Dr Sreenath Reddy",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "EC5101-el-86",
-    "code": "EC5101",
-    "name": "Introduction to Photonics",
-    "slot": "C",
-    "hall": "H12",
-    "faculty": "Dr Srijith",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "ID6100-el-87",
-    "code": "ID6100",
-    "name": "Energy Harvesting Technology",
-    "slot": "F, X4",
-    "hall": "H16",
-    "faculty": "Dr Pandiyarasan Veluswamy",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "EC5107-el-88",
-    "code": "EC5107",
-    "name": "Medical Imaging Systems",
-    "slot": "A",
-    "hall": "H43",
-    "faculty": "Dr Uttam Pal",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "EC5105-el-89",
-    "code": "EC5105",
-    "name": "Biosignal Processing and Analysis",
-    "slot": "F, X4",
-    "hall": "H43",
-    "faculty": "Dr Rohini",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "ME5127-el-90",
-    "code": "ME5127",
-    "name": "Multiscale Modeling of Materials using Machine Learning",
-    "slot": "F, X4",
-    "hall": "H36",
-    "faculty": "Arul Kumar M",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25ME5000-el-91",
-    "code": "25ME5000",
-    "name": "Data Science (Only for PhD)",
-    "slot": "B/H1,H2",
-    "hall": "H17/L110",
-    "faculty": "Kalpana P",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25ME5005-el-92",
-    "code": "25ME5005",
-    "name": "Manufacturing Systems Engineering",
-    "slot": "D/L3, X5",
-    "hall": "H17/L507",
-    "faculty": "Kishor Kumar Gajrani",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25ME5008-el-93",
-    "code": "25ME5008",
-    "name": "Additive and Hybrid Manufacturing Processes",
-    "slot": "G/J1, J2",
-    "hall": "H17/TLC",
-    "faculty": "P. Pandithevan",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "ME5113-el-94",
-    "code": "ME5113",
-    "name": "Gas Dynamics and Propulsive Systems",
-    "slot": "C",
-    "hall": "H17",
-    "faculty": "Dr. Shubhankar Chakraborty",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "ME5124-el-95",
-    "code": "ME5124",
-    "name": "Vibration Control",
-    "slot": "A",
-    "hall": "H17",
-    "faculty": "Dr. Venkatramani",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "ME5103-el-96",
-    "code": "ME5103",
-    "name": "Design of Heat Exchangers",
-    "slot": "F, X4",
-    "hall": "H34",
-    "faculty": "Dr. S. Jayavel",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25ME5001-el-97",
-    "code": "25ME5001",
-    "name": "Multibody System Dynamics",
-    "slot": "E, X1",
-    "hall": "H04",
-    "faculty": "Nagamanikandan G",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25ME5003-el-98",
-    "code": "25ME5003",
-    "name": "Structural Anaysis and Design Optimization",
-    "slot": "D",
-    "hall": "H36",
-    "faculty": "S Gowthaman",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "25ME5002-el-99",
-    "code": "25ME5002",
-    "name": "Engineering Design with Advanced Materials",
-    "slot": "G, X3",
-    "hall": "H34",
-    "faculty": "Dr. Venkatramani",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "ME5114-el-100",
-    "code": "ME5114",
-    "name": "Thermal Turbomachines",
-    "slot": "A",
-    "hall": "H13",
-    "faculty": "Vikash Kumar",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "DS5105-el-101",
-    "code": "DS5105",
-    "name": "Model based design and manufacturing",
-    "slot": "A",
-    "hall": "A",
-    "faculty": "Dr. Rajnish & Dr. Sudhir V",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "DS5107-el-102",
-    "code": "DS5107",
-    "name": "Design of non-invasive systems",
-    "slot": "C",
-    "hall": "H13",
-    "faculty": "Dr. Bingi & Dr. Anudeep",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "DS5106-el-103",
-    "code": "DS5106",
-    "name": "Simulation Driven Design",
-    "slot": "F",
-    "hall": "L407B",
-    "faculty": "Dr. Raguraman",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "DS5104-el-104",
-    "code": "DS5104",
-    "name": "Wearable Technologies",
-    "slot": "A",
-    "hall": "H12",
-    "faculty": "Dr. Karthic G",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "PH5102-el-105",
-    "code": "PH5102",
-    "name": "Materials Fabrication and Characterization Techniques",
-    "slot": "C",
-    "hall": "H41",
-    "faculty": "Dr. Y. Ashok Kumar Reddy",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
-  },
-  {
-    "id": "MA6102-el-106",
-    "code": "MA6102",
-    "name": "Algebraic Number Theory (Only for PhD)",
-    "slot": "B",
-    "hall": "H13",
-    "faculty": "Dr Jagannath Bhanja",
-    "program": "Electives & Minors",
-    "semester": "Semester 3",
-    "sourceFile": "Electives_Aug 2026_Updated.xlsx"
   }
 ];

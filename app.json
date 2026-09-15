@@ -8,18 +8,37 @@
     "scheme": "oryn",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.mao1729.oryn"
+      "icon": "./assets/images/icon.png",
+      "bundleIdentifier": "com.mao1729.oryn",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "fetch",
+          "remote-notification",
+          "processing"
+        ],
+        "BGTaskSchedulerPermittedIdentifiers": [
+          "com.expo.modules.backgroundtask.processing",
+          "ORYN_BACKGROUND_SYNC_TASK"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#2D2D2D",
+        "backgroundColor": "#1A1A1A",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.mao1729.oryn"
+      "package": "com.mao1729.oryn",
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.WAKE_LOCK",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION"
+      ]
     },
     "web": {
       "output": "static",
@@ -30,7 +49,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#2D2D2D",
+          "backgroundColor": "#1A1A1A",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 120
         }
@@ -45,20 +64,28 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/icon.png",
-          "color": "#7C3AED",
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#FFFFFF",
           "defaultChannel": "oryn"
         }
       ],
       "expo-secure-store",
       "expo-background-task",
       "expo-image",
-      "./plugins/withWidgets.js"
+      "./plugins/withWidgets.js",
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true,
       "srcDir": "src"
+    },
+    "extra": {
+      "projectId": "bde0d9cf7958c80bd96ca4d8826ccce0",
+      "projectIdentityNumber": 7401,
+      "projectIdentityTag": "#ORYN-7401",
+      "devFingerprint": "dev_210ee3f0cd58",
+      "prodFingerprint": "prod_5fee03d910b5"
     }
   }
 }

@@ -13,7 +13,7 @@ import {
   ScrollView,
   TextInput,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
 import { useAcademicStore } from '@/store/academicStore';
@@ -25,7 +25,11 @@ interface ElectiveSelectionModalProps {
   onClose: () => void;
 }
 
-export function ElectiveSelectionModal({ visible, onClose }: ElectiveSelectionModalProps) {
+export function ElectiveSelectionModal({
+  visible,
+  onClose,
+}: ElectiveSelectionModalProps) {
+  const insets = useSafeAreaInsets();
   const {
     semester,
     program,
@@ -79,10 +83,18 @@ export function ElectiveSelectionModal({ visible, onClose }: ElectiveSelectionMo
   };
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" statusBarTranslucent onRequestClose={onClose}>
-      <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
-        {/* Header */}
-        <View style={styles.header}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <Pressable style={styles.modalBackdrop} onPress={onClose} />
+        <View style={[styles.modalSheet, { maxHeight: '80%', paddingBottom: Math.max(insets.bottom, 20) }]}>
+          <View style={styles.grabHandle} />
+          {/* Header */}
+          <View style={styles.header}>
           <Pressable onPress={onClose} hitSlop={10} style={styles.closeBtn}>
             <Ionicons name="close" size={20} color={Colors.textSecondary} />
           </Pressable>
@@ -199,15 +211,38 @@ export function ElectiveSelectionModal({ visible, onClose }: ElectiveSelectionMo
             })
           )}
         </ScrollView>
-      </SafeAreaView>
+        </View>
+      </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  modalOverlay: {
     flex: 1,
+    justifyContent: 'flex-end',
+  },
+  modalBackdrop: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  },
+  modalSheet: {
     backgroundColor: Colors.background,
+    borderTopLeftRadius: Radius['2xl'],
+    borderTopRightRadius: Radius['2xl'],
+    maxHeight: '80%',
+    borderWidth: 1,
+    borderColor: Colors.border,
+    overflow: 'hidden',
+  },
+  grabHandle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: Colors.surfaceHigh,
+    alignSelf: 'center',
+    marginTop: 8,
+    marginBottom: 4,
   },
   header: {
     flexDirection: 'row',

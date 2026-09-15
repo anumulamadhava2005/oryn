@@ -76,7 +76,7 @@ export default function AnalyticsScreen() {
         {/* Banner Card */}
         <View style={styles.heroCard}>
           <View style={styles.heroHeader}>
-            <Ionicons name="sparkles" size={24} color={Colors.systemYellow} />
+            <Ionicons name="trending-up-outline" size={24} color={Colors.systemYellow} />
             <Text style={styles.heroTitle}>Productivity Boost</Text>
           </View>
           <Text style={styles.heroBigText}>{metrics.hoursSaved} Hours Saved</Text>

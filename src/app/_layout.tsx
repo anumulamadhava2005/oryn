@@ -14,6 +14,13 @@ import { useAuthStore, type AuthStore } from '@/store/auth';
 import { useOnboardingStore } from '@/store/onboarding';
 import { useAuth } from '@/hooks/useAuth';
 import { Colors } from '@/constants/theme';
+import { OrynSDUI } from '@/components/sdui';
+import { OrynLiveCodeEngine } from '@/components/codeUpdate/OrynLiveCodeEngine';
+import { CustomAlertModal } from '@/components/common/CustomAlertModal';
+import { setupCustomAlert } from '@/utils/alert';
+
+// Intercept all native alerts with Oryn custom alert dialogs
+setupCustomAlert();
 
 SplashScreen.preventAutoHideAsync();
 
@@ -56,12 +63,17 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <GestureHandlerRootView style={{ flex: 1, backgroundColor: Colors.background }}>
         <StatusBar style="light" />
-        <RouteGuard>
-          <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(app)" />
-          </Stack>
-        </RouteGuard>
+        <OrynLiveCodeEngine>
+          <OrynSDUI>
+            <RouteGuard>
+              <Stack screenOptions={{ headerShown: false, animation: 'fade' }}>
+                <Stack.Screen name="(auth)" />
+                <Stack.Screen name="(app)" />
+              </Stack>
+            </RouteGuard>
+          </OrynSDUI>
+        </OrynLiveCodeEngine>
+        <CustomAlertModal />
       </GestureHandlerRootView>
     </SafeAreaProvider>
   );

@@ -52,6 +52,8 @@ function getInitialSelectedElectives(): string[] {
   }
 }
 
+import { fetchRemoteTimetable } from '@/services/orynApi';
+
 export interface ScheduledSlotEntry {
   day: 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI';
   timeSlot: string;
@@ -63,6 +65,7 @@ export interface AcademicStore {
   program: ProgramType;
   semester: SemesterType;
   selectedElectiveIds: string[];
+  timetableVersion: number;
 
   setProgram: (program: ProgramType) => void;
   setSemester: (semester: SemesterType) => void;
@@ -71,6 +74,8 @@ export interface AcademicStore {
   toggleElective: (courseId: string) => void;
   setSelectedElectives: (courseIds: string[]) => void;
   clearElectives: () => void;
+
+  syncRemoteTimetable: () => Promise<void>;
 
   isElectivesAvailable: () => boolean;
   getCoreCourses: () => Course[];
@@ -94,6 +99,34 @@ function dayMatches(dayKey: string, text: string): boolean {
   return aliases.some(alias => new RegExp(`\\b${alias}\\b`).test(textUpper));
 }
 
+function splitTopLevel(text: string, delimiters: string[] = ['/', ',']): string[] {
+  const parts: string[] = [];
+  const current: string[] = [];
+  let parenDepth = 0;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    if (char === '(') {
+      parenDepth++;
+      current.push(char);
+    } else if (char === ')') {
+      parenDepth = Math.max(0, parenDepth - 1);
+      current.push(char);
+    } else if (delimiters.includes(char) && parenDepth === 0) {
+      parts.push(current.join('').trim());
+      current.length = 0;
+    } else {
+      current.push(char);
+    }
+  }
+
+  if (current.length > 0) {
+    parts.push(current.join('').trim());
+  }
+
+  return parts.filter(Boolean);
+}
+
 export function doesCourseMatchSlot(
   courseSlot: string,
   day: string,
@@ -106,7 +139,7 @@ export function doesCourseMatchSlot(
   const cs = courseSlot.trim();
   const csUpper = cs.toUpperCase();
 
-  // Handle explicit time / day descriptions (e.g., SIDI courses)
+  // Handle explicit time / day descriptions (e.g., SIDI design courses)
   if (
     csUpper.includes('AM TO') ||
     csUpper.includes('PM TO') ||
@@ -118,26 +151,23 @@ export function doesCourseMatchSlot(
       return ['10:00', '11:00', '12:00'].some(t => timeSlot.includes(t));
     }
     if (csUpper.includes('2 TO 5 PM') || csUpper.includes('2 TO 5')) {
-      return ['2:00', '3:00', '4:00', '3:20', '4:20'].some(t => timeSlot.includes(t));
+      return ['14:00', '15:00', '16:00', '15:20', '16:20'].some(t => timeSlot.includes(t));
     }
     return true;
   }
 
-  const components = cs.split('/').map(c => c.trim());
+  const components = splitTopLevel(cs, ['/']);
 
   for (const comp of components) {
     const compUpper = comp.toUpperCase();
 
     // Check EXCEPT clause (e.g. 'F (EXCEPT WED)')
     const exceptMatch = compUpper.match(/EXCEPT\s+([A-Z\s,\&]+)/);
-    if (exceptMatch) {
-      const exceptDays = exceptMatch[1];
-      if (dayMatches(day, exceptDays)) {
-        continue;
-      }
+    if (exceptMatch && dayMatches(day, exceptMatch[1])) {
+      continue;
     }
 
-    const subClauses = comp.split(',').map(sc => sc.trim()).filter(Boolean);
+    const subClauses = splitTopLevel(comp, [',']);
 
     for (const sc of subClauses) {
       const scUpper = sc.toUpperCase();
@@ -150,42 +180,48 @@ export function doesCourseMatchSlot(
         }
       });
 
-      if (scDays.length > 0) {
-        if (!scDays.includes(day)) {
-          continue;
-        }
-
-        let cleanSc = scUpper;
-        Object.keys(DAY_MAP).forEach(dKey => {
-          (DAY_MAP[dKey] || []).forEach(alias => {
-            cleanSc = cleanSc.replace(new RegExp(`\\b${alias}\\b`, 'g'), '');
-          });
+      // Clean tokens: remove day names and EXCEPT keywords
+      let cleanSc = scUpper;
+      Object.keys(DAY_MAP).forEach(dKey => {
+        (DAY_MAP[dKey] || []).forEach(alias => {
+          cleanSc = cleanSc.replace(new RegExp(`\\b${alias}\\b`, 'g'), '');
         });
-        cleanSc = cleanSc.replace(/EXCEPT/g, '');
+      });
+      cleanSc = cleanSc.replace(/EXCEPT/g, '');
 
-        const tokens = cleanSc.split(/[\/\,\s\(\)\+\&]+/).filter(Boolean);
-        if (tokens.includes(targetCode)) {
-          return true;
-        }
-      } else {
-        let hasSiblingDayMatch = false;
-        for (const sib of subClauses) {
-          if (sib !== sc) {
-            const sibNoExcept = sib.toUpperCase().replace(/EXCEPT\s+[A-Z\s,\&]+/g, '');
-            const hasDaySpec = Object.keys(DAY_MAP).some(dKey => dayMatches(dKey, sibNoExcept));
-            if (hasDaySpec && dayMatches(day, sibNoExcept)) {
-              hasSiblingDayMatch = true;
-              break;
+      const rawTokens = cleanSc.split(/[\/\,\s\(\)\+\&]+/).filter(Boolean);
+
+      // Expand tokens (e.g. H -> H1, H2, H3, H4 | H1-H2 -> H1, H2 | L3-X5 -> L3, X5)
+      const expanded = new Set<string>(rawTokens);
+      for (const rt of rawTokens) {
+        if (['H', 'I', 'J', 'K', 'L'].includes(rt)) {
+          expanded.add(`${rt}1`);
+          expanded.add(`${rt}2`);
+          expanded.add(`${rt}3`);
+          expanded.add(`${rt}4`);
+        } else if (rt.includes('-')) {
+          const parts = rt.split('-');
+          if (parts.length === 2 && parts[0].length >= 2 && parts[1].length >= 2) {
+            const prefix = parts[0][0];
+            const startN = parseInt(parts[0].slice(1), 10);
+            const endN = parseInt(parts[1].slice(1), 10);
+            if (!isNaN(startN) && !isNaN(endN) && parts[0][0] === parts[1][0]) {
+              for (let n = startN; n <= endN; n++) {
+                expanded.add(`${prefix}${n}`);
+              }
+            } else {
+              parts.forEach(p => expanded.add(p));
             }
           }
         }
+      }
 
-        if (hasSiblingDayMatch) {
-          continue;
+      if (scDays.length > 0) {
+        if (scDays.includes(day) && expanded.has(targetCode)) {
+          return true;
         }
-
-        const tokens = scUpper.split(/[\/\,\s\(\)\+\&]+/).filter(Boolean);
-        if (tokens.includes(targetCode)) {
+      } else {
+        if (expanded.has(targetCode)) {
           return true;
         }
       }
@@ -200,6 +236,7 @@ export const useAcademicStore = create<AcademicStore>()((set, get) => {
     program: getInitialProgram(),
     semester: getInitialSemester(),
     selectedElectiveIds: getInitialSelectedElectives(),
+    timetableVersion: 0,
 
     setProgram: (program: ProgramType) => {
       storage.set(KEYS.PROGRAM, program);
@@ -237,6 +274,17 @@ export const useAcademicStore = create<AcademicStore>()((set, get) => {
       set({ selectedElectiveIds: [] });
     },
 
+    syncRemoteTimetable: async () => {
+      try {
+        const entries = await fetchRemoteTimetable();
+        if (entries && entries.length > 0) {
+          set(state => ({ timetableVersion: state.timetableVersion + 1 }));
+        }
+      } catch (err) {
+        console.warn('[AcademicStore] Failed to sync timetable:', err);
+      }
+    },
+
     // Electives are available for 2nd, 3rd, and 4th years (Semester 3, Semester 5, Semester 7)
     isElectivesAvailable: () => {
       const { semester } = get();
@@ -246,9 +294,9 @@ export const useAcademicStore = create<AcademicStore>()((set, get) => {
     getCoreCourses: () => {
       const { program, semester } = get();
 
-      if (semester === 'Semester 1') {
+      if (semester === 'Semester 1' || program === 'Common (First Sem)') {
         return ALL_COURSES.filter(
-          c => c.program !== 'Electives & Minors' && (c.semester === 'Semester 1' || c.program.includes('First Sem'))
+          c => c.program === 'Common (First Sem)' || c.semester === 'Semester 1'
         );
       }
 
@@ -275,15 +323,9 @@ export const useAcademicStore = create<AcademicStore>()((set, get) => {
       const coreCourses = get().getCoreCourses();
       const isElectiveAllowed = get().isElectivesAvailable();
 
-      if (!isElectiveAllowed) {
-        return coreCourses;
-      }
-
-      const { selectedElectiveIds } = get();
-      const allElectives = get().getAvailableElectives();
-      const userSelectedElectives = allElectives.filter(e => selectedElectiveIds.includes(e.id));
-
-      return [...coreCourses, ...userSelectedElectives];
+      return !isElectiveAllowed
+        ? coreCourses
+        : [...coreCourses, ...get().getAvailableElectives().filter(e => get().selectedElectiveIds.includes(e.id))];
     },
 
     getWeeklySchedule: () => {
@@ -315,10 +357,10 @@ export const useAcademicStore = create<AcademicStore>()((set, get) => {
             return;
           }
 
-          // Find ALL courses matching this day and slot code
-          const matchingCourses = eligibleCourses.filter(c =>
-            doesCourseMatchSlot(c.slot, day, slotCode, timeSlot)
-          );
+          // Find ALL courses matching this day and slot code using the static slot string
+          const matchingCourses = eligibleCourses.filter(c => {
+            return doesCourseMatchSlot(c.slot, day, slotCode, timeSlot);
+          });
 
           schedule[day].push({
             day,

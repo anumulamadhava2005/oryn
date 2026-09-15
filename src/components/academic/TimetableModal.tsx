@@ -4,7 +4,7 @@
  * Provides instant 1-tap semester switching & elective selection.
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -22,21 +22,40 @@ import { Course, SEMESTER_OPTIONS, SemesterType } from '@/constants/academicData
 import { ElectiveSelectionModal } from '@/components/academic/ElectiveSelectionModal';
 import { hapticLight } from '@/utils/haptics';
 
+export type DayType = 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI';
+
+export const DAYS: DayType[] = ['MON', 'TUE', 'WED', 'THU', 'FRI'];
+
+export const DAY_MAP: Record<number, DayType> = {
+  1: 'MON',
+  2: 'TUE',
+  3: 'WED',
+  4: 'THU',
+  5: 'FRI',
+};
+
+export function getTodayDayKey(date: Date = new Date()): DayType {
+  const day = date.getDay();
+  // 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu, 5 = Fri. Weekends default to Monday.
+  return DAY_MAP[day] ?? 'MON';
+}
+
 interface TimetableModalProps {
   visible: boolean;
   onClose: () => void;
   onOpenProfileSettings?: () => void;
+  initialDay?: DayType;
+  selectedDate?: Date;
 }
 
 type TabType = 'schedule' | 'courses';
-type DayType = 'MON' | 'TUE' | 'WED' | 'THU' | 'FRI';
-
-const DAYS: DayType[] = ['MON', 'TUE', 'WED', 'THU', 'FRI'];
 
 export function TimetableModal({
   visible,
   onClose,
   onOpenProfileSettings,
+  initialDay,
+  selectedDate,
 }: TimetableModalProps) {
   const {
     program,
@@ -48,10 +67,21 @@ export function TimetableModal({
     getWeeklySchedule,
   } = useAcademicStore();
 
+  const getTargetDay = () =>
+    initialDay ?? (selectedDate ? getTodayDayKey(selectedDate) : getTodayDayKey());
+
   const [activeTab, setActiveTab] = useState<TabType>('schedule');
-  const [selectedDay, setSelectedDay] = useState<DayType>('MON');
+  const [selectedDay, setSelectedDay] = useState<DayType>(getTargetDay);
   const [searchQuery, setSearchQuery] = useState('');
   const [showElectiveModal, setShowElectiveModal] = useState(false);
+
+  // Automatically reset to today's day (or specified day/date) whenever the modal opens
+  useEffect(() => {
+    if (visible) {
+      setSelectedDay(getTargetDay());
+      setActiveTab('schedule');
+    }
+  }, [visible, initialDay, selectedDate]);
 
   const canChooseElectives = isElectivesAvailable();
 
@@ -79,7 +109,7 @@ export function TimetableModal({
 
   return (
     <>
-      <Modal visible={visible} animationType="slide" presentationStyle="fullScreen" statusBarTranslucent onRequestClose={onClose}>
+      <Modal visible={visible} animationType="slide" presentationStyle="fullScreen" onRequestClose={onClose}>
         <SafeAreaView style={styles.container} edges={['top', 'left', 'right', 'bottom']}>
           {/* Top Header */}
           <View style={styles.header}>
@@ -138,7 +168,7 @@ export function TimetableModal({
                   setShowElectiveModal(true);
                 }}
               >
-                <Ionicons name="sparkles" size={13} color={Colors.systemPurple} />
+                <Ionicons name="bookmarks-outline" size={13} color={Colors.systemPurple} />
                 <Text style={styles.electiveHeaderBtnText}>
                   Electives ({selectedElectiveIds.length})
                 </Text>
@@ -189,6 +219,7 @@ export function TimetableModal({
               <View style={styles.dayStrip}>
                 {DAYS.map(day => {
                   const isSelected = selectedDay === day;
+                  const isToday = getTodayDayKey() === day;
                   return (
                     <Pressable
                       key={day}
@@ -201,6 +232,9 @@ export function TimetableModal({
                       <Text style={[styles.dayPillText, isSelected && styles.dayPillTextActive]}>
                         {day}
                       </Text>
+                      {isToday && (
+                        <View style={[styles.todayIndicatorDot, isSelected && { backgroundColor: Colors.systemBlue }]} />
+                      )}
                     </Pressable>
                   );
                 })}
@@ -320,7 +354,7 @@ export function TimetableModal({
                     }}
                   >
                     <View style={styles.bannerLeft}>
-                      <Ionicons name="sparkles" size={18} color={Colors.systemPurple} />
+                      <Ionicons name="bookmarks-outline" size={18} color={Colors.systemPurple} />
                       <View style={styles.bannerTexts}>
                         <Text style={styles.bannerTitle}>Elective Selection Open</Text>
                         <Text style={styles.bannerSub}>
@@ -581,6 +615,13 @@ const styles = StyleSheet.create({
   dayPillTextActive: {
     color: Colors.systemBlue,
     fontWeight: Typography.weight.bold,
+  },
+  todayIndicatorDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: Colors.systemBlue,
+    marginTop: 3,
   },
   scheduleList: {
     paddingHorizontal: Spacing[4],

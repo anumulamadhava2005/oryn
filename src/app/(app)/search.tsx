@@ -68,12 +68,31 @@ export default function SearchScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>Search</Text>
+          <View style={styles.topRow}>
+            {router.canGoBack() && (
+              <Pressable
+                onPress={() => {
+                  hapticLight();
+                  router.back();
+                }}
+                style={({ pressed }) => [
+                  styles.backBtn,
+                  pressed && { opacity: 0.7 },
+                ]}
+                hitSlop={8}
+                accessibilityRole="button"
+                accessibilityLabel="Go back"
+              >
+                <Ionicons name="chevron-back" size={24} color={Colors.text} />
+              </Pressable>
+            )}
+            <Text style={styles.title}>Search</Text>
+          </View>
           <SearchBar
             value={query}
             onChangeText={setQuery}
             onSubmitEditing={() => commitSearch()}
-            autoFocus={false}
+            autoFocus={true}
           />
           {hasQuery && (
             <Text style={styles.resultCount}>
@@ -170,7 +189,7 @@ export default function SearchScreen() {
 
             {/* Hint */}
             <View style={styles.hintWrap}>
-              <Ionicons name="sparkles-outline" size={14} color={Colors.textMuted} />
+              <Ionicons name="bulb-outline" size={14} color={Colors.textMuted} />
               <Text style={styles.hintText}>
                 Search by sender, course code, company, faculty name, or any keyword
               </Text>
@@ -178,7 +197,7 @@ export default function SearchScreen() {
           </ScrollView>
         ) : results.length === 0 ? (
           <EmptyState
-            emoji="🫙"
+            icon="search-outline"
             title="No results"
             subtitle={`Nothing matched "${query}"`}
           />
@@ -210,6 +229,15 @@ const styles = StyleSheet.create({
     paddingTop: Spacing[2],
     paddingBottom: Spacing[3],
     gap: Spacing[3],
+  },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing[2],
+  },
+  backBtn: {
+    padding: Spacing[1],
+    marginLeft: -Spacing[1.5],
   },
   title: {
     fontSize: Typography.size['2xl'],

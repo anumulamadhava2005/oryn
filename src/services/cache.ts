@@ -78,6 +78,14 @@ export function getAllCachedEmails(): ParsedEmail[] {
   return results;
 }
 
+/** Update unread status in cache */
+export function updateCachedEmailReadStatus(id: string, isUnread: boolean): void {
+  const cached = getCachedEmail(id);
+  if (!cached) return;
+  cached.parsed.isUnread = isUnread;
+  cacheEmail(cached);
+}
+
 /** Get only the cached IDs — avoids deserialising all messages */
 export function getCachedEmailIds(): string[] {
   return readIndex();

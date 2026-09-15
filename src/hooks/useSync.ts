@@ -12,6 +12,8 @@ import { useEmailsStore } from '@/store/emails';
 import { useSyncStore } from '@/store/sync';
 import { hapticSuccess } from '@/utils/haptics';
 
+import { useAcademicStore } from '@/store/academicStore';
+
 export function useSync() {
   const emailStore = useEmailsStore();
   const syncStore = useSyncStore();
@@ -44,6 +46,10 @@ export function useSync() {
       const allCached = getAllCachedEmails();
       emailStore.setEmails(allCached.length > 0 ? allCached : emails);
       await processNewEmailNotifications(emails, { isBackground: false });
+
+      // Sync master timetable & announcements
+      await useAcademicStore.getState().syncRemoteTimetable();
+
       syncStore.finishSync(Date.now());
       hapticSuccess();
     } catch (err: unknown) {
@@ -70,6 +76,9 @@ export function useSync() {
         emailStore.prependEmails(newEmails);
         await processNewEmailNotifications(newEmails, { isBackground: false });
       }
+
+      // Sync master timetable & announcements
+      await useAcademicStore.getState().syncRemoteTimetable();
 
       syncStore.finishSync(Date.now());
       hapticSuccess();

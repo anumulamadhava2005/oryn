@@ -149,7 +149,7 @@ export default function TodayScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
-      {/* Top Bar with Segmented Control & Analytics Button */}
+      {/* Top Bar with Segmented Control */}
       <View style={styles.topControlRow}>
         <View style={styles.segmentContainer}>
           <Pressable
@@ -167,15 +167,6 @@ export default function TodayScreen() {
             <Text style={[styles.segmentText, activeTab === 'calendar' && styles.segmentTextActive]}>
               Calendar
             </Text>
-          </Pressable>
-        </View>
-
-        <View style={{ flexDirection: 'row', gap: Spacing[2] }}>
-          <Pressable
-            onPress={() => { hapticLight(); router.push('/(app)/analytics'); }}
-            style={styles.analyticsBtn}
-          >
-            <Ionicons name="stats-chart" size={16} color={Colors.systemBlue} />
           </Pressable>
         </View>
       </View>
@@ -246,13 +237,16 @@ export default function TodayScreen() {
                 animate={{ opacity: 1, translateY: 0 }}
                 transition={{ type: 'timing', duration: 400, delay: 100 }}
               >
-                <Text style={styles.sectionTitle}>⏰ DEADLINES</Text>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>DEADLINES</Text>
+                  <Text style={styles.sectionCount}>{todayDeadlines.length}</Text>
+                </View>
                 <View style={styles.sectionCard}>
                   {todayDeadlines.map((email, idx) => {
                     const deadline = new Date(email.deadline!);
                     const isOverdue = isPast(deadline);
                     const timeLabel = isOverdue
-                      ? `Overdue · ${formatDistanceToNow(deadline)} ago`
+                      ? `Overdue ${formatDistanceToNow(deadline)} ago`
                       : `Due ${formatDistanceToNow(deadline, { addSuffix: true })}`;
 
                     return (
@@ -265,20 +259,16 @@ export default function TodayScreen() {
                           pressed && styles.rowPressed,
                         ]}
                       >
-                        <View style={[styles.deadlineIcon, isOverdue && styles.deadlineIconOverdue]}>
-                          <Ionicons
-                            name={isOverdue ? 'alert-circle' : 'alarm-outline'}
-                            size={16}
-                            color={isOverdue ? Colors.systemRed : Colors.systemOrange}
-                          />
+                        <View style={styles.deadlineLeft}>
+                          <View style={[styles.deadlineDot, isOverdue && styles.deadlineDotOverdue]} />
+                          <View style={styles.deadlineContent}>
+                            <Text style={styles.deadlineSubject} numberOfLines={1}>{email.subject}</Text>
+                            <Text style={[styles.deadlineTime, isOverdue && styles.deadlineTimeOverdue]}>
+                              {timeLabel}
+                            </Text>
+                          </View>
                         </View>
-                        <View style={styles.deadlineContent}>
-                          <Text style={styles.deadlineSubject} numberOfLines={1}>{email.subject}</Text>
-                          <Text style={[styles.deadlineTime, isOverdue && styles.deadlineTimeOverdue]}>
-                            {timeLabel}
-                          </Text>
-                        </View>
-                        <Ionicons name="chevron-forward" size={14} color={Colors.textMuted} />
+                        <Ionicons name="chevron-forward" size={13} color={Colors.textMuted} />
                       </Pressable>
                     );
                   })}
@@ -293,7 +283,10 @@ export default function TodayScreen() {
                 animate={{ opacity: 1, translateY: 0 }}
                 transition={{ type: 'timing', duration: 400, delay: 200 }}
               >
-                <Text style={styles.sectionTitle}>✅ ACTION ITEMS</Text>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>ACTION ITEMS</Text>
+                  <Text style={styles.sectionCount}>{todayActionItems.length}</Text>
+                </View>
                 <View style={styles.sectionCard}>
                   {todayActionItems.map((item, idx) => (
                     <Pressable
@@ -305,12 +298,10 @@ export default function TodayScreen() {
                         pressed && styles.rowPressed,
                       ]}
                     >
-                      <View style={styles.actionCheckbox}>
-                        <Ionicons name="square-outline" size={18} color={Colors.systemBlue} />
-                      </View>
+                      <Ionicons name="square-outline" size={16} color={Colors.systemBlue} style={styles.actionIcon} />
                       <View style={styles.actionContent}>
                         <Text style={styles.actionText} numberOfLines={2}>{item.action}</Text>
-                        <Text style={styles.actionSource} numberOfLines={1}>from: {item.email.sender}</Text>
+                        <Text style={styles.actionSource} numberOfLines={1}>{item.email.sender}</Text>
                       </View>
                     </Pressable>
                   ))}
@@ -325,7 +316,10 @@ export default function TodayScreen() {
                 animate={{ opacity: 1, translateY: 0 }}
                 transition={{ type: 'timing', duration: 400, delay: 300 }}
               >
-                <Text style={styles.sectionTitle}>🚨 REQUIRES ATTENTION</Text>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>REQUIRES ATTENTION</Text>
+                  <Text style={styles.sectionCount}>{stats.criticalAlerts.length}</Text>
+                </View>
                 <View style={styles.sectionCard}>
                   {stats.criticalAlerts.map((email, idx) => (
                     <Pressable
@@ -344,7 +338,7 @@ export default function TodayScreen() {
                           {email.sender} · {formatDistanceToNow(new Date(email.date), { addSuffix: true })}
                         </Text>
                       </View>
-                      <Ionicons name="chevron-forward" size={14} color={Colors.textMuted} />
+                      <Ionicons name="chevron-forward" size={13} color={Colors.textMuted} />
                     </Pressable>
                   ))}
                 </View>
@@ -358,15 +352,26 @@ export default function TodayScreen() {
                 animate={{ opacity: 1, translateY: 0 }}
                 transition={{ type: 'timing', duration: 400, delay: 400 }}
               >
-                <Text style={styles.sectionTitle}>📊 TODAY'S BREAKDOWN</Text>
-                <View style={styles.breakdownGrid}>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>TODAY'S BREAKDOWN</Text>
+                </View>
+                <View style={styles.breakdownStrip}>
                   {categoryBreakdown.map(([group, count]) => {
                     const meta = GROUP_META[group as keyof typeof GROUP_META];
-                    const color = (Colors.categoryGroup[group as keyof typeof Colors.categoryGroup] as string) ?? Colors.systemGray;
+                    const groupColor =
+                      (Colors.categoryGroup[group as keyof typeof Colors.categoryGroup] as string) ?? Colors.systemBlue;
                     return (
-                      <View key={group} style={[styles.breakdownCard, { borderColor: color + '30' }]}>
-                        <Text style={[styles.breakdownCount, { color }]}>{count}</Text>
-                        <Text style={styles.breakdownLabel} numberOfLines={1}>{meta?.label ?? group}</Text>
+                      <View
+                        key={group}
+                        style={[
+                          styles.breakdownChip,
+                          { borderColor: groupColor + '30', backgroundColor: groupColor + '12' },
+                        ]}
+                      >
+                        <Text style={[styles.breakdownCount, { color: groupColor }]}>{count}</Text>
+                        <Text style={styles.breakdownLabel} numberOfLines={1}>
+                          {meta?.label ?? group}
+                        </Text>
                       </View>
                     );
                   })}
@@ -430,12 +435,12 @@ export default function TodayScreen() {
 
             {/* Selected Date Summary */}
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitleText}>
+              <Text style={styles.sectionTitle}>
                 {isSameDay(selectedCalendarDate, new Date())
                   ? 'DEADLINES TODAY'
                   : `DEADLINES FOR ${format(selectedCalendarDate, 'MMM d, yyyy').toUpperCase()}`}
               </Text>
-              <Text style={styles.countBadge}>{selectedDayDeadlines.length} items</Text>
+              <Text style={styles.sectionCount}>{selectedDayDeadlines.length} items</Text>
             </View>
 
             {selectedDayDeadlines.length === 0 ? (
@@ -471,7 +476,7 @@ export default function TodayScreen() {
 
             {/* All Upcoming Deadlines Timeline */}
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitleText}>ALL UPCOMING DEADLINES</Text>
+              <Text style={styles.sectionTitle}>ALL UPCOMING DEADLINES</Text>
             </View>
 
             <View style={styles.allDeadlinesList}>
@@ -504,6 +509,7 @@ export default function TodayScreen() {
 
       <TimetableModal
         visible={showTimetableModal}
+        selectedDate={activeTab === 'calendar' ? selectedCalendarDate : undefined}
         onClose={() => setShowTimetableModal(false)}
         onOpenProfileSettings={() => setShowAcademicModal(true)}
       />
@@ -523,24 +529,24 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   topControlRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: Spacing[4],
-    paddingVertical: Spacing[2],
-    borderBottomWidth: 1,
+    paddingVertical: Spacing[2.5],
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.border,
+    backgroundColor: Colors.background,
   },
   segmentContainer: {
     flexDirection: 'row',
     backgroundColor: Colors.surfaceHigh,
     borderRadius: Radius.lg,
     padding: 3,
-    gap: 4,
+    gap: 3,
   },
   segmentBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 6,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 7,
     borderRadius: Radius.md,
   },
   segmentBtnActive: {
@@ -548,47 +554,41 @@ const styles = StyleSheet.create({
     ...Shadows.sm,
   },
   segmentText: {
-    fontSize: Typography.size.xs,
+    fontSize: Typography.size.sm,
     fontWeight: Typography.weight.medium,
     color: Colors.textMuted,
   },
   segmentTextActive: {
-    fontWeight: Typography.weight.bold,
+    fontWeight: Typography.weight.semibold,
     color: Colors.text,
-  },
-  analyticsBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: Radius.full,
-    backgroundColor: Colors.accentFaded,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   content: {
     paddingHorizontal: Spacing[4],
-    paddingTop: Spacing[3],
-    paddingBottom: Spacing[16],
+    paddingTop: Spacing[4],
+    paddingBottom: Spacing[6],
     gap: Spacing[4],
   },
   greetingSection: {
-    gap: Spacing[1],
+    gap: 3,
+    paddingBottom: 2,
   },
   dateLabel: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: Typography.weight.bold,
     color: Colors.textMuted,
-    letterSpacing: Typography.tracking.widest,
+    letterSpacing: 1.0,
+    textTransform: 'uppercase',
   },
   greeting: {
     fontSize: Typography.size['2xl'],
     fontWeight: Typography.weight.bold,
     color: Colors.text,
-    letterSpacing: Typography.tracking.tight,
+    letterSpacing: -0.4,
   },
   summaryLine: {
     fontSize: Typography.size.sm,
     color: Colors.textSecondary,
-    marginTop: 2,
+    marginTop: 1,
   },
   allClearCard: {
     backgroundColor: Colors.card,
@@ -613,13 +613,29 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     maxWidth: 260,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: Spacing[2],
+    paddingLeft: Spacing['0.5'],
+  },
   sectionTitle: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: Typography.weight.bold,
     color: Colors.textMuted,
-    letterSpacing: Typography.tracking.widest,
-    marginBottom: Spacing[2],
-    paddingLeft: Spacing[1],
+    letterSpacing: 0.8,
+  },
+  sectionCount: {
+    fontSize: 11,
+    fontWeight: Typography.weight.bold,
+    color: Colors.textMuted,
+    backgroundColor: Colors.surface,
+    paddingHorizontal: 6,
+    paddingVertical: 1,
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   sectionCard: {
     backgroundColor: Colors.card,
@@ -638,23 +654,31 @@ const styles = StyleSheet.create({
   deadlineRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: Spacing[3],
+    paddingVertical: 11,
+    paddingHorizontal: Spacing[3],
     gap: Spacing[3],
   },
-  deadlineIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: Radius.sm,
-    backgroundColor: Colors.warningFaded,
+  deadlineLeft: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: Spacing[3],
+    minWidth: 0,
   },
-  deadlineIconOverdue: {
-    backgroundColor: Colors.errorFaded,
+  deadlineDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: Colors.systemOrange,
+    flexShrink: 0,
+  },
+  deadlineDotOverdue: {
+    backgroundColor: Colors.systemRed,
   },
   deadlineContent: {
     flex: 1,
-    gap: 2,
+    gap: 1,
+    minWidth: 0,
   },
   deadlineSubject: {
     fontSize: Typography.size.sm,
@@ -662,7 +686,7 @@ const styles = StyleSheet.create({
     color: Colors.text,
   },
   deadlineTime: {
-    fontSize: Typography.size.xs,
+    fontSize: 11,
     color: Colors.systemOrange,
     fontWeight: Typography.weight.medium,
   },
@@ -672,36 +696,41 @@ const styles = StyleSheet.create({
   actionRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    padding: Spacing[3],
-    gap: Spacing[3],
+    paddingVertical: 10,
+    paddingHorizontal: Spacing[3],
+    gap: Spacing[2],
   },
-  actionCheckbox: {
-    paddingTop: 2,
+  actionIcon: {
+    marginTop: 1,
+    flexShrink: 0,
   },
   actionContent: {
     flex: 1,
-    gap: 2,
+    gap: 1,
+    minWidth: 0,
   },
   actionText: {
     fontSize: Typography.size.sm,
     color: Colors.text,
-    lineHeight: Typography.size.sm * 1.4,
+    lineHeight: 19,
   },
   actionSource: {
-    fontSize: Typography.size.xs,
+    fontSize: 11,
     color: Colors.textMuted,
   },
   criticalRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: Spacing[3],
+    paddingVertical: 11,
+    paddingHorizontal: Spacing[3],
     gap: Spacing[3],
   },
   criticalDot: {
-    width: 8,
-    height: 8,
+    width: 7,
+    height: 7,
     borderRadius: 4,
     backgroundColor: Colors.systemRed,
+    flexShrink: 0,
   },
   criticalContent: {
     flex: 1,
@@ -716,29 +745,30 @@ const styles = StyleSheet.create({
     fontSize: Typography.size.xs,
     color: Colors.textMuted,
   },
-  breakdownGrid: {
+  breakdownStrip: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     gap: Spacing[2],
+    flexWrap: 'wrap',
   },
-  breakdownCard: {
+  breakdownChip: {
     backgroundColor: Colors.card,
     borderRadius: Radius.md,
     borderWidth: 1,
-    paddingVertical: Spacing[3],
-    paddingHorizontal: Spacing[4],
+    borderColor: Colors.border,
+    paddingVertical: Spacing[2],
+    paddingHorizontal: Spacing[3],
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    minWidth: 90,
-    flex: 1,
+    gap: 6,
   },
   breakdownCount: {
-    fontSize: Typography.size.xl,
+    fontSize: Typography.size.base,
     fontWeight: Typography.weight.bold,
+    color: Colors.text,
   },
   breakdownLabel: {
     fontSize: Typography.size.xs,
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontWeight: Typography.weight.medium,
   },
   // Calendar View Styles
@@ -772,11 +802,11 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   dayCardSelected: {
-    backgroundColor: Colors.systemBlue,
-    borderColor: Colors.systemBlue,
+    backgroundColor: Colors.surfaceElevated,
+    borderColor: Colors.text,
   },
   dayCardToday: {
-    borderColor: Colors.systemBlue,
+    borderColor: Colors.textSecondary,
   },
   dayName: {
     fontSize: 10,
@@ -801,32 +831,15 @@ const styles = StyleSheet.create({
     width: 5,
     height: 5,
     borderRadius: 2.5,
-    backgroundColor: Colors.systemOrange,
+    backgroundColor: Colors.textMuted,
   },
   dotSelected: {
-    backgroundColor: '#FFF',
+    backgroundColor: Colors.text,
   },
   dotCount: {
     fontSize: 9,
-    color: Colors.systemOrange,
-    fontWeight: Typography.weight.bold,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: Spacing[1],
-  },
-  sectionTitleText: {
-    fontSize: 10,
-    fontWeight: Typography.weight.bold,
     color: Colors.textMuted,
-    letterSpacing: Typography.tracking.widest,
-  },
-  countBadge: {
-    fontSize: Typography.size.xs,
-    color: Colors.systemBlue,
-    fontWeight: Typography.weight.semibold,
+    fontWeight: Typography.weight.bold,
   },
   emptyBox: {
     backgroundColor: Colors.card,

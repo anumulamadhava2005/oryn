@@ -221,7 +221,7 @@ export default function EmailDetailScreen() {
               style={styles.insightsHeader}
             >
               <View style={styles.insightsHeaderLeft}>
-                <Ionicons name="sparkles" size={16} color={Colors.systemBlue} />
+                <Ionicons name="flash-outline" size={16} color={Colors.systemBlue} />
                 <Text style={styles.insightsTitle}>AI Insights</Text>
                 {email.actionItems.length > 0 && (
                   <View style={styles.insightsBadge}>

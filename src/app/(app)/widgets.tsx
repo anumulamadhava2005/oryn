@@ -49,7 +49,7 @@ export default function WidgetsScreen() {
       setIsSyncing(false);
       hapticSuccess();
       Alert.alert(
-        'Widgets Synchronized! ⚡',
+        'Widgets Synchronized',
         'Live data for Timetable, Mess Menu, and Category Emails updated for your home screen widgets.'
       );
     }, 600);
@@ -81,7 +81,7 @@ export default function WidgetsScreen() {
         {/* Intro Subtitle Banner */}
         <View style={styles.introCard}>
           <View style={styles.introIconCol}>
-            <Ionicons name="sparkles" size={22} color={Colors.systemBlue} />
+            <Ionicons name="layers-outline" size={22} color={Colors.systemBlue} />
           </View>
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={styles.introHeading}>ORYN CAMPUS WIDGETS</Text>
@@ -301,10 +301,10 @@ export default function WidgetsScreen() {
         {/* 6. Installation Guide Card */}
         {showGuide && (
           <View style={styles.guideCard}>
-            <Text style={styles.guideTitle}>📱 How to Add Widgets to Phone</Text>
+            <Text style={styles.guideTitle}>How to Add Widgets to Phone</Text>
 
             <View style={styles.guideStepBox}>
-              <Text style={styles.guideOsHeader}>🍏 iOS (iPhone & iPad)</Text>
+              <Text style={styles.guideOsHeader}>iOS (iPhone & iPad)</Text>
               <Text style={styles.guideStepText}>1. Touch and hold any app on your Home Screen until apps jiggle.</Text>
               <Text style={styles.guideStepText}>2. Tap the <Text style={{ color: Colors.systemBlue }}>+ Add Widget</Text> button in top left.</Text>
               <Text style={styles.guideStepText}>3. Search for <Text style={{ fontWeight: '700', color: Colors.text }}>Oryn</Text> in widget gallery.</Text>
@@ -312,7 +312,7 @@ export default function WidgetsScreen() {
             </View>
 
             <View style={styles.guideStepBox}>
-              <Text style={styles.guideOsHeader}>🤖 Android (Phones & Tablets)</Text>
+              <Text style={styles.guideOsHeader}>Android (Phones & Tablets)</Text>
               <Text style={styles.guideStepText}>1. Long press on any empty space on your Android home screen.</Text>
               <Text style={styles.guideStepText}>2. Tap <Text style={{ color: Colors.systemOrange }}>Widgets</Text> icon.</Text>
               <Text style={styles.guideStepText}>3. Scroll down and expand the <Text style={{ fontWeight: '700', color: Colors.text }}>Oryn</Text> app drawer.</Text>

@@ -54,6 +54,7 @@ export function useEmails() {
   const stats = useMemo(() => {
     const all = store.emails;
     const unreadCount = all.filter(e => e.isUnread).length;
+    const starredCount = all.filter(e => e.isStarred).length;
     const importantCount = all.filter(e => e.isImportant || e.priority === 'critical' || e.priority === 'high').length;
 
     const today = new Date();
@@ -88,6 +89,7 @@ export function useEmails() {
     return {
       totalCount: all.length,
       unreadCount,
+      starredCount,
       importantCount,
       upcomingDeadlines,
       criticalAlerts,

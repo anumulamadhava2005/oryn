@@ -9,21 +9,16 @@ import { Colors, Typography, Spacing } from '@/constants/theme';
 
 interface Props {
   icon?: React.ComponentProps<typeof Ionicons>['name'];
-  emoji?: string;
   title: string;
   subtitle?: string;
 }
 
-export function EmptyState({ icon, emoji = '📭', title, subtitle }: Props) {
+export function EmptyState({ icon = 'mail-open-outline', title, subtitle }: Props) {
   return (
     <View style={styles.container}>
-      {icon ? (
-        <View style={styles.iconCircle}>
-          <Ionicons name={icon} size={36} color={Colors.textMuted} />
-        </View>
-      ) : (
-        <Text style={styles.emoji}>{emoji}</Text>
-      )}
+      <View style={styles.iconCircle}>
+        <Ionicons name={icon} size={32} color={Colors.textMuted} />
+      </View>
       <Text style={styles.title}>{title}</Text>
       {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
     </View>

@@ -4,7 +4,7 @@
  * Removed redundant section labels, category wrapper, and stat segment bar.
  */
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import {
   Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { FlashList } from '@shopify/flash-list';
+import { FlashList, type FlashListRef } from '@shopify/flash-list';
 import { useRouter } from 'expo-router';
 import { Colors, Typography, Spacing, Radius, Opacity } from '@/constants/theme';
 import { useEmails } from '@/hooks/useEmails';
@@ -24,11 +24,11 @@ import { useEmailsStore } from '@/store/emails';
 import { usePreferredSendersStore } from '@/store/preferredSenders';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
-import { SmartCard } from '@/components/dashboard/SmartCard';
 import { EmailCard } from '@/components/email/EmailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { InboxSkeleton } from '@/components/common/SkeletonLoader';
 import { UndoToast } from '@/components/common/UndoToast';
+import { SmartSearchOverlay } from '@/components/search/SmartSearchOverlay';
 import type { ParsedEmail, CategoryGroup } from '@/types/email';
 
 type StatFilter = 'all' | 'unread' | 'important' | 'deadlines';
@@ -42,7 +42,26 @@ function InboxContent() {
   const prependEmails = useEmailsStore(s => s.prependEmails);
   const { selectedSenders, activeFilter, setActiveFilter } = usePreferredSendersStore();
 
+  const listRef = useRef<FlashListRef<ParsedEmail>>(null);
+  const prevFilterSignatureRef = useRef<string>('');
+
   const [activeStatFilter, setActiveStatFilter] = useState<StatFilter>('all');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  // Compute filter signature to detect any filter changes / resets
+  const filterSignature = useMemo(
+    () =>
+      `${activeStatFilter}|${filters.group ?? ''}|${filters.category ?? ''}|${filters.unreadOnly}|${filters.importantOnly}|${filters.hasDeadline}|${filters.priority ?? ''}|${activeFilter}`,
+    [activeStatFilter, filters, activeFilter],
+  );
+
+  // Automatically reset scroll offset to top whenever any filter is applied, switched, or cleared
+  useEffect(() => {
+    if (prevFilterSignatureRef.current && prevFilterSignatureRef.current !== filterSignature) {
+      listRef.current?.scrollToOffset({ offset: 0, animated: false });
+    }
+    prevFilterSignatureRef.current = filterSignature;
+  }, [filterSignature]);
 
   // Keep preferred senders filter synced with store
   useEffect(() => {
@@ -64,6 +83,7 @@ function InboxContent() {
   const handleStatFilterChange = useCallback(
     (filter: StatFilter) => {
       setActiveStatFilter(filter);
+      listRef.current?.scrollToOffset({ offset: 0, animated: false });
       switch (filter) {
         case 'unread':
           setFilters({ unreadOnly: true, importantOnly: false, hasDeadline: false });
@@ -85,6 +105,7 @@ function InboxContent() {
 
   const handleGroupFilter = useCallback(
     (group: CategoryGroup | null) => {
+      listRef.current?.scrollToOffset({ offset: 0, animated: false });
       setFilters({ group, category: null });
       // Reset stat filter when switching groups
       if (group) setActiveStatFilter('all');
@@ -138,11 +159,6 @@ function InboxContent() {
   // Show skeleton while initial data hasn't loaded yet
   const showSkeleton = emails.length === 0 && isSyncing;
 
-  const hasHighlights =
-    stats.criticalAlerts.length > 0 ||
-    stats.upcomingDeadlines.length > 0 ||
-    stats.placementEmails.length > 0;
-
   const renderHeaderComponent = useMemo(() => {
     return (
       <View style={styles.headerStack}>
@@ -163,40 +179,8 @@ function InboxContent() {
           isPreferredActive={activeFilter}
           preferredSenderCount={selectedSenders.length}
           onTogglePreferredFilter={() => setActiveFilter(!activeFilter)}
+          onSearchPress={() => setIsSearchOpen(true)}
         />
-
-        {/* Alert banners — compact, stacked vertically */}
-        {hasHighlights && (
-          <View style={styles.alertsWrap}>
-            {stats.criticalAlerts.length > 0 && (
-              <SmartCard
-                title="Critical Alerts"
-                icon="alert-circle"
-                emails={stats.criticalAlerts}
-                accentColor={Colors.systemRed}
-                onPress={() => setFilters({ priority: 'critical' })}
-              />
-            )}
-            {stats.upcomingDeadlines.length > 0 && (
-              <SmartCard
-                title="Upcoming Deadlines"
-                icon="alarm"
-                emails={stats.upcomingDeadlines}
-                accentColor={Colors.systemOrange}
-                onPress={() => handleStatFilterChange('deadlines')}
-              />
-            )}
-            {stats.placementEmails.length > 0 && (
-              <SmartCard
-                title="Placement Drive"
-                icon="briefcase"
-                emails={stats.placementEmails}
-                accentColor={Colors.systemIndigo}
-                onPress={() => setFilters({ group: 'placement' })}
-              />
-            )}
-          </View>
-        )}
 
         {/* Filter status bar — only when filtered */}
         {hasFilter && (
@@ -206,6 +190,7 @@ function InboxContent() {
             </Text>
             <Pressable
               onPress={() => {
+                listRef.current?.scrollToOffset({ offset: 0, animated: false });
                 resetFilters();
                 setActiveStatFilter('all');
               }}
@@ -228,7 +213,6 @@ function InboxContent() {
     handleGroupFilter,
     groupCounts,
     hasFilter,
-    hasHighlights,
     emails.length,
     resetFilters,
     setFilters,
@@ -265,6 +249,7 @@ function InboxContent() {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <FlashList
+        ref={listRef}
         data={emails}
         renderItem={renderEmailItem}
         keyExtractor={keyExtractor}
@@ -297,6 +282,11 @@ function InboxContent() {
         onUndo={handleUndo}
         onDismiss={handleUndoDismiss}
       />
+      <SmartSearchOverlay
+        visible={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onEmailPress={handleEmailPress}
+      />
     </SafeAreaView>
   );
 }
@@ -327,22 +317,18 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   contentContainer: {
-    paddingBottom: Spacing[16],
+    paddingBottom: Spacing[6],
   },
   headerStack: {
-    gap: Spacing[2],
-    paddingBottom: Spacing[2],
-  },
-  alertsWrap: {
-    paddingHorizontal: Spacing[4],
-    gap: Spacing[2],
+    gap: Spacing[1.5],
+    paddingBottom: Spacing[1],
   },
   filterStatusBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: Spacing[4],
-    paddingVertical: Spacing[2],
+    paddingVertical: Spacing[1],
   },
   filterStatusText: {
     fontSize: Typography.size.xs,

@@ -10,6 +10,7 @@ export type SortOrder = 'date_desc' | 'date_asc' | 'priority';
 
 export interface EmailFilters {
   unreadOnly: boolean;
+  starredOnly?: boolean;
   importantOnly: boolean;
   hasDeadline: boolean;
   group: CategoryGroup | null;
@@ -22,6 +23,7 @@ export interface EmailFilters {
 
 const DEFAULT_FILTERS: EmailFilters = {
   unreadOnly: false,
+  starredOnly: false,
   importantOnly: false,
   hasDeadline: false,
   group: null,
@@ -111,6 +113,7 @@ export const useEmailsStore = create<EmailsStore>()((set, get) => ({
 
     let result = emails.filter(email => {
       if (filters.unreadOnly && !email.isUnread) return false;
+      if (filters.starredOnly && !email.isStarred) return false;
       if (filters.importantOnly && !email.isImportant) return false;
       if (filters.hasDeadline && !email.deadline) return false;
       if (filters.group && email.categoryGroup !== filters.group) return false;

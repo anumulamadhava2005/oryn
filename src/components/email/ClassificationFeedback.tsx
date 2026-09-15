@@ -88,7 +88,7 @@ export function ClassificationFeedback({ emailId, currentCategory, currentGroup,
   return (
     <View style={styles.container}>
       <View style={styles.headerRow}>
-        <Ionicons name="sparkles-outline" size={14} color={Colors.textMuted} />
+        <Ionicons name="pricetag-outline" size={14} color={Colors.textMuted} />
         <Text style={styles.headerText}>Is this categorized correctly?</Text>
       </View>
 
@@ -171,7 +171,10 @@ export function ClassificationFeedback({ emailId, currentCategory, currentGroup,
       </AnimatePresence>
 
       {feedback === 'correct' && (
-        <Text style={styles.thankYou}>Thanks for the feedback! 🎉</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+          <Ionicons name="checkmark-circle" size={14} color={Colors.systemGreen} />
+          <Text style={styles.thankYou}>Thanks for the feedback!</Text>
+        </View>
       )}
     </View>
   );

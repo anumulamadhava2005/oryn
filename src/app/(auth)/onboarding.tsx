@@ -36,7 +36,7 @@ interface Slide {
 const SLIDES: Slide[] = [
   {
     id: '1',
-    icon: 'sparkles',
+    icon: 'layers-outline',
     iconColor: Colors.systemBlue,
     iconBg: Colors.systemBlue + '20',
     title: 'Your Emails,\nIntelligently Organized',
