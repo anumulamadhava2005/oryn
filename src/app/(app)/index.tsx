@@ -29,12 +29,14 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { InboxSkeleton } from '@/components/common/SkeletonLoader';
 import { UndoToast } from '@/components/common/UndoToast';
 import { SmartSearchOverlay } from '@/components/search/SmartSearchOverlay';
+import { useResponsive } from '@/hooks/useResponsive';
 import type { ParsedEmail, CategoryGroup } from '@/types/email';
 
 type StatFilter = 'all' | 'unread' | 'important' | 'deadlines';
 
 function InboxContent() {
   const router = useRouter();
+  const { isTablet } = useResponsive();
   const { user } = useAuth();
   const { emails, stats, filters, setFilters, resetFilters, toggleStarred, toggleUnread } = useEmails();
   const { isSyncing, runIncrementalSync, runInitialSync, lastSyncAt } = useSync();
@@ -128,7 +130,7 @@ function InboxContent() {
   }, [lastSyncAt, runInitialSync, runIncrementalSync]);
 
   const handleEmailPress = useCallback(
-    (id: string) => router.push(`/(app)/email/${id}`),
+    (id: string) => router.push(`/(app)/email/${id}?from=inbox` as any),
     [router],
   );
 
@@ -241,7 +243,9 @@ function InboxContent() {
   if (showSkeleton) {
     return (
       <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
-        <InboxSkeleton />
+        <View style={isTablet ? { maxWidth: 740, width: '100%', alignSelf: 'center', flex: 1 } : { flex: 1 }}>
+          <InboxSkeleton />
+        </View>
       </SafeAreaView>
     );
   }
@@ -266,7 +270,10 @@ function InboxContent() {
           />
         }
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.contentContainer}
+        contentContainerStyle={[
+          styles.contentContainer,
+          isTablet && { maxWidth: 740, width: '100%', alignSelf: 'center', paddingBottom: 110 },
+        ]}
         refreshControl={
           <RefreshControl
             refreshing={isSyncing}

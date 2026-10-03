@@ -3,7 +3,7 @@
  * Shows all messages in the thread, expanded/collapsed, with reply action and full timeline.
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   Pressable,
   StyleSheet,
   Linking,
+  BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -21,11 +22,12 @@ import { Colors, Typography, Spacing, Radius, Shadows } from '@/constants/theme'
 import { useThreads } from '@/hooks/useThreads';
 import { HtmlEmailRenderer } from '@/components/email/HtmlEmailRenderer';
 import { CategoryBadge } from '@/components/ui/Badge';
+import { usePreferencesStore } from '@/store/preferences';
 import { hapticLight, hapticMedium } from '@/utils/haptics';
 import type { ParsedEmail } from '@/types/email';
 
 export default function ThreadDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
   const router = useRouter();
   const { threads } = useThreads();
 
@@ -49,7 +51,33 @@ export default function ThreadDetailScreen() {
     setExpandedMap(prev => ({ ...prev, [msgId]: !prev[msgId] }));
   }, []);
 
-  const handleBack = useCallback(() => router.back(), [router]);
+  const showInboxTab = usePreferencesStore((s) => s.showInboxTab);
+  const startScreen = usePreferencesStore((s) => s.startScreen);
+
+  const handleBack = useCallback(() => {
+    hapticLight();
+    if (from === 'today') {
+      router.replace('/(app)/today');
+    } else if (from === 'search') {
+      router.replace('/(app)/search');
+    } else if (from === 'lost-found') {
+      router.replace('/(app)/lost-found');
+    } else if (from === 'inbox' || from === 'index') {
+      router.replace('/(app)');
+    } else if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(!showInboxTab || startScreen === 'today' ? '/(app)/today' : '/(app)');
+    }
+  }, [from, router, showInboxTab, startScreen]);
+
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      handleBack();
+      return true;
+    });
+    return () => sub.remove();
+  }, [handleBack]);
 
   if (!thread) {
     return (
@@ -79,7 +107,7 @@ export default function ThreadDetailScreen() {
       <View style={styles.header}>
         <Pressable onPress={handleBack} style={styles.backBtn}>
           <Ionicons name="chevron-back" size={24} color={Colors.systemBlue} />
-          <Text style={styles.backText}>Inbox</Text>
+          <Text style={styles.backText}>Back</Text>
         </Pressable>
         <View style={styles.headerRight}>
           <CategoryBadge category={thread.category as any} />

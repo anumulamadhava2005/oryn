@@ -5,15 +5,12 @@ import {
   Modal,
   TouchableOpacity,
   StyleSheet,
-  Dimensions,
 } from 'react-native';
 import { MotiView } from 'moti';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Colors, Shadows } from '@/constants/theme';
 import { hapticLight } from '@/utils/haptics';
-
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 interface FullScreenImageViewerProps {
   visible: boolean;
@@ -76,8 +73,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   imageWrap: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT * 0.86,
+    width: '100%',
+    height: '86%',
   },
   image: {
     width: '100%',

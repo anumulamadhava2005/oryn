@@ -131,7 +131,7 @@ function httpGetBuffer(urlStr) {
   });
 }
 
-function httpPostJson(urlStr, data) {
+function httpPostJson(urlStr, data, retries = 2) {
   return new Promise((resolve) => {
     try {
       const parsed = new URL(urlStr);
@@ -146,6 +146,7 @@ function httpPostJson(urlStr, data) {
           headers: {
             'Content-Type': 'application/json',
             'Content-Length': Buffer.byteLength(bodyStr),
+            'Connection': 'close',
             'x-api-key': ADMIN_API_KEY,
             Authorization: `Bearer ${ADMIN_API_KEY}`,
           },
@@ -165,14 +166,29 @@ function httpPostJson(urlStr, data) {
         }
       );
 
-      req.on('error', (err) => resolve({ ok: false, error: err.message }));
+      req.on('error', async (err) => {
+        if (retries > 0) {
+          await new Promise((r) => setTimeout(r, 600));
+          resolve(await httpPostJson(urlStr, data, retries - 1));
+        } else {
+          resolve({ ok: false, error: err.message });
+        }
+      });
       req.on('timeout', () => {
         req.destroy();
         resolve({ ok: false, error: 'TIMEOUT' });
       });
 
-      req.write(bodyStr);
-      req.end();
+      try {
+        req.write(bodyStr);
+        req.end();
+      } catch (writeErr) {
+        if (retries > 0) {
+          httpPostJson(urlStr, data, retries - 1).then(resolve);
+        } else {
+          resolve({ ok: false, error: writeErr.message });
+        }
+      }
     } catch (e) {
       resolve({ ok: false, error: e.message });
     }
@@ -180,7 +196,7 @@ function httpPostJson(urlStr, data) {
 }
 
 async function uploadBundleInChunks(serverUrl, fingerprint, environment, bundleBuffer, hash) {
-  const CHUNK_SIZE = 512 * 1024; // 512 KB per chunk to stay well under proxy limits
+  const CHUNK_SIZE = 256 * 1024; // 256 KB per chunk for maximum network resilience
   const totalChunks = Math.ceil(bundleBuffer.length / CHUNK_SIZE);
   const uploadId = 'up_' + crypto.randomBytes(8).toString('hex');
 

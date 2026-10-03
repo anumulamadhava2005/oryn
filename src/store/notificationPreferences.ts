@@ -21,6 +21,8 @@ const KEYS = {
   DEADLINE_3H: 'notif_pref:deadline_3h',
   DEADLINE_1H: 'notif_pref:deadline_1h',
   CLASS_CANCELLATIONS: 'notif_pref:class_cancellations',
+  CLASS_REMINDERS: 'notif_pref:class_reminders',
+  CLASS_REMINDER_MINUTES: 'notif_pref:class_reminder_minutes',
   MORNING_BRIEFING: 'notif_pref:morning_briefing',
   MORNING_TIME: 'notif_pref:morning_time',
   NIGHTLY_RADAR: 'notif_pref:nightly_radar',
@@ -40,6 +42,8 @@ export interface NotificationPreferencesState {
   deadline3h: boolean;
   deadline1h: boolean;
   classCancellations: boolean;
+  classReminders: boolean;
+  classReminderMinutes: number; // default 15
   morningBriefing: boolean;
   morningTime: string; // 'HH:mm'
   nightlyRadar: boolean;
@@ -58,6 +62,8 @@ export interface NotificationPreferencesState {
   setDeadline3h: (val: boolean) => void;
   setDeadline1h: (val: boolean) => void;
   setClassCancellations: (val: boolean) => void;
+  setClassReminders: (val: boolean) => void;
+  setClassReminderMinutes: (val: number) => void;
   setMorningBriefing: (val: boolean) => void;
   setMorningTime: (val: string) => void;
   setNightlyRadar: (val: boolean) => void;
@@ -79,6 +85,8 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
     deadline3h: storage.getBoolean(KEYS.DEADLINE_3H) ?? true,
     deadline1h: storage.getBoolean(KEYS.DEADLINE_1H) ?? true,
     classCancellations: storage.getBoolean(KEYS.CLASS_CANCELLATIONS) ?? true,
+    classReminders: storage.getBoolean(KEYS.CLASS_REMINDERS) ?? true,
+    classReminderMinutes: storage.getNumber(KEYS.CLASS_REMINDER_MINUTES) || 15,
     morningBriefing: storage.getBoolean(KEYS.MORNING_BRIEFING) ?? true,
     morningTime: storage.getString(KEYS.MORNING_TIME) ?? '08:00',
     nightlyRadar: storage.getBoolean(KEYS.NIGHTLY_RADAR) ?? true,
@@ -116,6 +124,14 @@ export const useNotificationPreferencesStore = create<NotificationPreferencesSta
     setClassCancellations: (val: boolean) => {
       storage.set(KEYS.CLASS_CANCELLATIONS, val);
       set({ classCancellations: val });
+    },
+    setClassReminders: (val: boolean) => {
+      storage.set(KEYS.CLASS_REMINDERS, val);
+      set({ classReminders: val });
+    },
+    setClassReminderMinutes: (val: number) => {
+      storage.set(KEYS.CLASS_REMINDER_MINUTES, val);
+      set({ classReminderMinutes: val });
     },
     setMorningBriefing: (val: boolean) => {
       storage.set(KEYS.MORNING_BRIEFING, val);

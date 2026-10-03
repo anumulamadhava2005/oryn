@@ -10,7 +10,7 @@
  * - Sticky bottom action bar with white 'RSVP Now' pill.
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -23,11 +23,7 @@ import {
   TextInput,
   Platform,
   ActivityIndicator,
-  Alert,
 } from 'react-native';
-import * as FileSystem from 'expo-file-system/legacy';
-import * as Sharing from 'expo-sharing';
-import ViewShot, { captureRef } from 'react-native-view-shot';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -37,6 +33,7 @@ import { useAuthStore } from '@/store/auth';
 import { useEventsStore } from '@/store/eventsStore';
 import type { DistrictEvent, RSVPStatus } from '@/types/events';
 import { hapticLight, hapticSuccess, hapticMedium } from '@/utils/haptics';
+import { showAlert } from '@/store/alertStore';
 import { EventScannerModal } from './EventScannerModal';
 import { EventAttendeesModal } from './EventAttendeesModal';
 import { EventBroadcastModal } from './EventBroadcastModal';
@@ -65,28 +62,32 @@ interface Inquiry {
 
 function formatDetailDate(dateStr?: string | null): { dateLine: string; kickoffText: string } {
   if (!dateStr) return { dateLine: 'Date TBA', kickoffText: 'Upcoming' };
-  const d = new Date(dateStr);
-  if (isNaN(d.getTime())) return { dateLine: 'Date TBA', kickoffText: 'Upcoming' };
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return { dateLine: 'Date TBA', kickoffText: 'Upcoming' };
 
-  const dayStr = d.toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-  });
-  const timeStr = d.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
+    const dayStr = d.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    });
+    const timeStr = d.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
 
-  const now = new Date();
-  const diffDays = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-  const kickoffText = diffDays <= 0 ? 'Happening today' : diffDays === 1 ? 'Kickoff tomorrow' : `Kickoff in ${diffDays} days`;
+    const now = new Date();
+    const diffDays = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    const kickoffText = diffDays <= 0 ? 'Happening today' : diffDays === 1 ? 'Kickoff tomorrow' : `Kickoff in ${diffDays} days`;
 
-  return {
-    dateLine: `${dayStr} • ${timeStr}`,
-    kickoffText,
-  };
+    return {
+      dateLine: `${dayStr} • ${timeStr}`,
+      kickoffText,
+    };
+  } catch {
+    return { dateLine: 'Date TBA', kickoffText: 'Upcoming' };
+  }
 }
 
 export function EventDetailModal({
@@ -104,7 +105,11 @@ export function EventDetailModal({
   const isSuperAdmin = useEventsStore((s) => s.isSuperAdmin);
   const userClubRoles = useEventsStore((s) => s.userClubRoles);
   const deleteEvent = useEventsStore((s) => s.deleteEvent);
-  const isClubLeadForEvent = Boolean(event && userClubRoles.some((r) => r.organization_id === event.organization_id));
+  const isClubLeadForEvent = Boolean(
+    event &&
+    Array.isArray(userClubRoles) &&
+    userClubRoles.some((r) => r.organization_id === event.organization_id)
+  );
   const isOrganizer = isSuperAdmin || isClubLeadForEvent;
 
   const [imageError, setImageError] = useState(false);
@@ -124,11 +129,10 @@ export function EventDetailModal({
   const [replyingInquiryId, setReplyingInquiryId] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
   const [isSharing, setIsSharing] = useState(false);
-  const shareCardRef = useRef<any>(null);
 
   // Sync inquiries, broadcasts, and bookmarks from MMKV storage when event loads
   useEffect(() => {
-    if (!event) return;
+    if (!event || !event.id) return;
     setImageError(false);
     setOrgLogoError(false);
     setReplyingInquiryId(null);
@@ -170,11 +174,10 @@ export function EventDetailModal({
     }
   }, [event?.id]);
 
-  if (!event) return null;
+  if (!event || !event.id) return null;
 
   const isGoing = event.user_rsvp_status === 'going';
   const isInterested = event.user_rsvp_status === 'interested';
-  const isHyped = isGoing || isInterested;
   const goingCount = Number(event.going_count || 0);
   const interestedCount = Number(event.interested_count || 0);
   const totalHyped = goingCount + interestedCount;
@@ -186,83 +189,28 @@ export function EventDetailModal({
   const { dateLine, kickoffText } = formatDetailDate(event.event_time);
 
   const handleShare = async () => {
-    if (isSharing) return;
+    if (isSharing || !event) return;
     setIsSharing(true);
     hapticLight();
 
     try {
-      const cacheDir = FileSystem.cacheDirectory || '';
-      const safeId = (event.id || 'event').replace(/[^a-zA-Z0-9]/g, '_');
-      let localImageUri: string | null = null;
-
-      // 1. If event has a poster URL, process and save to a local cache file
-      if (event.poster_url) {
-        try {
-          if (event.poster_url.startsWith('file://')) {
-            localImageUri = event.poster_url;
-          } else if (event.poster_url.startsWith('data:')) {
-            const match = event.poster_url.match(/^data:([^;]+);base64,(.+)$/);
-            const mime = match ? match[1] : 'image/jpeg';
-            const b64 = match ? match[2] : event.poster_url.split(',')[1] ?? event.poster_url;
-            const ext = mime.includes('png') ? 'png' : mime.includes('webp') ? 'webp' : 'jpg';
-            const uri = `${cacheDir}share_event_${safeId}.${ext}`;
-            await FileSystem.writeAsStringAsync(uri, b64, { encoding: FileSystem.EncodingType.Base64 });
-            localImageUri = uri;
-          } else if (event.poster_url.startsWith('http')) {
-            const rawExt = event.poster_url.split('?')[0].split('.').pop()?.toLowerCase();
-            const ext = rawExt && ['jpg', 'jpeg', 'png', 'webp'].includes(rawExt) ? rawExt : 'jpg';
-            const uri = `${cacheDir}share_event_${safeId}.${ext}`;
-            const dl = await FileSystem.downloadAsync(event.poster_url, uri);
-            localImageUri = dl.uri;
-          }
-        } catch (downloadErr) {
-          console.warn('[EventShare] Poster download failed, falling back to card capture:', downloadErr);
-        }
+      const parts = [
+        `Check out "${event.title}" hosted by ${event.organization_name || 'Campus Clubs'} on Oryn!`,
+      ];
+      if (event.event_time) {
+        parts.push(`📅 ${dateLine}`);
+      }
+      if (event.location || event.building) {
+        parts.push(`📍 ${[event.building, event.room_number, event.location].filter(Boolean).join(' • ')}`);
+      }
+      if (event.summary) {
+        parts.push(`\n${event.summary}`);
       }
 
-      // 2. If no poster exists or download failed, capture offscreen branded card
-      if (!localImageUri && shareCardRef.current) {
-        try {
-          const capturedUri = await captureRef(shareCardRef, {
-            format: 'png',
-            quality: 0.95,
-          });
-          localImageUri = capturedUri;
-        } catch (captureErr) {
-          console.warn('[EventShare] ViewShot capture failed:', captureErr);
-        }
-      }
-
-      // 3. Share the local image file
-      if (localImageUri) {
-        const isAvailable = await Sharing.isAvailableAsync();
-        const mime = localImageUri.endsWith('.png')
-          ? 'image/png'
-          : localImageUri.endsWith('.webp')
-          ? 'image/webp'
-          : 'image/jpeg';
-
-        if (isAvailable) {
-          await Sharing.shareAsync(localImageUri, {
-            mimeType: mime,
-            dialogTitle: event.title,
-            UTI: mime,
-          });
-          return;
-        } else {
-          await Share.share({
-            url: localImageUri,
-            title: event.title,
-            message: `Check out ${event.title} hosted by ${event.organization_name || 'campus clubs'} on Oryn!`,
-          });
-          return;
-        }
-      }
-
-      // 4. Ultimate fallback to text sharing
       await Share.share({
         title: event.title,
-        message: `Check out ${event.title} hosted by ${event.organization_name || 'campus clubs'} on Oryn!\n${event.location ? `📍 ${event.location}` : ''}`,
+        message: parts.join('\n'),
+        url: event.poster_url || undefined,
       });
     } catch (err: any) {
       console.warn('[EventShare] Share error:', err.message);
@@ -274,10 +222,11 @@ export function EventDetailModal({
   const handleDelete = () => {
     if (!event) return;
     hapticMedium();
-    Alert.alert(
-      'Delete Event',
-      `Are you sure you want to permanently delete "${event.title}"? This will cancel all student RSVPs and remove the event from the feed.`,
-      [
+    showAlert({
+      title: 'Delete Event',
+      message: `Are you sure you want to permanently delete "${event.title}"? This will cancel all student RSVPs and remove the event from the feed.`,
+      type: 'destructive',
+      buttons: [
         { text: 'Cancel', style: 'cancel' },
         {
           text: 'Delete Permanently',
@@ -287,14 +236,22 @@ export function EventDetailModal({
               await deleteEvent(event.id);
               hapticSuccess();
               onClose();
-              Alert.alert('Event Deleted', `"${event.title}" has been deleted.`);
+              showAlert({
+                title: 'Event Deleted',
+                message: `"${event.title}" has been permanently removed.`,
+                type: 'success',
+              });
             } catch (err: any) {
-              Alert.alert('Delete Failed', err.message || 'Could not delete event.');
+              showAlert({
+                title: 'Delete Failed',
+                message: err.message || 'Could not delete event.',
+                type: 'destructive',
+              });
             }
           },
         },
-      ]
-    );
+      ],
+    });
   };
 
   const toggleBookmark = () => {
@@ -452,9 +409,9 @@ export function EventDetailModal({
 
             {/* Bottom Overlay Pills */}
             <View style={styles.heroPillsRow}>
-              {event.organization_category && (
+              {Boolean(event.organization_category) && (
                 <View style={styles.heroPill}>
-                  <Text style={styles.heroPillText}>{event.organization_category.toUpperCase()}</Text>
+                  <Text style={styles.heroPillText}>{String(event.organization_category).toUpperCase()}</Text>
                 </View>
               )}
               {event.priority === 'Critical' && (
@@ -466,11 +423,11 @@ export function EventDetailModal({
           </View>
 
           {/* Active Attendee Broadcast Alert */}
-          {activeBroadcast && (
+          {Boolean(activeBroadcast) && (
             <View style={styles.broadcastAlertBanner}>
               <View style={styles.broadcastAlertHeader}>
                 <Ionicons name="megaphone" size={13} color={DISTRICT_THEME.accentOrange} style={{ marginRight: 6 }} />
-                <Text style={styles.broadcastAlertBadge}>ANNOUNCEMENT • {activeBroadcast.type.toUpperCase()}</Text>
+                <Text style={styles.broadcastAlertBadge}>ANNOUNCEMENT • {String(activeBroadcast.type || '').toUpperCase()}</Text>
                 <Text style={styles.broadcastAlertTime}>{activeBroadcast.createdAt}</Text>
               </View>
               <Text style={styles.broadcastAlertTitle}>{activeBroadcast.title}</Text>
@@ -498,7 +455,7 @@ export function EventDetailModal({
           )}
 
           {/* 4. Club / Organizer Card */}
-          {event.organization_name && (
+          {Boolean(event.organization_name) && (
             <View style={styles.organizerCard}>
               <View style={styles.organizerLogoWrap}>
                 {hasOrgLogo ? (
@@ -510,7 +467,7 @@ export function EventDetailModal({
                 ) : (
                   <View style={styles.organizerLogoPlaceholder}>
                     <Text style={styles.organizerLogoInitial}>
-                      {event.organization_name.charAt(0).toUpperCase()}
+                      {(event.organization_name || 'C').charAt(0).toUpperCase()}
                     </Text>
                   </View>
                 )}
@@ -521,7 +478,7 @@ export function EventDetailModal({
                   <Text style={styles.organizerName} numberOfLines={1}>
                     {event.organization_name}
                   </Text>
-                  {event.organization_verified && (
+                  {Boolean(event.organization_verified) && (
                     <Ionicons name="checkmark-circle" size={14} color="#60A5FA" />
                   )}
                 </View>
@@ -559,7 +516,7 @@ export function EventDetailModal({
             </View>
 
             {/* Campus Venue */}
-            {(event.location || event.building) && (
+            {Boolean(event.location || event.building) && (
               <View style={styles.metaRow}>
                 <View style={styles.metaIconCircle}>
                   <Ionicons name="location-outline" size={17} color={DISTRICT_THEME.accentOrange} />
@@ -817,7 +774,7 @@ export function EventDetailModal({
                   <Text style={styles.inquiryQuestion}>{inq.question}</Text>
 
                   {/* Organizer Answer Box */}
-                  {inq.answerText && (
+                  {Boolean(inq.answerText) && (
                     <View style={styles.organizerAnswerBox}>
                       <View style={styles.organizerAnswerHeader}>
                         <View style={styles.organizerBadgePill}>
@@ -831,7 +788,7 @@ export function EventDetailModal({
                   )}
 
                   {/* Organizer Reply Trigger */}
-                  {isOrganizer && !inq.answerText && (
+                  {Boolean(isOrganizer && !inq.answerText) && (
                     <View style={styles.organizerReplyRow}>
                       {replyingInquiryId === inq.id ? (
                         <View style={styles.replyBox}>
@@ -1010,59 +967,6 @@ export function EventDetailModal({
             } catch {}
           }}
         />
-        {/* ── Offscreen Branded Event Share Card for ViewShot ── */}
-        <View style={styles.offscreenShareWrap} pointerEvents="none">
-          <ViewShot ref={shareCardRef} options={{ format: 'png', quality: 0.95 }} style={styles.shareCardContainer}>
-            <View style={styles.shareCardHeader}>
-              <View style={styles.shareCardBrandRow}>
-                <View style={styles.shareCardLogoDot} />
-                <Text style={styles.shareCardBrandText}>ORYN CAMPUS EVENTS</Text>
-              </View>
-              {event.organization_category && (
-                <View style={styles.shareCardCategoryPill}>
-                  <Text style={styles.shareCardCategoryText}>{event.organization_category}</Text>
-                </View>
-              )}
-            </View>
-
-            <Text style={styles.shareCardTitle}>{event.title}</Text>
-
-            {event.summary ? (
-              <Text style={styles.shareCardSummary} numberOfLines={3}>
-                {event.summary}
-              </Text>
-            ) : null}
-
-            <View style={styles.shareCardMetaBox}>
-              <View style={styles.shareCardMetaRow}>
-                <Ionicons name="calendar-outline" size={15} color="#FFFFFF" />
-                <Text style={styles.shareCardMetaText}>{dateLine}</Text>
-              </View>
-              <View style={styles.shareCardMetaRow}>
-                <Ionicons name="time-outline" size={15} color="#FFFFFF" />
-                <Text style={styles.shareCardMetaText}>{kickoffText}</Text>
-              </View>
-              {(event.location || event.building) && (
-                <View style={styles.shareCardMetaRow}>
-                  <Ionicons name="location-outline" size={15} color="#FFFFFF" />
-                  <Text style={styles.shareCardMetaText}>
-                    {[event.location, event.building, event.room_number].filter(Boolean).join(' • ')}
-                  </Text>
-                </View>
-              )}
-            </View>
-
-            <View style={styles.shareCardFooter}>
-              <View style={styles.shareCardOrgWrap}>
-                <Text style={styles.shareCardOrgLabel}>ORGANIZED BY</Text>
-                <Text style={styles.shareCardOrgName}>{event.organization_name || 'Campus Club'}</Text>
-              </View>
-              <View style={styles.shareCardFooterRight}>
-                <Text style={styles.shareCardFooterApp}>Get Oryn</Text>
-              </View>
-            </View>
-          </ViewShot>
-        </View>
       </View>
     </Modal>
   );

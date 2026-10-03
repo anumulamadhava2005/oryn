@@ -16,6 +16,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
+import { useResponsive } from '@/hooks/useResponsive';
 import { hapticLight, hapticSuccess } from '@/utils/haptics';
 
 import {
@@ -61,6 +62,7 @@ export function LostFoundFilterModal({
   onApply,
 }: LostFoundFilterModalProps) {
   const insets = useSafeAreaInsets();
+  const { modalSheetStyles } = useResponsive();
   const [selectedTab, setSelectedTab] = useState<LostFoundTab>(activeTab);
   const [selectedCat, setSelectedCat] = useState<LostFoundCategory>(
     activeCategory || 'All'
@@ -90,9 +92,9 @@ export function LostFoundFilterModal({
       transparent
       onRequestClose={onClose}
     >
-      <View style={styles.modalOverlay}>
+      <View style={[styles.modalOverlay, modalSheetStyles.overlay]}>
         <Pressable style={styles.modalBackdrop} onPress={onClose} />
-        <View style={[styles.modalSheet, { maxHeight: '80%', paddingBottom: Math.max(insets.bottom, 20) }]}>
+        <View style={[styles.modalSheet, modalSheetStyles.sheet, { maxHeight: '80%', paddingBottom: Math.max(insets.bottom, 20) }]}>
           {/* Apple Grab Handle */}
           <View style={styles.grabHandle} />
 

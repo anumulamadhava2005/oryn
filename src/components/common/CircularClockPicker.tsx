@@ -16,6 +16,7 @@ import {
   PanResponder,
   Pressable,
   GestureResponderEvent,
+  PanResponderGestureState,
 } from 'react-native';
 import { Typography, Radius } from '@/constants/theme';
 import { hapticLight, hapticSuccess } from '@/utils/haptics';
@@ -45,8 +46,6 @@ export function CircularClockPicker({
   onChange,
 }: CircularClockPickerProps) {
   const [mode, setMode] = useState<ClockMode>('hours');
-  const dialRef = useRef<View>(null);
-  const dialLayoutRef = useRef<{ pageX: number; pageY: number }>({ pageX: 0, pageY: 0 });
 
   const lastHourRef = useRef(hour12);
   const lastMinuteRef = useRef(minute);
@@ -59,27 +58,13 @@ export function CircularClockPicker({
     lastMinuteRef.current = minute;
   }, [minute]);
 
-  const updateDialPosition = () => {
-    if (dialRef.current) {
-      dialRef.current.measure((_x, _y, _width, _height, pageX, pageY) => {
-        dialLayoutRef.current = { pageX, pageY };
-      });
-    }
-  };
+  const startTouchRef = useRef<{ x: number; y: number }>({ x: RADIUS, y: RADIUS });
 
   /**
-   * Calculates angle and updates hour or minute from touch coordinates
+   * Calculates angle and updates hour or minute from touch coordinates (pure math, 0 bridge calls)
    */
-  const handleTouch = useCallback(
-    (e: GestureResponderEvent, isEnd = false) => {
-      const { pageX, pageY } = e.nativeEvent;
-      const dialX = dialLayoutRef.current.pageX || 0;
-      const dialY = dialLayoutRef.current.pageY || 0;
-
-      // Coordinate relative to dial center
-      const touchX = pageX - dialX - RADIUS;
-      const touchY = pageY - dialY - RADIUS;
-
+  const processAngle = useCallback(
+    (touchX: number, touchY: number, isEnd = false) => {
       // Angle in degrees from 12 o'clock (clockwise)
       let deg = Math.atan2(touchY, touchX) * (180 / Math.PI) + 90;
       if (deg < 0) deg += 360;
@@ -99,7 +84,7 @@ export function CircularClockPicker({
           setTimeout(() => {
             hapticSuccess();
             setMode('minutes');
-          }, 150);
+          }, 120);
         }
       } else {
         const m = Math.round(deg / 6) % 60;
@@ -113,23 +98,30 @@ export function CircularClockPicker({
     [mode, ampm, onChange]
   );
 
-  // PanResponder for smooth dragging around the clock dial
+  // High-performance PanResponder with zero native-bridge measurement calls
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: (e: GestureResponderEvent) => {
-        updateDialPosition();
-        handleTouch(e, false);
+        const { locationX, locationY } = e.nativeEvent;
+        startTouchRef.current = { x: locationX, y: locationY };
+        processAngle(locationX - RADIUS, locationY - RADIUS, false);
       },
-      onPanResponderMove: (e: GestureResponderEvent) => {
-        handleTouch(e, false);
+      onPanResponderMove: (_e: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+        const touchX = startTouchRef.current.x + gestureState.dx - RADIUS;
+        const touchY = startTouchRef.current.y + gestureState.dy - RADIUS;
+        processAngle(touchX, touchY, false);
       },
-      onPanResponderRelease: (e: GestureResponderEvent) => {
-        handleTouch(e, true);
+      onPanResponderRelease: (_e: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+        const touchX = startTouchRef.current.x + gestureState.dx - RADIUS;
+        const touchY = startTouchRef.current.y + gestureState.dy - RADIUS;
+        processAngle(touchX, touchY, true);
       },
-      onPanResponderTerminate: (e: GestureResponderEvent) => {
-        handleTouch(e, true);
+      onPanResponderTerminate: (_e: GestureResponderEvent, gestureState: PanResponderGestureState) => {
+        const touchX = startTouchRef.current.x + gestureState.dx - RADIUS;
+        const touchY = startTouchRef.current.y + gestureState.dy - RADIUS;
+        processAngle(touchX, touchY, true);
       },
     })
   ).current;
@@ -209,8 +201,6 @@ export function CircularClockPicker({
       {/* Analog Clock Face Dial */}
       <View style={styles.dialWrapper}>
         <View
-          ref={dialRef}
-          onLayout={updateDialPosition}
           style={styles.dialContainer}
           {...panResponder.panHandlers}
         >

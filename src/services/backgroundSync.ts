@@ -10,7 +10,10 @@ import {
   processNewEmailNotifications,
   scheduleMorningBriefing,
   scheduleNightlyRadar,
+  scheduleClassReminders,
 } from './notifications';
+import { syncEventsFromEmail } from './eventsEmailImporter';
+import { syncLostFoundFromEmail } from './lostFoundEmailImporter';
 
 export const BACKGROUND_SYNC_TASK = 'ORYN_BACKGROUND_SYNC_TASK';
 
@@ -26,6 +29,15 @@ TaskManager.defineTask(BACKGROUND_SYNC_TASK, async () => {
       await scheduleMorningBriefing().catch(() => {});
       await scheduleNightlyRadar().catch(() => {});
     }
+
+    // Always keep upcoming 15-minute class reminders fresh
+    await scheduleClassReminders().catch(() => {});
+
+    // Automatically parse and import campus events & clubs from emails in the background
+    await syncEventsFromEmail().catch(() => {});
+
+    // Automatically parse and import lost & found items from emails in the background
+    await syncLostFoundFromEmail().catch(() => {});
 
     return BackgroundTask.BackgroundTaskResult.Success;
   } catch (error) {

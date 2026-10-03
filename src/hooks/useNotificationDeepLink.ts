@@ -21,7 +21,14 @@ export function useNotificationDeepLink() {
     async function handleResponse(response: Notifications.NotificationResponse) {
       const { actionIdentifier } = response;
       const content = response.notification.request.content;
-      const data = content.data as { emailId?: string; type?: string; stage?: string } | undefined;
+      const data = content.data as {
+        emailId?: string;
+        type?: string;
+        stage?: string;
+        itemId?: string;
+        foundItemId?: string;
+        action_url?: string;
+      } | undefined;
       const emailId = data?.emailId;
 
       // 1. Action: Mark as Read
@@ -56,9 +63,24 @@ export function useNotificationDeepLink() {
         actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER ||
         actionIdentifier === ACTION_IDS.VIEW_EMAIL
       ) {
-        if (emailId && emailId !== 'test-placement-id' && emailId !== 'test-deadline-id' && emailId !== 'test-cancellation-id') {
+        if (
+          data?.type === 'lost_found_match' ||
+          data?.foundItemId ||
+          (data as any)?.action_url?.includes('lost-found')
+        ) {
+          const actionUrl = (data as any)?.action_url || '';
+          const matchId =
+            data?.foundItemId ||
+            data?.itemId ||
+            (actionUrl.includes('itemId=') ? actionUrl.split('itemId=')[1].split('&')[0] : undefined);
+          if (matchId) {
+            router.push({ pathname: '/(app)/lost-found', params: { itemId: matchId } });
+          } else {
+            router.push('/(app)/lost-found');
+          }
+        } else if (emailId && emailId !== 'test-placement-id' && emailId !== 'test-deadline-id' && emailId !== 'test-cancellation-id') {
           router.push(`/(app)/email/${emailId}`);
-        } else if (data?.type === 'briefing_morning' || data?.type === 'briefing_nightly') {
+        } else if (data?.type === 'briefing_morning' || data?.type === 'briefing_nightly' || data?.type === 'class_reminder') {
           router.push('/(app)/today');
         }
       }

@@ -62,10 +62,12 @@ function createDeltaPatch(baseBuf, targetBuf, expectedBaseHash, expectedTargetHa
     const tIndex = new Map();
     for (let j = tStart; j <= tEnd - minMatch; j += step) {
       const key = targetBuf.readUInt32BE(j); // 4-byte fast hash filter
-      if (!tIndex.has(key)) {
-        tIndex.set(key, []);
+      const arr = tIndex.get(key);
+      if (!arr) {
+        tIndex.set(key, [j]);
+      } else if (arr.length < 8) {
+        arr.push(j);
       }
-      tIndex.get(key).push(j);
     }
 
     let bestB = -1;
@@ -76,7 +78,7 @@ function createDeltaPatch(baseBuf, targetBuf, expectedBaseHash, expectedTargetHa
     for (let i = bStart; i <= bEnd - minMatch; i += step) {
       const key = baseBuf.readUInt32BE(i);
       const candidates = tIndex.get(key);
-      if (!candidates) continue;
+      if (!candidates || candidates.length > 8) continue;
 
       for (const j of candidates) {
         // Verify full minMatch bytes
@@ -104,6 +106,26 @@ function createDeltaPatch(baseBuf, targetBuf, expectedBaseHash, expectedTargetHa
   // Recursive diffing on sub-slices
   function diffRange(bStart, bEnd, tStart, tEnd) {
     if (bStart === bEnd && tStart === tEnd) return;
+
+    // Fast path: Pure insertion
+    if (bStart === bEnd) {
+      ops.push({
+        offset: bStart,
+        del: 0,
+        ins: targetBuf.slice(tStart, tEnd).toString('utf8'),
+      });
+      return;
+    }
+
+    // Fast path: Pure deletion
+    if (tStart === tEnd) {
+      ops.push({
+        offset: bStart,
+        del: bEnd - bStart,
+        ins: '',
+      });
+      return;
+    }
 
     const match = findBlockMatch(bStart, bEnd, tStart, tEnd);
     if (match) {

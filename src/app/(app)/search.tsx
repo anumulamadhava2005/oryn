@@ -2,7 +2,7 @@
  * Search screen — upgraded with fuzzy search, recent searches, and category/sender suggestions.
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,10 +11,11 @@ import {
   Platform,
   Pressable,
   ScrollView,
+  BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FlashList } from '@shopify/flash-list';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
 import { useSearch } from '@/hooks/useSearch';
@@ -23,10 +24,12 @@ import { EmailCard } from '@/components/email/EmailCard';
 import { EmptyState } from '@/components/common/EmptyState';
 import { hapticLight } from '@/utils/haptics';
 import { GROUP_META } from '@/constants/categories';
+import { usePreferencesStore } from '@/store/preferences';
 import type { ParsedEmail } from '@/types/email';
 
 export default function SearchScreen() {
   const router = useRouter();
+  const { from } = useLocalSearchParams<{ from?: string }>();
   const {
     query,
     setQuery,
@@ -38,8 +41,36 @@ export default function SearchScreen() {
     suggestions,
   } = useSearch();
 
+  const showInboxTab = usePreferencesStore((s) => s.showInboxTab);
+  const startScreen = usePreferencesStore((s) => s.startScreen);
+
+  const handleBack = useCallback(() => {
+    hapticLight();
+    if (from === 'inbox' || from === 'index') {
+      router.replace('/(app)');
+    } else if (from === 'today') {
+      router.replace('/(app)/today');
+    } else if (from === 'events') {
+      router.replace('/(app)/events' as any);
+    } else if (from === 'lost-found') {
+      router.replace('/(app)/lost-found' as any);
+    } else if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(!showInboxTab || startScreen === 'today' ? '/(app)/today' : '/(app)');
+    }
+  }, [from, router, showInboxTab, startScreen]);
+
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      handleBack();
+      return true;
+    });
+    return () => sub.remove();
+  }, [handleBack]);
+
   const handleEmailPress = useCallback(
-    (id: string) => router.push(`/(app)/email/${id}`),
+    (id: string) => router.push(`/(app)/email/${id}?from=search` as any),
     [router],
   );
 
@@ -69,23 +100,18 @@ export default function SearchScreen() {
       >
         <View style={styles.header}>
           <View style={styles.topRow}>
-            {router.canGoBack() && (
-              <Pressable
-                onPress={() => {
-                  hapticLight();
-                  router.back();
-                }}
-                style={({ pressed }) => [
-                  styles.backBtn,
-                  pressed && { opacity: 0.7 },
-                ]}
-                hitSlop={8}
-                accessibilityRole="button"
-                accessibilityLabel="Go back"
-              >
-                <Ionicons name="chevron-back" size={24} color={Colors.text} />
-              </Pressable>
-            )}
+            <Pressable
+              onPress={handleBack}
+              style={({ pressed }) => [
+                styles.backBtn,
+                pressed && { opacity: 0.7 },
+              ]}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel="Go back"
+            >
+              <Ionicons name="chevron-back" size={24} color={Colors.text} />
+            </Pressable>
             <Text style={styles.title}>Search</Text>
           </View>
           <SearchBar

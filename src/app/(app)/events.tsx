@@ -31,10 +31,13 @@ import { Colors, Typography, Spacing, Radius, DISTRICT_THEME } from '@/constants
 import { useEventsStore, DISTRICT_CATEGORIES, type DistrictCategory } from '@/store/eventsStore';
 import { useAuthStore } from '@/store/auth';
 import { hapticLight, hapticSuccess } from '@/utils/haptics';
+import { useResponsive } from '@/hooks/useResponsive';
+import { ResponsiveContainer } from '@/components/common/ResponsiveContainer';
 
 // Components
 import { DistrictEventCard } from '@/components/events/DistrictEventCard';
 import { DistrictPollCard } from '@/components/events/DistrictPollCard';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 // Modals
 import { EventDetailModal } from '@/components/events/EventDetailModal';
@@ -89,9 +92,21 @@ export default function EventsScreen() {
   // Filter Pill state
   const [activeFilterPill, setActiveFilterPill] = useState<string>('All');
 
-  // Grid dimensions
-  const { width: windowWidth } = useWindowDimensions();
-  const gridCardWidth = Math.floor((windowWidth - Spacing[4] * 2 - 12) / 2);
+  // Grid dimensions & responsive layout
+  const {
+    isTablet,
+    isLargeTablet,
+    width: windowWidth,
+    maxContentWidth,
+    contentPadding,
+    modalSheetStyles,
+  } = useResponsive();
+
+  const gridColumns = isLargeTablet ? 4 : isTablet ? 3 : 2;
+  const effectiveFeedWidth = maxContentWidth ? Math.min(windowWidth, maxContentWidth) : windowWidth;
+  const gridCardWidth = Math.floor(
+    (effectiveFeedWidth - contentPadding * 2 - 12 * (gridColumns - 1)) / gridColumns,
+  );
 
   // Modal States
   const [selectedEvent, setSelectedEvent] = useState<DistrictEvent | null>(null);
@@ -142,20 +157,26 @@ export default function EventsScreen() {
           if (!e.event_time) return false;
           const d = new Date(e.event_time);
           const now = new Date();
-          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+          return (
+            (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) ||
+            Math.abs(d.getTime() - now.getTime()) <= 30 * 24 * 60 * 60 * 1000
+          );
         }
         return (
           (e.organization_category && e.organization_category.toLowerCase() === p) ||
-          (Array.isArray(e.tags) && e.tags.some((t) => t.toLowerCase() === p))
+          (Array.isArray(e.tags) && e.tags.some((t) => t.toLowerCase() === p)) ||
+          e.title.toLowerCase().includes(p)
         );
       });
     }
 
     if (selectedCategory !== 'All') {
+      const cat = selectedCategory.toLowerCase();
       list = list.filter(
         (e) =>
-          (e.organization_category && e.organization_category.toLowerCase() === selectedCategory.toLowerCase()) ||
-          (Array.isArray(e.tags) && e.tags.some((t) => t.toLowerCase() === selectedCategory.toLowerCase()))
+          (e.organization_category && e.organization_category.toLowerCase() === cat) ||
+          (Array.isArray(e.tags) && e.tags.some((t) => t.toLowerCase() === cat)) ||
+          e.title.toLowerCase().includes(cat)
       );
     }
 
@@ -197,7 +218,7 @@ export default function EventsScreen() {
       <StatusBar barStyle="light-content" backgroundColor={DISTRICT_THEME.background} />
 
       {/* ─── Top Header (Matching District Screenshots) ─── */}
-      <View style={styles.headerBar}>
+      <ResponsiveContainer style={styles.headerBar}>
         <View style={styles.headerLeft}>
           <Ionicons name="film-outline" size={22} color={DISTRICT_THEME.text} style={{ marginRight: 10 }} />
           <View>
@@ -228,6 +249,18 @@ export default function EventsScreen() {
             accessibilityLabel="Search"
           >
             <Ionicons name="search-outline" size={19} color={DISTRICT_THEME.text} />
+          </Pressable>
+
+          {/* Sync events from emails */}
+          <Pressable
+            style={styles.headerIconBtn}
+            onPress={async () => {
+              hapticLight();
+              await useEventsStore.getState().syncEventsFromEmail();
+            }}
+            accessibilityLabel="Sync Events from Emails"
+          >
+            <Ionicons name="mail-unread-outline" size={18} color={DISTRICT_THEME.text} />
           </Pressable>
 
           {isSuperAdmin && (
@@ -262,12 +295,12 @@ export default function EventsScreen() {
             </Text>
           </Pressable>
         </View>
-      </View>
+      </ResponsiveContainer>
 
       {/* ─── Scrollable District Feed ─── */}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.mainScrollContent, { paddingBottom: 72 }]}
+        contentContainerStyle={[styles.mainScrollContent, { paddingBottom: 88 }]}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
@@ -277,6 +310,7 @@ export default function EventsScreen() {
           />
         }
       >
+        <ResponsiveContainer>
         {/* ── SECTION 1: EXPLORE CARDS (From Screenshot 3) ── */}
         <View style={styles.exploreSection}>
           <Text style={styles.sectionHeaderTitle}>Explore</Text>
@@ -455,8 +489,8 @@ export default function EventsScreen() {
                     </Text>
                   </View>
 
-                  {/* 2-Column Vertical Poster Grid (Matching Screenshot 2) */}
-                  <View style={styles.upcomingGridWrap}>
+                  {/* Multi-Column Vertical Poster Grid */}
+                  <View style={[styles.upcomingGridWrap, isTablet && { justifyContent: 'flex-start', gap: 12 }]}>
                     {displayedEvents.map((evt) => (
                       <DistrictEventCard
                         key={evt.id}
@@ -483,6 +517,17 @@ export default function EventsScreen() {
                 </Text>
 
                 <View style={styles.emptyActionRow}>
+                  <Pressable
+                    style={[styles.emptyPrimaryBtn, { backgroundColor: '#1e1e1e', borderWidth: 1, borderColor: '#333' }]}
+                    onPress={() => {
+                      hapticLight();
+                      refreshFeed();
+                    }}
+                  >
+                    <Ionicons name="mail-open-outline" size={16} color="#fff" style={{ marginRight: 6 }} />
+                    <Text style={styles.emptyPrimaryBtnText}>Scan Emails</Text>
+                  </Pressable>
+
                   {isSuperAdmin || isClubLead ? (
                     <Pressable
                       style={styles.emptyPrimaryBtn}
@@ -596,11 +641,18 @@ export default function EventsScreen() {
             )}
           </View>
         )}
+        </ResponsiveContainer>
       </ScrollView>
 
       {/* ── Floating Action Button (Create / Register) ── */}
       <Pressable
-        style={styles.fabPill}
+        style={[
+          styles.fabPill,
+          isTablet && {
+            right: Math.max(20, (windowWidth - (maxContentWidth ?? 740)) / 2 + 20),
+            bottom: 84,
+          },
+        ]}
         onPress={() => {
           hapticLight();
           if (isSuperAdmin || isClubLead) router.push('/(app)/creator-studio' as any);
@@ -615,14 +667,16 @@ export default function EventsScreen() {
       </Pressable>
 
       {/* ── Modals ── */}
-      <EventDetailModal
-        visible={Boolean(selectedEvent)}
-        event={selectedEvent}
-        canViewDemographics={isSuperAdmin || isClubLead}
-        onClose={() => setSelectedEvent(null)}
-        onRsvp={handleRsvp}
-        onViewDemographics={handleOpenDemographics}
-      />
+      <ErrorBoundary fallbackTitle="Could not display event details">
+        <EventDetailModal
+          visible={Boolean(selectedEvent)}
+          event={selectedEvent}
+          canViewDemographics={isSuperAdmin || isClubLead}
+          onClose={() => setSelectedEvent(null)}
+          onRsvp={handleRsvp}
+          onViewDemographics={handleOpenDemographics}
+        />
+      </ErrorBoundary>
 
       <ClubDetailModal
         visible={Boolean(selectedClub)}
@@ -672,9 +726,9 @@ export default function EventsScreen() {
         animationType="slide"
         onRequestClose={() => setShowCampusSheet(false)}
       >
-        <View style={styles.sheetOverlay}>
+        <View style={[styles.sheetOverlay, modalSheetStyles.overlay]}>
           <Pressable style={styles.sheetBackdrop} onPress={() => setShowCampusSheet(false)} />
-          <View style={[styles.bottomSheetCard, { paddingBottom: Math.max(insets.bottom, 20) }]}>
+          <View style={[styles.bottomSheetCard, modalSheetStyles.sheet, { paddingBottom: Math.max(insets.bottom, 20) }]}>
             <View style={styles.sheetGrabHandle} />
             <View style={styles.sheetHeader}>
               <Text style={styles.sheetTitle}>Campus & District</Text>
@@ -729,9 +783,9 @@ export default function EventsScreen() {
         animationType="slide"
         onRequestClose={() => setShowProfileModal(false)}
       >
-        <View style={styles.sheetOverlay}>
+        <View style={[styles.sheetOverlay, modalSheetStyles.overlay]}>
           <Pressable style={styles.sheetBackdrop} onPress={() => setShowProfileModal(false)} />
-          <View style={[styles.bottomSheetCard, { paddingBottom: Math.max(insets.bottom, 20) }]}>
+          <View style={[styles.bottomSheetCard, modalSheetStyles.sheet, { paddingBottom: Math.max(insets.bottom, 20) }]}>
             <View style={styles.sheetGrabHandle} />
             <View style={styles.sheetHeader}>
               <Text style={styles.sheetTitle}>Account & Profile</Text>

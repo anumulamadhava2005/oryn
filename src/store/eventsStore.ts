@@ -23,9 +23,13 @@ import {
   createPoll as apiCreatePoll,
   submitClubRequest as apiSubmitClubRequest,
   invalidateDistrictCache,
+  getCachedDistrictEvents,
+  getCachedClubs,
+  getCachedPolls,
 } from '@/services/eventsApi';
 import { useAuthStore } from '@/store/auth';
 import { useAcademicStore } from '@/store/academicStore';
+import { syncEventsFromEmail as runEventsEmailSync } from '@/services/eventsEmailImporter';
 import type {
   DistrictEvent,
   Club,
@@ -62,6 +66,7 @@ interface EventsState {
   isLoading: boolean;
   isRefreshing: boolean;
   isSubmitting: boolean;
+  isEmailSyncing: boolean;
   error: string | null;
 
   // Roles & Permissions
@@ -77,7 +82,7 @@ interface EventsState {
   isDemographicsLoading: boolean;
 
   // Actions
-  loadFeed: () => Promise<void>;
+  loadFeed: (skipEmailSync?: boolean) => Promise<void>;
   refreshFeed: () => Promise<void>;
   setCategory: (cat: DistrictCategory) => void;
   setSearchQuery: (query: string) => void;
@@ -98,17 +103,19 @@ interface EventsState {
   loadDemographics: (eventId: string) => Promise<void>;
   clearDemographics: () => void;
   clearError: () => void;
+  syncEventsFromEmail: () => Promise<void>;
 }
 
 export const useEventsStore = create<EventsState>()((set, get) => ({
-  events: [],
-  clubs: [],
-  polls: [],
+  events: getCachedDistrictEvents(),
+  clubs: getCachedClubs(),
+  polls: getCachedPolls(),
   selectedCategory: 'All',
   searchQuery: '',
   isLoading: false,
   isRefreshing: false,
   isSubmitting: false,
+  isEmailSyncing: false,
   error: null,
 
   isSuperAdmin: false,
@@ -121,10 +128,12 @@ export const useEventsStore = create<EventsState>()((set, get) => ({
   demographicsData: null,
   isDemographicsLoading: false,
 
-  loadFeed: async () => {
-    const { selectedCategory, searchQuery } = get();
-    set({ isLoading: true, error: null });
-    invalidateDistrictCache();
+  loadFeed: async (skipEmailSync = false) => {
+    const { selectedCategory, searchQuery, events } = get();
+    // Stale-While-Revalidate: only trigger loading skeleton if cache is completely empty
+    if (events.length === 0) {
+      set({ isLoading: true, error: null });
+    }
 
     try {
       const [eventsData, clubsData, pollsData] = await Promise.all([
@@ -136,12 +145,32 @@ export const useEventsStore = create<EventsState>()((set, get) => ({
         fetchPolls(),
       ]);
 
+      // Stale-While-Revalidate: update with fresh data; if network returned empty on transient error, preserve existing cached events
+      const updatedEvents = eventsData.length > 0 ? eventsData : (events.length > 0 ? events : eventsData);
+      const updatedClubs = clubsData.length > 0 ? clubsData : (get().clubs.length > 0 ? get().clubs : clubsData);
+      const updatedPolls = pollsData.length > 0 ? pollsData : (get().polls.length > 0 ? get().polls : pollsData);
+
       set({
-        events: eventsData,
-        clubs: clubsData,
-        polls: pollsData,
+        events: updatedEvents,
+        clubs: updatedClubs,
+        polls: updatedPolls,
         isLoading: false,
       });
+
+      // Background: parse new events from emails without blocking UI or causing loops
+      if (!skipEmailSync && !get().isEmailSyncing) {
+        set({ isEmailSyncing: true });
+        runEventsEmailSync(false)
+          .then((res) => {
+            if (res.imported > 0) {
+              get().loadFeed(true);
+            }
+          })
+          .catch(() => {})
+          .finally(() => {
+            set({ isEmailSyncing: false });
+          });
+      }
     } catch (err: any) {
       set({ error: err.message || 'Failed to load events', isLoading: false });
     }
@@ -149,8 +178,14 @@ export const useEventsStore = create<EventsState>()((set, get) => ({
 
   refreshFeed: async () => {
     set({ isRefreshing: true, error: null });
-    invalidateDistrictCache();
     try {
+      // Sync fresh emails first (guarded against concurrent sync)
+      if (!get().isEmailSyncing) {
+        set({ isEmailSyncing: true });
+        await runEventsEmailSync(false).catch(() => {});
+        set({ isEmailSyncing: false });
+      }
+
       const { selectedCategory, searchQuery } = get();
       const [eventsData, clubsData, pollsData] = await Promise.all([
         fetchDistrictEvents({
@@ -162,15 +197,25 @@ export const useEventsStore = create<EventsState>()((set, get) => ({
       ]);
 
       set({
-        events: eventsData,
-        clubs: clubsData,
-        polls: pollsData,
+        events: eventsData.length > 0 ? eventsData : get().events,
+        clubs: clubsData.length > 0 ? clubsData : get().clubs,
+        polls: pollsData.length > 0 ? pollsData : get().polls,
         isRefreshing: false,
       });
       // Also check permissions in the background
       get().checkPermissions().catch(() => {});
     } catch (err: any) {
       set({ error: err.message || 'Failed to refresh events', isRefreshing: false });
+    }
+  },
+
+  syncEventsFromEmail: async () => {
+    set({ isRefreshing: true, isEmailSyncing: true });
+    try {
+      await runEventsEmailSync(true);
+      await get().loadFeed(true);
+    } finally {
+      set({ isRefreshing: false, isEmailSyncing: false });
     }
   },
 

@@ -251,6 +251,20 @@ export async function fetchHistorySince(
   }
 }
 
+/**
+ * Download an attachment by message ID and attachment ID.
+ * Returns the raw base64url-encoded attachment data.
+ */
+export async function fetchAttachment(
+  messageId: string,
+  attachmentId: string,
+): Promise<string> {
+  const data = await gmailFetch<{ data: string; size: number }>(
+    `/users/me/messages/${messageId}/attachments/${attachmentId}`,
+  );
+  return data.data; // base64url encoded
+}
+
 export class HistoryExpiredError extends Error {
   constructor() {
     super('History ID expired — full sync required');

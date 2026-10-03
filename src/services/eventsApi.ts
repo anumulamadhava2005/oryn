@@ -20,6 +20,7 @@ import type {
   CreateClubRequestPayload,
   CreatePollPayload,
   RSVPStatus,
+  EventPriority,
 } from '@/types/events';
 
 const storage = new MMKV({ id: 'oryn-district-events-cache' });
@@ -34,20 +35,21 @@ const ORYN_JWT_KEY = 'oryn_backend_jwt';
 function getApiBaseUrls(): string[] {
   const urls: string[] = ['https://api.cruxel.xyz/oryn'];
 
-  const hostUri = Constants.expoConfig?.hostUri;
-  if (hostUri) {
-    const host = hostUri.split(':')[0];
-    if (host && host !== 'localhost' && host !== '127.0.0.1') {
-      urls.push(`http://${host}:3000/oryn`);
+  if (__DEV__) {
+    const hostUri = Constants.expoConfig?.hostUri;
+    if (hostUri) {
+      const host = hostUri.split(':')[0];
+      if (host && host !== 'localhost' && host !== '127.0.0.1') {
+        urls.unshift(`http://${host}:3000/oryn`);
+      }
     }
-  }
 
-  if (Platform.OS === 'android') {
-    urls.push('http://10.0.2.2:3000/oryn');
+    if (Platform.OS === 'android') {
+      urls.push('http://10.0.2.2:3000/oryn');
+    }
+    urls.push('http://localhost:3000/oryn');
+    urls.push('http://127.0.0.1:3000/oryn');
   }
-
-  urls.push('http://localhost:3000/oryn');
-  urls.push('http://127.0.0.1:3000/oryn');
 
   return urls;
 }
@@ -83,7 +85,7 @@ async function exchangeTokenForJwt(): Promise<string | null> {
   for (const base of urls) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
 
       const response = await fetch(`${base}/auth/google`, {
         method: 'POST',
@@ -132,10 +134,16 @@ async function fetchFromApi(
 
   let authHeader: string | undefined;
   const currentUser = useAuthStore.getState().user;
-  if (needsAuth) {
-    const jwt = await getValidOrynJwt().catch(() => null);
-    if (jwt) {
-      authHeader = `Bearer ${jwt}`;
+
+  // Always attach JWT if available in SecureStore
+  const storedJwt = await getOrynJwt().catch(() => null);
+  if (storedJwt) {
+    authHeader = `Bearer ${storedJwt}`;
+  } else if (needsAuth) {
+    // Only attempt exchange or throw when authentication is strictly required
+    const freshJwt = await exchangeTokenForJwt().catch(() => null);
+    if (freshJwt) {
+      authHeader = `Bearer ${freshJwt}`;
     } else if (!currentUser?.email) {
       throw new Error('Authentication required. Please sign in again.');
     }
@@ -145,7 +153,8 @@ async function fetchFromApi(
     try {
       const fullUrl = `${base}${endpoint}${queryString}`;
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
+      // Generous 15s timeout to support Cloudflare tunnel DNS and cellular connections
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
 
       const headers: Record<string, string> = {};
       if (method !== 'GET') headers['Content-Type'] = 'application/json';
@@ -232,9 +241,9 @@ export async function fetchDistrictEvents(filters?: {
     if (filters?.limit) query.append('limit', String(filters.limit));
     if (filters?.offset) query.append('offset', String(filters.offset));
 
-    const data = await fetchFromApi('/events/district', { queryParams: query, auth: true });
+    const data = await fetchFromApi('/events/district', { queryParams: query, auth: false });
     if (Array.isArray(data)) {
-      if (!filters?.category || filters.category === 'All') {
+      if ((!filters?.category || filters.category === 'All') && !filters?.search && data.length > 0) {
         storage.set(EVENTS_CACHE_KEY, JSON.stringify(data));
       }
       return data;
@@ -261,6 +270,39 @@ export async function fetchDistrictEvents(filters?: {
 }
 
 /**
+ * Synchronously read cached district events from MMKV for instant 0ms startup.
+ */
+export function getCachedDistrictEvents(): DistrictEvent[] {
+  const cachedRaw = storage.getString(EVENTS_CACHE_KEY);
+  if (cachedRaw) {
+    try { return JSON.parse(cachedRaw); } catch {}
+  }
+  return [];
+}
+
+/**
+ * Synchronously read cached clubs from MMKV for instant 0ms startup.
+ */
+export function getCachedClubs(): Club[] {
+  const cachedRaw = storage.getString(CLUBS_CACHE_KEY);
+  if (cachedRaw) {
+    try { return JSON.parse(cachedRaw); } catch {}
+  }
+  return [];
+}
+
+/**
+ * Synchronously read cached polls from MMKV for instant 0ms startup.
+ */
+export function getCachedPolls(): Poll[] {
+  const cachedRaw = storage.getString(POLLS_CACHE_KEY);
+  if (cachedRaw) {
+    try { return JSON.parse(cachedRaw); } catch {}
+  }
+  return [];
+}
+
+/**
  * Fetch all registered clubs.
  */
 export async function fetchClubs(filters?: { search?: string }): Promise<Club[]> {
@@ -270,7 +312,9 @@ export async function fetchClubs(filters?: { search?: string }): Promise<Club[]>
 
     const data = await fetchFromApi('/clubs', { queryParams: query, auth: false });
     if (Array.isArray(data)) {
-      storage.set(CLUBS_CACHE_KEY, JSON.stringify(data));
+      if (!filters?.search && data.length > 0) {
+        storage.set(CLUBS_CACHE_KEY, JSON.stringify(data));
+      }
       return data;
     }
   } catch (err: any) {
@@ -300,9 +344,11 @@ export async function fetchClubById(clubId: string): Promise<Club | null> {
  */
 export async function fetchPolls(): Promise<Poll[]> {
   try {
-    const data = await fetchFromApi('/polls', { auth: true });
+    const data = await fetchFromApi('/polls', { auth: false });
     if (Array.isArray(data)) {
-      storage.set(POLLS_CACHE_KEY, JSON.stringify(data));
+      if (data.length > 0) {
+        storage.set(POLLS_CACHE_KEY, JSON.stringify(data));
+      }
       return data;
     }
   } catch (err: any) {
@@ -493,4 +539,58 @@ export function invalidateDistrictCache(): void {
   storage.delete(EVENTS_CACHE_KEY);
   storage.delete(CLUBS_CACHE_KEY);
   storage.delete(POLLS_CACHE_KEY);
+}
+
+// ─── Email Event Import ──────────────────────────────────────────
+
+export interface ImportEventPayload {
+  club?: {
+    name?: string;
+    email?: string;
+    category?: string;
+    description?: string;
+    logo_url?: string;
+  };
+  event: {
+    title: string;
+    summary?: string;
+    description?: string;
+    poster_url?: string | null;
+    priority?: EventPriority;
+    location?: string | null;
+    building?: string | null;
+    room_number?: string | null;
+    event_time?: string | null;
+    event_end_time?: string | null;
+    is_featured?: boolean;
+    tags?: string[];
+    requires_action?: boolean;
+    action_label?: string | null;
+    action_url?: string | null;
+    attachments?: any[];
+  };
+}
+
+/**
+ * Import a single event & club extracted from an email.
+ */
+export async function importEventFromEmailApi(payload: ImportEventPayload): Promise<any> {
+  return await fetchFromApi('/events/import-from-email', {
+    method: 'POST',
+    body: payload,
+    auth: false,
+  });
+}
+
+/**
+ * Batch import events & clubs extracted from emails.
+ */
+export async function batchImportEventsFromEmailApi(
+  items: Array<ImportEventPayload & { email_id?: string }>,
+): Promise<{ total: number; imported: number; skipped: number; errors: number; results: any[] }> {
+  return await fetchFromApi('/events/batch-import-from-email', {
+    method: 'POST',
+    body: { items },
+    auth: false,
+  });
 }

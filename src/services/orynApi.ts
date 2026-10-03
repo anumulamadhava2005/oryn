@@ -48,28 +48,24 @@ export interface CampusAnnouncement {
 }
 
 function getApiBaseUrls(): string[] {
-  const urls: string[] = [];
+  const urls: string[] = ['https://api.cruxel.xyz/oryn'];
 
-  // 1. Host IP from Expo Dev Client / Metro (works on real phones over Wi-Fi / USB)
-  const hostUri = Constants.expoConfig?.hostUri;
-  if (hostUri) {
-    const host = hostUri.split(':')[0];
-    if (host && host !== 'localhost' && host !== '127.0.0.1') {
-      urls.push(`http://${host}:3456/api`);
+  if (__DEV__) {
+    const hostUri = Constants.expoConfig?.hostUri;
+    if (hostUri) {
+      const host = hostUri.split(':')[0];
+      if (host && host !== 'localhost' && host !== '127.0.0.1') {
+        urls.unshift(`http://${host}:3000/oryn`);
+      }
     }
+
+    if (Platform.OS === 'android') {
+      urls.push('http://10.0.2.2:3000/oryn');
+    }
+
+    urls.push('http://localhost:3000/oryn');
+    urls.push('http://127.0.0.1:3000/oryn');
   }
-
-  // 2. Android Emulator Loopback
-  if (Platform.OS === 'android') {
-    urls.push('http://10.0.2.2:3456/api');
-  }
-
-  // 3. Localhost (iOS Simulator / Web / Desktop)
-  urls.push('http://localhost:3456/api');
-  urls.push('http://127.0.0.1:3456/api');
-
-  // 4. Remote Production Fallback
-  urls.push('https://api.cruxel.xyz/oryn');
 
   return urls;
 }
@@ -82,7 +78,7 @@ async function fetchFromApi(endpoint: string, queryParams?: URLSearchParams): Pr
     try {
       const fullUrl = `${base}${endpoint}${queryString}`;
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2500);
+      const timeoutId = setTimeout(() => controller.abort(), 12000);
 
       const response = await fetch(fullUrl, { signal: controller.signal });
       clearTimeout(timeoutId);

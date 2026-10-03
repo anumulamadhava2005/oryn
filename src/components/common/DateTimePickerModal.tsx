@@ -34,6 +34,7 @@ import {
   setMinutes,
 } from 'date-fns';
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
+import { useResponsive } from '@/hooks/useResponsive';
 import { hapticLight, hapticSuccess } from '@/utils/haptics';
 import { CircularClockPicker } from './CircularClockPicker';
 
@@ -48,7 +49,7 @@ interface DateTimePickerModalProps {
 type PickerTab = 'date' | 'start_time' | 'end_time';
 
 const HOURS_12 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-const MINUTES = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
+const MINUTES_STEPS = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55];
 const COMMON_MINUTES = [0, 15, 30, 45];
 
 export function DateTimePickerModal({
@@ -59,6 +60,7 @@ export function DateTimePickerModal({
   onConfirm,
 }: DateTimePickerModalProps) {
   const insets = useSafeAreaInsets();
+  const { modalSheetStyles } = useResponsive();
 
   // Internal state
   const [selectedDate, setSelectedDate] = useState<Date>(() => initialDate || addDays(new Date(), 1));
@@ -169,10 +171,10 @@ export function DateTimePickerModal({
       animationType="slide"
       onRequestClose={onClose}
     >
-      <View style={styles.modalOverlay}>
+      <View style={[styles.modalOverlay, modalSheetStyles.overlay]}>
         <Pressable style={styles.backdrop} onPress={onClose} />
 
-        <View style={[styles.sheetContainer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
+        <View style={[styles.sheetContainer, modalSheetStyles.sheet, { paddingBottom: Math.max(insets.bottom, 20) }]}>
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerTitleWrap}>

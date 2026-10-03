@@ -71,63 +71,7 @@ export function EventScannerModal({ visible, event, onClose }: EventScannerModal
       } catch {}
     }
 
-    // Initialize attendee list for the event
-    const eventPrefix = event.id.slice(0, 8).toUpperCase();
-    const initialAttendees: AttendeeRecord[] = [
-      {
-        id: '1',
-        name: 'Madhava Anumula',
-        rollNumber: 'CS23B1008',
-        department: 'Computer Science & Engineering',
-        year: 2,
-        email: 'cs23b1008@iiitdm.ac.in',
-        passCode: `ORYN-EVT-${eventPrefix}`,
-        checkedIn: false,
-      },
-      {
-        id: '2',
-        name: 'Rahul Sharma',
-        rollNumber: 'EC23B1042',
-        department: 'Electronics & Communication',
-        year: 2,
-        email: 'ec23b1042@iiitdm.ac.in',
-        passCode: `ORYN-EVT-${eventPrefix}-02`,
-        checkedIn: false,
-      },
-      {
-        id: '3',
-        name: 'Sneha Patel',
-        rollNumber: 'ME22B1015',
-        department: 'Mechanical Engineering',
-        year: 3,
-        email: 'me22b1015@iiitdm.ac.in',
-        passCode: `ORYN-EVT-${eventPrefix}-03`,
-        checkedIn: false,
-      },
-      {
-        id: '4',
-        name: 'Karthik Raja',
-        rollNumber: 'CS24B1033',
-        department: 'Computer Science & Engineering',
-        year: 1,
-        email: 'cs24b1033@iiitdm.ac.in',
-        passCode: `ORYN-EVT-${eventPrefix}-04`,
-        checkedIn: false,
-      },
-      {
-        id: '5',
-        name: 'Ananya Deshmukh',
-        rollNumber: 'DS23B1012',
-        department: 'Design (Smart Manufacturing)',
-        year: 2,
-        email: 'ds23b1012@iiitdm.ac.in',
-        passCode: `ORYN-EVT-${eventPrefix}-05`,
-        checkedIn: false,
-      },
-    ];
-
-    setAttendees(initialAttendees);
-    checkInStorage.set(storageKey, JSON.stringify(initialAttendees));
+    setAttendees([]);
   }, [event?.id]);
 
   const persistAttendees = (list: AttendeeRecord[]) => {

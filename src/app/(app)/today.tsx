@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import {
   format,
   formatDistanceToNow,
@@ -32,30 +32,55 @@ import { Colors, Typography, Spacing, Radius, Shadows } from '@/constants/theme'
 import { useEmails } from '@/hooks/useEmails';
 import { useAuth } from '@/hooks/useAuth';
 import { hapticLight } from '@/utils/haptics';
-import { CATEGORY_META, GROUP_META } from '@/constants/categories';
 import { isOfficialEmail } from '@/classifiers/category';
 import { CategoryBadge } from '@/components/ui/Badge';
 import { MessMenuCard } from '@/components/today/MessMenuCard';
 import { ClassScheduleCard } from '@/components/today/ClassScheduleCard';
+import { TriageFeed } from '@/components/today/TriageFeed';
+import { getPersonalizedGreetingName } from '@/utils/userHelpers';
+import { deduplicateActionItems } from '@/utils/actionItemDeduplicator';
 import { TimetableModal } from '@/components/academic/TimetableModal';
 import { AcademicProfileModal } from '@/components/settings/AcademicProfileModal';
+import { AttendanceModal } from '@/components/academic/AttendanceModal';
+import { RoomLocatorModal } from '@/components/academic/RoomLocatorModal';
+import { useResponsive } from '@/hooks/useResponsive';
 import type { ParsedEmail } from '@/types/email';
 
 export default function TodayScreen() {
   const router = useRouter();
+  const params = useLocalSearchParams<{ tab?: string }>();
+  const { isTablet } = useResponsive();
   const { user } = useAuth();
   const { stats, allEmails } = useEmails();
 
-  const [activeTab, setActiveTab] = useState<'briefing' | 'calendar'>('briefing');
+  const [activeTab, setActiveTab] = useState<'briefing' | 'calendar'>(
+    params.tab === 'calendar' ? 'calendar' : 'briefing'
+  );
+
+  React.useEffect(() => {
+    if (params.tab === 'calendar' || params.tab === 'briefing') {
+      setActiveTab(params.tab);
+    }
+  }, [params.tab]);
+  const [selectedBriefingDate, setSelectedBriefingDate] = useState<Date>(new Date());
+  const [isWeekExpanded, setIsWeekExpanded] = useState(false);
+
+  const threeDays = useMemo(() => {
+    const today = new Date();
+    return [today, addDays(today, 1), addDays(today, 2)];
+  }, []);
+
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date>(new Date());
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(
     startOfWeek(new Date(), { weekStartsOn: 1 })
   );
   const [showTimetableModal, setShowTimetableModal] = useState(false);
   const [showAcademicModal, setShowAcademicModal] = useState(false);
+  const [showAttendanceModal, setShowAttendanceModal] = useState(false);
+  const [showRoomLocator, setShowRoomLocator] = useState(false);
+  const [selectedRoomCode, setSelectedRoomCode] = useState<string | null>(null);
 
-  const name = user?.givenName ?? user?.name?.split(' ')[0] ?? 'there';
-  const todayStr = format(new Date(), 'EEEE, MMMM d');
+  const name = useMemo(() => getPersonalizedGreetingName(user), [user]);
 
   // Greeting based on time of day
   const greeting = useMemo(() => {
@@ -66,7 +91,7 @@ export default function TodayScreen() {
   }, []);
 
   const handleEmailPress = useCallback(
-    (id: string) => { hapticLight(); router.push(`/(app)/email/${id}`); },
+    (id: string) => { hapticLight(); router.push(`/(app)/email/${id}?from=today` as any); },
     [router],
   );
 
@@ -94,19 +119,6 @@ export default function TodayScreen() {
     return officialCampusEmails.filter(e => e.date >= startOfToday);
   }, [officialCampusEmails]);
 
-  // Category breakdown for today
-  const categoryBreakdown = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const e of todayEmails) {
-      if (e.categoryGroup && e.categoryGroup !== 'general') {
-        counts[e.categoryGroup] = (counts[e.categoryGroup] ?? 0) + 1;
-      }
-    }
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 6);
-  }, [todayEmails]);
-
   // Action items from today's official emails
   const todayActionItems = useMemo(() => {
     const items: Array<{ email: ParsedEmail; action: string }> = [];
@@ -115,8 +127,22 @@ export default function TodayScreen() {
         items.push({ email: e, action });
       }
     }
-    return items.slice(0, 6);
+    return items.slice(0, 10);
   }, [todayEmails]);
+
+  // Deduplicated action items
+  const dedupedActionItems = useMemo(() => {
+    return deduplicateActionItems(todayActionItems);
+  }, [todayActionItems]);
+
+  // Urgent vs upcoming deadlines
+  const overdueDeadlines = useMemo(() => {
+    return todayDeadlines.filter(e => isPast(new Date(e.deadline!)));
+  }, [todayDeadlines]);
+
+  const dueTodayDeadlines = useMemo(() => {
+    return todayDeadlines.filter(e => !isPast(new Date(e.deadline!)));
+  }, [todayDeadlines]);
 
   // Calendar logic: official deadlines only
   const deadlineEmails = useMemo(() => {
@@ -150,7 +176,7 @@ export default function TodayScreen() {
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       {/* Top Bar with Segmented Control */}
-      <View style={styles.topControlRow}>
+      <View style={[styles.topControlRow, isTablet && { maxWidth: 760, width: '100%', alignSelf: 'center' }]}>
         <View style={styles.segmentContainer}>
           <Pressable
             onPress={() => { hapticLight(); setActiveTab('briefing'); }}
@@ -173,211 +199,252 @@ export default function TodayScreen() {
 
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          isTablet && { maxWidth: 760, width: '100%', alignSelf: 'center', paddingBottom: 120 },
+        ]}
       >
         {activeTab === 'briefing' ? (
           <>
-            {/* Greeting Header */}
+            {/* ─── Hero Summary Area with Breathing Room (Pillars 1 & 5) ─── */}
             <MotiView
-              from={{ opacity: 0, translateY: -12 }}
+              from={{ opacity: 0, translateY: -8 }}
               animate={{ opacity: 1, translateY: 0 }}
-              transition={{ type: 'timing', duration: 500 }}
-              style={styles.greetingSection}
+              transition={{ type: 'timing', duration: 400 }}
+              style={styles.heroCard}
             >
-              <Text style={styles.dateLabel}>{todayStr.toUpperCase()}</Text>
-              <Text style={styles.greeting}>{greeting}, {name}</Text>
-              <Text style={styles.summaryLine}>
-                {todayEmails.length > 0
-                  ? `${todayEmails.length} new email${todayEmails.length !== 1 ? 's' : ''} today`
-                  : 'No new emails today'
-                }
-                {todayDeadlines.length > 0 && ` · ${todayDeadlines.length} deadline${todayDeadlines.length !== 1 ? 's' : ''}`}
-              </Text>
+              <View style={styles.heroHeader}>
+                <Text style={styles.heroDate}>{format(new Date(), 'EEEE, MMMM d').toUpperCase()}</Text>
+                <Text style={styles.heroGreeting}>{greeting}, {name}</Text>
+              </View>
+
+              {/* 3-Tier Semantic Status Pills */}
+              <View style={styles.heroStatusRow}>
+                {/* 1. Urgent / Overdue or Due Today (Red) */}
+                {(overdueDeadlines.length > 0 || dueTodayDeadlines.length > 0) && (
+                  <View style={styles.heroPillUrgent}>
+                    <Ionicons name="alert-circle" size={13} color="#EF4444" />
+                    <Text style={styles.heroPillTextUrgent}>
+                      {overdueDeadlines.length + dueTodayDeadlines.length}{' '}
+                      {overdueDeadlines.length + dueTodayDeadlines.length === 1 ? 'deadline' : 'deadlines'} due
+                    </Text>
+                  </View>
+                )}
+
+                {/* 2. Action Needed (Accent Blue) */}
+                {dedupedActionItems.length > 0 && (
+                  <View style={styles.heroPillAction}>
+                    <Ionicons name="checkbox-outline" size={13} color="#3B82F6" />
+                    <Text style={styles.heroPillTextAction}>
+                      {dedupedActionItems.length} action{dedupedActionItems.length === 1 ? '' : 's'} needed
+                    </Text>
+                  </View>
+                )}
+
+                {/* 3. Informational (Neutral Gray) */}
+                {todayEmails.length > 0 && (
+                  <View style={styles.heroPillNeutral}>
+                    <Ionicons name="mail-unread-outline" size={13} color="#A1A1AA" />
+                    <Text style={styles.heroPillTextNeutral}>
+                      {todayEmails.length} campus update{todayEmails.length === 1 ? '' : 's'}
+                    </Text>
+                  </View>
+                )}
+
+                {/* All Clear Fallback */}
+                {overdueDeadlines.length === 0 &&
+                  dueTodayDeadlines.length === 0 &&
+                  dedupedActionItems.length === 0 && (
+                    <View style={styles.heroPillSuccess}>
+                      <Ionicons name="checkmark-circle-outline" size={13} color="#10B981" />
+                      <Text style={styles.heroPillTextSuccess}>All caught up</Text>
+                    </View>
+                  )}
+              </View>
+
+              {/* Glanceable Day Focus Strip: Today + Next 2 Days with Week Toggle */}
+              <View style={styles.heroPickerContainer}>
+                <View style={styles.heroPickerHeader}>
+                  <Text style={styles.heroPickerLabel}>
+                    {isWeekExpanded ? 'THIS WEEK' : 'SCHEDULE FOCUS'}
+                  </Text>
+                  <Pressable
+                    onPress={() => {
+                      hapticLight();
+                      setIsWeekExpanded((p) => !p);
+                    }}
+                    hitSlop={8}
+                    style={styles.heroPickerToggle}
+                    accessibilityRole="button"
+                    accessibilityLabel={isWeekExpanded ? 'Show 3 days focus' : 'Expand to full week'}
+                  >
+                    <Text style={styles.heroPickerToggleText}>
+                      {isWeekExpanded ? 'Show 3 Days' : 'Full Week'}
+                    </Text>
+                    <Ionicons
+                      name={isWeekExpanded ? 'chevron-up' : 'chevron-down'}
+                      size={12}
+                      color="#A1A1AA"
+                    />
+                  </Pressable>
+                </View>
+
+                {isWeekExpanded ? (
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.heroDaysScroll}
+                  >
+                    {weekDays.map((day) => {
+                      const isSelected = isSameDay(day, selectedBriefingDate);
+                      const isTodayDate = isSameDay(day, new Date());
+                      const dayDeadlinesCount = deadlineEmails.filter((e) =>
+                        isSameDay(new Date(e.deadline!), day)
+                      ).length;
+
+                      return (
+                        <Pressable
+                          key={day.toISOString()}
+                          onPress={() => {
+                            hapticLight();
+                            setSelectedBriefingDate(day);
+                          }}
+                          style={[
+                            styles.spaciousDayCard,
+                            styles.spaciousDayCardWeek,
+                            isSelected && styles.spaciousDayCardSelected,
+                            isTodayDate && !isSelected && styles.spaciousDayCardToday,
+                          ]}
+                        >
+                          <Text style={[styles.spaciousDayName, isSelected && styles.spaciousDayTextSelected]}>
+                            {isTodayDate ? 'TODAY' : format(day, 'EEE').toUpperCase()}
+                          </Text>
+                          <Text style={[styles.spaciousDayNum, isSelected && styles.spaciousDayTextSelected]}>
+                            {format(day, 'd')}
+                          </Text>
+                          {dayDeadlinesCount > 0 ? (
+                            <View style={styles.dayBadgeDot}>
+                              <View style={[styles.dayDot, isSelected ? styles.dayDotSelected : styles.dayDotActive]} />
+                            </View>
+                          ) : (
+                            <View style={styles.dayDotPlaceholder} />
+                          )}
+                        </Pressable>
+                      );
+                    })}
+                  </ScrollView>
+                ) : (
+                  <View style={styles.heroDaysRow}>
+                    {threeDays.map((day) => {
+                      const isSelected = isSameDay(day, selectedBriefingDate);
+                      const isTodayDate = isSameDay(day, new Date());
+                      const dayDeadlinesCount = deadlineEmails.filter((e) =>
+                        isSameDay(new Date(e.deadline!), day)
+                      ).length;
+
+                      return (
+                        <Pressable
+                          key={day.toISOString()}
+                          onPress={() => {
+                            hapticLight();
+                            setSelectedBriefingDate(day);
+                          }}
+                          style={[
+                            styles.spaciousDayCard,
+                            isSelected && styles.spaciousDayCardSelected,
+                            isTodayDate && !isSelected && styles.spaciousDayCardToday,
+                          ]}
+                        >
+                          <Text style={[styles.spaciousDayName, isSelected && styles.spaciousDayTextSelected]}>
+                            {isTodayDate ? 'TODAY' : format(day, 'EEE').toUpperCase()}
+                          </Text>
+                          <Text style={[styles.spaciousDayNum, isSelected && styles.spaciousDayTextSelected]}>
+                            {format(day, 'd')}
+                          </Text>
+                          {dayDeadlinesCount > 0 ? (
+                            <View style={styles.dayBadgeDot}>
+                              <View style={[styles.dayDot, isSelected ? styles.dayDotSelected : styles.dayDotActive]} />
+                            </View>
+                          ) : (
+                            <View style={styles.dayDotPlaceholder} />
+                          )}
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                )}
+
+                {/* Quick Return to Today button if an upcoming day is selected */}
+                {!isSameDay(selectedBriefingDate, new Date()) && (
+                  <Pressable
+                    onPress={() => {
+                      hapticLight();
+                      setSelectedBriefingDate(new Date());
+                    }}
+                    style={styles.heroResetBtn}
+                  >
+                    <Ionicons name="arrow-undo-outline" size={13} color="#3B82F6" />
+                    <Text style={styles.heroResetText}>
+                      Viewing {format(selectedBriefingDate, 'EEEE, MMM d')} · Tap to return to Today
+                    </Text>
+                  </Pressable>
+                )}
+              </View>
             </MotiView>
 
-            {/* Class Schedule Card */}
+            {/* 1. Academic Schedule & Timetable (Driven by selectedBriefingDate) */}
+            <View style={styles.sectionDivider} />
+
             <MotiView
-              from={{ opacity: 0, translateY: 12 }}
+              from={{ opacity: 0, translateY: 8 }}
               animate={{ opacity: 1, translateY: 0 }}
               transition={{ type: 'timing', duration: 400, delay: 50 }}
             >
               <ClassScheduleCard
-                selectedDate={new Date()}
+                selectedDate={selectedBriefingDate}
                 onOpenTimetable={() => setShowTimetableModal(true)}
+                onOpenProfile={() => setShowAcademicModal(true)}
+                onOpenAttendance={() => setShowAttendanceModal(true)}
+                onOpenRoomLocator={(hall) => {
+                  setSelectedRoomCode(hall);
+                  setShowRoomLocator(true);
+                }}
               />
             </MotiView>
 
-            {/* Campus Mess Menu */}
+            {/* 2. Campus Mess Menu (Driven by selectedBriefingDate) */}
+            <View style={styles.sectionDivider} />
+
             <MotiView
-              from={{ opacity: 0, translateY: 12 }}
+              from={{ opacity: 0, translateY: 8 }}
               animate={{ opacity: 1, translateY: 0 }}
               transition={{ type: 'timing', duration: 400, delay: 100 }}
             >
-              <MessMenuCard />
+              <MessMenuCard
+                selectedDate={selectedBriefingDate}
+                onDateChange={setSelectedBriefingDate}
+                collapsible
+                defaultCollapsed={false}
+              />
             </MotiView>
 
-            {/* All Clear State */}
-            {hasNoContent && (
-              <MotiView
-                from={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: 'timing', duration: 400, delay: 200 }}
-                style={styles.allClearCard}
-              >
-                <Text style={styles.allClearEmoji}>🎉</Text>
-                <Text style={styles.allClearTitle}>All Clear!</Text>
-                <Text style={styles.allClearSubtitle}>No deadlines or urgent emails today. Enjoy your day!</Text>
-              </MotiView>
-            )}
+            {/* 3. Triage-First "Needs Your Action Today" & Clustered Activity Feed */}
+            <View style={styles.sectionDivider} />
 
-            {/* Deadlines Section */}
-            {todayDeadlines.length > 0 && (
-              <MotiView
-                from={{ opacity: 0, translateY: 12 }}
-                animate={{ opacity: 1, translateY: 0 }}
-                transition={{ type: 'timing', duration: 400, delay: 100 }}
-              >
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>DEADLINES</Text>
-                  <Text style={styles.sectionCount}>{todayDeadlines.length}</Text>
-                </View>
-                <View style={styles.sectionCard}>
-                  {todayDeadlines.map((email, idx) => {
-                    const deadline = new Date(email.deadline!);
-                    const isOverdue = isPast(deadline);
-                    const timeLabel = isOverdue
-                      ? `Overdue ${formatDistanceToNow(deadline)} ago`
-                      : `Due ${formatDistanceToNow(deadline, { addSuffix: true })}`;
-
-                    return (
-                      <Pressable
-                        key={email.id}
-                        onPress={() => handleEmailPress(email.id)}
-                        style={({ pressed }) => [
-                          styles.deadlineRow,
-                          idx < todayDeadlines.length - 1 && styles.rowBorder,
-                          pressed && styles.rowPressed,
-                        ]}
-                      >
-                        <View style={styles.deadlineLeft}>
-                          <View style={[styles.deadlineDot, isOverdue && styles.deadlineDotOverdue]} />
-                          <View style={styles.deadlineContent}>
-                            <Text style={styles.deadlineSubject} numberOfLines={1}>{email.subject}</Text>
-                            <Text style={[styles.deadlineTime, isOverdue && styles.deadlineTimeOverdue]}>
-                              {timeLabel}
-                            </Text>
-                          </View>
-                        </View>
-                        <Ionicons name="chevron-forward" size={13} color={Colors.textMuted} />
-                      </Pressable>
-                    );
-                  })}
-                </View>
-              </MotiView>
-            )}
-
-            {/* Action Items Section */}
-            {todayActionItems.length > 0 && (
-              <MotiView
-                from={{ opacity: 0, translateY: 12 }}
-                animate={{ opacity: 1, translateY: 0 }}
-                transition={{ type: 'timing', duration: 400, delay: 200 }}
-              >
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>ACTION ITEMS</Text>
-                  <Text style={styles.sectionCount}>{todayActionItems.length}</Text>
-                </View>
-                <View style={styles.sectionCard}>
-                  {todayActionItems.map((item, idx) => (
-                    <Pressable
-                      key={`${item.email.id}-${idx}`}
-                      onPress={() => handleEmailPress(item.email.id)}
-                      style={({ pressed }) => [
-                        styles.actionRow,
-                        idx < todayActionItems.length - 1 && styles.rowBorder,
-                        pressed && styles.rowPressed,
-                      ]}
-                    >
-                      <Ionicons name="square-outline" size={16} color={Colors.systemBlue} style={styles.actionIcon} />
-                      <View style={styles.actionContent}>
-                        <Text style={styles.actionText} numberOfLines={2}>{item.action}</Text>
-                        <Text style={styles.actionSource} numberOfLines={1}>{item.email.sender}</Text>
-                      </View>
-                    </Pressable>
-                  ))}
-                </View>
-              </MotiView>
-            )}
-
-            {/* Critical / Urgent Emails Section */}
-            {stats.criticalAlerts.length > 0 && (
-              <MotiView
-                from={{ opacity: 0, translateY: 12 }}
-                animate={{ opacity: 1, translateY: 0 }}
-                transition={{ type: 'timing', duration: 400, delay: 300 }}
-              >
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>REQUIRES ATTENTION</Text>
-                  <Text style={styles.sectionCount}>{stats.criticalAlerts.length}</Text>
-                </View>
-                <View style={styles.sectionCard}>
-                  {stats.criticalAlerts.map((email, idx) => (
-                    <Pressable
-                      key={email.id}
-                      onPress={() => handleEmailPress(email.id)}
-                      style={({ pressed }) => [
-                        styles.criticalRow,
-                        idx < stats.criticalAlerts.length - 1 && styles.rowBorder,
-                        pressed && styles.rowPressed,
-                      ]}
-                    >
-                      <View style={styles.criticalDot} />
-                      <View style={styles.criticalContent}>
-                        <Text style={styles.criticalSubject} numberOfLines={1}>{email.subject}</Text>
-                        <Text style={styles.criticalSender} numberOfLines={1}>
-                          {email.sender} · {formatDistanceToNow(new Date(email.date), { addSuffix: true })}
-                        </Text>
-                      </View>
-                      <Ionicons name="chevron-forward" size={13} color={Colors.textMuted} />
-                    </Pressable>
-                  ))}
-                </View>
-              </MotiView>
-            )}
-
-            {/* Category Breakdown */}
-            {categoryBreakdown.length > 0 && (
-              <MotiView
-                from={{ opacity: 0, translateY: 12 }}
-                animate={{ opacity: 1, translateY: 0 }}
-                transition={{ type: 'timing', duration: 400, delay: 400 }}
-              >
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>TODAY'S BREAKDOWN</Text>
-                </View>
-                <View style={styles.breakdownStrip}>
-                  {categoryBreakdown.map(([group, count]) => {
-                    const meta = GROUP_META[group as keyof typeof GROUP_META];
-                    const groupColor =
-                      (Colors.categoryGroup[group as keyof typeof Colors.categoryGroup] as string) ?? Colors.systemBlue;
-                    return (
-                      <View
-                        key={group}
-                        style={[
-                          styles.breakdownChip,
-                          { borderColor: groupColor + '30', backgroundColor: groupColor + '12' },
-                        ]}
-                      >
-                        <Text style={[styles.breakdownCount, { color: groupColor }]}>{count}</Text>
-                        <Text style={styles.breakdownLabel} numberOfLines={1}>
-                          {meta?.label ?? group}
-                        </Text>
-                      </View>
-                    );
-                  })}
-                </View>
-              </MotiView>
-            )}
+            <MotiView
+              from={{ opacity: 0, translateY: 8 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ type: 'timing', duration: 400, delay: 150 }}
+            >
+              <TriageFeed
+                overdueDeadlines={overdueDeadlines}
+                dueTodayDeadlines={dueTodayDeadlines}
+                actionItems={dedupedActionItems}
+                criticalAlerts={stats.criticalAlerts}
+                allCampusEmails={officialCampusEmails}
+                onEmailPress={handleEmailPress}
+              />
+            </MotiView>
           </>
         ) : (
           /* Calendar Tab Content */
@@ -519,6 +586,17 @@ export default function TodayScreen() {
         onClose={() => setShowAcademicModal(false)}
         onOpenTimetable={() => setShowTimetableModal(true)}
       />
+
+      <AttendanceModal
+        visible={showAttendanceModal}
+        onClose={() => setShowAttendanceModal(false)}
+      />
+
+      <RoomLocatorModal
+        visible={showRoomLocator}
+        initialRoomCode={selectedRoomCode}
+        onClose={() => setShowRoomLocator(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -564,54 +642,216 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: Spacing[4],
-    paddingTop: Spacing[4],
+    paddingTop: Spacing[3],
     paddingBottom: Spacing[6],
-    gap: Spacing[4],
+    gap: Spacing[3],
   },
-  greetingSection: {
-    gap: 3,
-    paddingBottom: 2,
+  sectionDivider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: 'rgba(255, 255, 255, 0.07)',
+    marginVertical: Spacing[1],
   },
-  dateLabel: {
+  heroCard: {
+    gap: Spacing[3],
+  },
+  heroHeader: {
+    gap: 4,
+  },
+  heroDate: {
     fontSize: 11,
     fontWeight: Typography.weight.bold,
     color: Colors.textMuted,
-    letterSpacing: 1.0,
+    letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
-  greeting: {
-    fontSize: Typography.size['2xl'],
+  heroGreeting: {
+    fontSize: 26,
     fontWeight: Typography.weight.bold,
     color: Colors.text,
-    letterSpacing: -0.4,
+    letterSpacing: -0.5,
   },
-  summaryLine: {
-    fontSize: Typography.size.sm,
-    color: Colors.textSecondary,
-    marginTop: 1,
-  },
-  allClearCard: {
-    backgroundColor: Colors.card,
-    borderRadius: Radius.lg,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    padding: Spacing[8],
+  heroStatusRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: Spacing[2],
     alignItems: 'center',
+  },
+  heroPillUrgent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(239, 68, 68, 0.12)',
+    paddingVertical: 5,
+    paddingHorizontal: Spacing[2.5],
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(239, 68, 68, 0.3)',
+  },
+  heroPillTextUrgent: {
+    fontSize: Typography.size.xs,
+    fontWeight: Typography.weight.semibold,
+    color: '#EF4444',
+  },
+  heroPillAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(59, 130, 246, 0.12)',
+    paddingVertical: 5,
+    paddingHorizontal: Spacing[2.5],
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.3)',
+  },
+  heroPillTextAction: {
+    fontSize: Typography.size.xs,
+    fontWeight: Typography.weight.semibold,
+    color: '#3B82F6',
+  },
+  heroPillNeutral: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    paddingVertical: 5,
+    paddingHorizontal: Spacing[2.5],
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+  },
+  heroPillTextNeutral: {
+    fontSize: Typography.size.xs,
+    fontWeight: Typography.weight.medium,
+    color: '#A1A1AA',
+  },
+  heroPillSuccess: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    paddingVertical: 5,
+    paddingHorizontal: Spacing[2.5],
+    borderRadius: Radius.full,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.3)',
+  },
+  heroPillTextSuccess: {
+    fontSize: Typography.size.xs,
+    fontWeight: Typography.weight.semibold,
+    color: '#10B981',
+  },
+  heroPickerContainer: {
+    gap: Spacing[2],
+    marginTop: 2,
+  },
+  heroPickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 2,
+  },
+  heroPickerLabel: {
+    fontSize: 10,
+    fontWeight: Typography.weight.bold,
+    letterSpacing: 0.8,
+    color: Colors.textMuted,
+  },
+  heroPickerToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    paddingVertical: 2,
+    paddingHorizontal: 6,
+    borderRadius: Radius.sm,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+  },
+  heroPickerToggleText: {
+    fontSize: 11,
+    fontWeight: Typography.weight.semibold,
+    color: '#A1A1AA',
+  },
+  heroDaysRow: {
+    flexDirection: 'row',
     gap: Spacing[2],
   },
-  allClearEmoji: {
-    fontSize: 48,
+  heroDaysScroll: {
+    gap: Spacing[2],
+    paddingVertical: 2,
   },
-  allClearTitle: {
+  spaciousDayCard: {
+    flex: 1,
+    minHeight: 64,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Spacing[2],
+    paddingHorizontal: Spacing[1.5],
+    borderRadius: Radius.md,
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    gap: 2,
+  },
+  spaciousDayCardWeek: {
+    width: 58,
+    flex: undefined,
+  },
+  spaciousDayCardSelected: {
+    backgroundColor: Colors.systemBlue,
+    borderColor: Colors.systemBlue,
+  },
+  spaciousDayCardToday: {
+    borderColor: 'rgba(0, 122, 255, 0.45)',
+    backgroundColor: 'rgba(0, 122, 255, 0.08)',
+  },
+  spaciousDayName: {
+    fontSize: 10,
+    fontWeight: Typography.weight.semibold,
+    color: Colors.textMuted,
+    letterSpacing: 0.5,
+  },
+  spaciousDayNum: {
     fontSize: Typography.size.lg,
     fontWeight: Typography.weight.bold,
     color: Colors.text,
   },
-  allClearSubtitle: {
-    fontSize: Typography.size.sm,
-    color: Colors.textMuted,
-    textAlign: 'center',
-    maxWidth: 260,
+  spaciousDayTextSelected: {
+    color: '#FFFFFF',
+  },
+  dayBadgeDot: {
+    height: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  dayDotPlaceholder: {
+    height: 6,
+  },
+  dayDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+  },
+  dayDotActive: {
+    backgroundColor: '#EF4444',
+  },
+  dayDotSelected: {
+    backgroundColor: '#3B82F6',
+  },
+  heroResetBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 6,
+    backgroundColor: 'rgba(59, 130, 246, 0.08)',
+    borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.2)',
+    marginTop: 2,
+  },
+  heroResetText: {
+    fontSize: 11,
+    fontWeight: Typography.weight.medium,
+    color: '#3B82F6',
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -636,140 +876,6 @@ const styles = StyleSheet.create({
     borderRadius: Radius.full,
     borderWidth: 1,
     borderColor: Colors.border,
-  },
-  sectionCard: {
-    backgroundColor: Colors.card,
-    borderRadius: Radius.lg,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    overflow: 'hidden',
-  },
-  rowBorder: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.border,
-  },
-  rowPressed: {
-    backgroundColor: Colors.cardHover,
-  },
-  deadlineRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 11,
-    paddingHorizontal: Spacing[3],
-    gap: Spacing[3],
-  },
-  deadlineLeft: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing[3],
-    minWidth: 0,
-  },
-  deadlineDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: Colors.systemOrange,
-    flexShrink: 0,
-  },
-  deadlineDotOverdue: {
-    backgroundColor: Colors.systemRed,
-  },
-  deadlineContent: {
-    flex: 1,
-    gap: 1,
-    minWidth: 0,
-  },
-  deadlineSubject: {
-    fontSize: Typography.size.sm,
-    fontWeight: Typography.weight.semibold,
-    color: Colors.text,
-  },
-  deadlineTime: {
-    fontSize: 11,
-    color: Colors.systemOrange,
-    fontWeight: Typography.weight.medium,
-  },
-  deadlineTimeOverdue: {
-    color: Colors.systemRed,
-  },
-  actionRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingVertical: 10,
-    paddingHorizontal: Spacing[3],
-    gap: Spacing[2],
-  },
-  actionIcon: {
-    marginTop: 1,
-    flexShrink: 0,
-  },
-  actionContent: {
-    flex: 1,
-    gap: 1,
-    minWidth: 0,
-  },
-  actionText: {
-    fontSize: Typography.size.sm,
-    color: Colors.text,
-    lineHeight: 19,
-  },
-  actionSource: {
-    fontSize: 11,
-    color: Colors.textMuted,
-  },
-  criticalRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 11,
-    paddingHorizontal: Spacing[3],
-    gap: Spacing[3],
-  },
-  criticalDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: Colors.systemRed,
-    flexShrink: 0,
-  },
-  criticalContent: {
-    flex: 1,
-    gap: 2,
-  },
-  criticalSubject: {
-    fontSize: Typography.size.sm,
-    fontWeight: Typography.weight.semibold,
-    color: Colors.text,
-  },
-  criticalSender: {
-    fontSize: Typography.size.xs,
-    color: Colors.textMuted,
-  },
-  breakdownStrip: {
-    flexDirection: 'row',
-    gap: Spacing[2],
-    flexWrap: 'wrap',
-  },
-  breakdownChip: {
-    backgroundColor: Colors.card,
-    borderRadius: Radius.md,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    paddingVertical: Spacing[2],
-    paddingHorizontal: Spacing[3],
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  breakdownCount: {
-    fontSize: Typography.size.base,
-    fontWeight: Typography.weight.bold,
-    color: Colors.text,
-  },
-  breakdownLabel: {
-    fontSize: Typography.size.xs,
-    color: Colors.textMuted,
-    fontWeight: Typography.weight.medium,
   },
   // Calendar View Styles
   calContainer: {

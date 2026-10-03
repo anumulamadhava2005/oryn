@@ -19,6 +19,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { MotiView } from 'moti';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
+import { useResponsive } from '@/hooks/useResponsive';
 import type { LostItem } from '@/services/lostFoundApi';
 import { hapticLight } from '@/utils/haptics';
 
@@ -40,6 +41,7 @@ export function LostFoundSearchModal({
   onClose,
 }: LostFoundSearchModalProps) {
   const insets = useSafeAreaInsets();
+  const { modalSheetStyles } = useResponsive();
   const searchInputRef = useRef<TextInput>(null);
 
   const isSearching = searchQuery.trim().length > 0;
@@ -65,13 +67,13 @@ export function LostFoundSearchModal({
       transparent
       onRequestClose={onClose}
     >
-      <View style={styles.modalOverlay}>
+      <View style={[styles.modalOverlay, modalSheetStyles.overlay]}>
         <Pressable style={styles.modalBackdrop} onPress={onClose} />
         <MotiView
           from={{ opacity: 0, translateY: 30 }}
           animate={{ opacity: 1, translateY: 0 }}
           transition={{ type: 'timing', duration: 250 }}
-          style={[styles.modalSheet, { maxHeight: '80%', paddingBottom: Math.max(insets.bottom, 20) }]}
+          style={[styles.modalSheet, modalSheetStyles.sheet, { maxHeight: '80%', paddingBottom: Math.max(insets.bottom, 20) }]}
         >
           {/* Apple Grab Handle */}
           <View style={styles.grabHandle} />

@@ -6,15 +6,13 @@ import {
   Modal,
   Pressable,
   Animated,
-  Dimensions,
+  useWindowDimensions,
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Radius, Shadows } from '@/constants/theme';
 import { useAlertStore, type AlertButton, type AlertType } from '@/store/alertStore';
 import { hapticLight, hapticMedium, hapticWarning, hapticSuccess } from '@/utils/haptics';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 function inferAlertType(title: string, message?: string, buttons?: AlertButton[]): { type: AlertType; icon: any } {
   const text = `${title} ${message || ''}`.toLowerCase();
@@ -225,7 +223,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   card: {
-    width: Math.min(SCREEN_WIDTH - 56, 336),
+    width: '100%',
+    maxWidth: 340,
     backgroundColor: '#1C1C1E',
     borderRadius: 24,
     borderWidth: 1,

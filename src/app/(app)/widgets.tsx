@@ -3,7 +3,7 @@
  * Allows users to configure and preview Academic Calendar, Mess Menu, and Category Mails widgets.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   ScrollView,
   Pressable,
   Alert,
+  BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -55,15 +56,29 @@ export default function WidgetsScreen() {
     }, 600);
   };
 
+  const handleBack = useCallback(() => {
+    hapticLight();
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(app)/settings');
+    }
+  }, [router]);
+
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      handleBack();
+      return true;
+    });
+    return () => sub.remove();
+  }, [handleBack]);
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Top Header Navigation */}
       <View style={styles.headerBar}>
         <Pressable
-          onPress={() => {
-            hapticLight();
-            router.back();
-          }}
+          onPress={handleBack}
           style={styles.backButton}
         >
           <Ionicons name="chevron-back" size={22} color={Colors.text} />

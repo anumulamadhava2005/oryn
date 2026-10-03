@@ -33,6 +33,7 @@ Notifications.setNotificationHandler({
 
 export const CHANNELS = {
   GENERAL: 'oryn_general',
+  CLASSES: 'oryn_classes',
   PLACEMENT: 'oryn_placement',
   DEADLINES: 'oryn_deadlines',
   BRIEFING: 'oryn_briefing',
@@ -80,10 +81,23 @@ export async function setupAllNotificationChannels(): Promise<void> {
     showBadge: true,
   });
 
-  // 3. General Campus Notices
+  // 3. Class Reminders Channel (15 minutes before lecture/lab)
+  await Notifications.setNotificationChannelAsync(CHANNELS.CLASSES, {
+    name: 'Class Reminders & Lectures',
+    description: 'Punctual reminders 15 minutes before scheduled lectures and labs',
+    importance: Notifications.AndroidImportance.HIGH,
+    vibrationPattern: [0, 200, 100, 200],
+    lightColor: '#3B82F6',
+    sound: 'default',
+    enableLights: true,
+    enableVibrate: true,
+    showBadge: true,
+  });
+
+  // 4. General Campus Notices
   await Notifications.setNotificationChannelAsync(CHANNELS.GENERAL, {
-    name: 'Campus Notices & Classes',
-    description: 'Class cancellations, administrative circulars, hostel & faculty emails',
+    name: 'Campus Notices & Circulars',
+    description: 'Administrative circulars, hostel & faculty emails',
     importance: Notifications.AndroidImportance.HIGH,
     vibrationPattern: [0, 250, 250, 250],
     lightColor: '#7C3AED',
@@ -93,7 +107,7 @@ export async function setupAllNotificationChannels(): Promise<void> {
     showBadge: true,
   });
 
-  // 4. Daily Briefings Channel (Default priority, pleasant & unobtrusive)
+  // 5. Daily Briefings Channel (Default priority, pleasant & unobtrusive)
   await Notifications.setNotificationChannelAsync(CHANNELS.BRIEFING, {
     name: 'Daily Briefing & Radar',
     description: 'Morning schedule summary and nightly radar',
@@ -553,6 +567,119 @@ export async function scheduleNightlyRadar(): Promise<void> {
       channelId: CHANNELS.BRIEFING,
     },
   });
+}
+
+// --------------------------------------------------------------------------
+// Class Reminders (15 minutes prior to every scheduled class)
+// --------------------------------------------------------------------------
+
+/**
+ * Parses timeSlot string like "8:00 - 8:50 AM" or "2:00 - 4:50 PM"
+ * and returns { hour, minute } in 24-hour format.
+ */
+export function parseClassStartTime(timeSlot: string): { hour: number; minute: number } | null {
+  const parts = timeSlot.split('-').map((p) => p.trim());
+  if (parts.length < 2) return null;
+
+  const startPart = parts[0];
+  const endPart = parts[1];
+
+  const isPM = /PM/i.test(endPart) || /PM/i.test(startPart);
+  const isAM = /AM/i.test(endPart) || /AM/i.test(startPart);
+
+  const startMatch = startPart.match(/(\d+):(\d+)/);
+  if (!startMatch) return null;
+
+  let hour = parseInt(startMatch[1], 10);
+  const minute = parseInt(startMatch[2], 10);
+
+  if (isPM && hour < 12) {
+    hour += 12;
+  } else if (isAM && hour === 12) {
+    hour = 0;
+  }
+
+  return { hour, minute };
+}
+
+/**
+ * Schedules 15-minute pre-class reminders for all lectures and labs
+ * on the student's registered timetable for the upcoming 7 days.
+ */
+export async function scheduleClassReminders(): Promise<{ scheduled: number }> {
+  const prefs = useNotificationPreferencesStore.getState();
+  if (!prefs.enabled || !prefs.classReminders) {
+    return { scheduled: 0 };
+  }
+
+  const reminderMinutes = prefs.classReminderMinutes || 15;
+  const weeklySchedule = useAcademicStore.getState().getWeeklySchedule();
+  if (!weeklySchedule) return { scheduled: 0 };
+
+  let scheduledCount = 0;
+  const now = new Date();
+  const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] as const;
+
+  for (let offset = 0; offset < 7; offset++) {
+    const targetDate = new Date(now);
+    targetDate.setDate(now.getDate() + offset);
+
+    const dayOfWeek = dayNames[targetDate.getDay()];
+    if (dayOfWeek === 'SUN' || dayOfWeek === 'SAT') continue; // No classes on weekends
+
+    const daySlots = weeklySchedule[dayOfWeek] || [];
+
+    for (const slot of daySlots) {
+      if (!slot.courses || slot.courses.length === 0) continue;
+      if (slot.slotCode === 'LUNCH') continue;
+
+      const timeInfo = parseClassStartTime(slot.timeSlot);
+      if (!timeInfo) continue;
+
+      // Construct exact class start date/time
+      const classStart = new Date(targetDate);
+      classStart.setHours(timeInfo.hour, timeInfo.minute, 0, 0);
+
+      // Notification trigger time = class start minus reminderMinutes
+      const triggerTime = new Date(classStart.getTime() - reminderMinutes * 60 * 1000);
+
+      // If already passed, skip
+      if (triggerTime.getTime() <= now.getTime()) continue;
+
+      for (const course of slot.courses) {
+        const identifier = `class_reminder:${dayOfWeek}:${slot.slotCode}:${course.id || course.code}:${targetDate.toISOString().slice(0, 10)}`;
+
+        await Notifications.cancelScheduledNotificationAsync(identifier).catch(() => {});
+
+        const venueStr = course.hall ? ` in ${course.hall}` : '';
+        const facultyStr = course.faculty ? ` · Prof. ${course.faculty}` : '';
+
+        await Notifications.scheduleNotificationAsync({
+          identifier,
+          content: {
+            title: `📚 Class in ${reminderMinutes} mins: ${course.name || course.code}`,
+            body: `${course.code} starts at ${slot.timeSlot.split('-')[0].trim()}${venueStr}${facultyStr}`,
+            data: {
+              type: 'class_reminder',
+              courseId: course.id,
+              courseCode: course.code,
+              hall: course.hall,
+              timeSlot: slot.timeSlot,
+            },
+          },
+          trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
+            date: triggerTime,
+            channelId: CHANNELS.CLASSES,
+          },
+        }).catch(() => {});
+
+        scheduledCount++;
+      }
+    }
+  }
+
+  return { scheduled: scheduledCount };
 }
 
 // --------------------------------------------------------------------------

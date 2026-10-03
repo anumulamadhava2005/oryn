@@ -20,6 +20,7 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius, Opacity } from '@/constants/theme';
+import { useResponsive } from '@/hooks/useResponsive';
 import { hapticLight, hapticMedium } from '@/utils/haptics';
 import { CATEGORY_GROUP_ORDER, GROUP_META } from '@/constants/categories';
 import { usePreferencesStore } from '@/store/preferences';
@@ -83,6 +84,7 @@ export function DashboardHeader({
   onSearchPress,
 }: Props) {
   const router = useRouter();
+  const { modalSheetStyles } = useResponsive();
   const [filterModalVisible, setFilterModalVisible] = useState(false);
   const themeMode = usePreferencesStore(s => s.themeMode);
   const isMono = themeMode === 'monochrome';
@@ -184,7 +186,7 @@ export function DashboardHeader({
             if (onSearchPress) {
               onSearchPress();
             } else {
-              router.push('/(app)/search');
+              router.push('/(app)/search?from=inbox' as any);
             }
           }}
           style={({ pressed }) => [
@@ -271,10 +273,10 @@ export function DashboardHeader({
         onRequestClose={() => setFilterModalVisible(false)}
       >
         <Pressable
-          style={styles.modalOverlay}
+          style={[styles.modalOverlay, modalSheetStyles.overlay]}
           onPress={() => setFilterModalVisible(false)}
         >
-          <Pressable style={styles.modalSheet} onPress={(e) => e.stopPropagation()}>
+          <Pressable style={[styles.modalSheet, modalSheetStyles.sheet]} onPress={(e) => e.stopPropagation()}>
             {/* Grab Handle */}
             <View style={styles.grabHandle} />
 

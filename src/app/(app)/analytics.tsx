@@ -3,14 +3,14 @@
  * Visualizes email volumes, category distribution, deadline completion, and time saved.
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
   ScrollView,
   Pressable,
   StyleSheet,
-  Dimensions,
+  BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -18,14 +18,34 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
 import { useEmails } from '@/hooks/useEmails';
+import { useResponsive } from '@/hooks/useResponsive';
 import { GROUP_META } from '@/constants/categories';
+import { usePreferencesStore } from '@/store/preferences';
 import { hapticLight } from '@/utils/haptics';
-
-const SCREEN_WIDTH = Dimensions.get('window').width;
 
 export default function AnalyticsScreen() {
   const router = useRouter();
+  const { isTablet } = useResponsive();
   const { emails, stats } = useEmails();
+  const showInboxTab = usePreferencesStore((s) => s.showInboxTab);
+  const startScreen = usePreferencesStore((s) => s.startScreen);
+
+  const handleBack = useCallback(() => {
+    hapticLight();
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(!showInboxTab || startScreen === 'today' ? '/(app)/today' : '/(app)');
+    }
+  }, [router, showInboxTab, startScreen]);
+
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      handleBack();
+      return true;
+    });
+    return () => sub.remove();
+  }, [handleBack]);
 
   const metrics = useMemo(() => {
     const total = emails.length;
@@ -63,8 +83,8 @@ export default function AnalyticsScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
+      <View style={[styles.header, isTablet && { maxWidth: 760, width: '100%', alignSelf: 'center' }]}>
+        <Pressable onPress={handleBack} style={styles.backBtn}>
           <Ionicons name="chevron-back" size={24} color={Colors.systemBlue} />
           <Text style={styles.backText}>Back</Text>
         </Pressable>
@@ -72,7 +92,13 @@ export default function AnalyticsScreen() {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          isTablet && { maxWidth: 760, width: '100%', alignSelf: 'center', paddingBottom: 120 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Banner Card */}
         <View style={styles.heroCard}>
           <View style={styles.heroHeader}>
@@ -221,7 +247,9 @@ const styles = StyleSheet.create({
     gap: Spacing[3],
   },
   kpiCard: {
-    width: (SCREEN_WIDTH - Spacing[4] * 2 - Spacing[3]) / 2,
+    flex: 1,
+    minWidth: 140,
+    flexBasis: '46%',
     backgroundColor: Colors.card,
     borderRadius: Radius.lg,
     padding: Spacing[4],

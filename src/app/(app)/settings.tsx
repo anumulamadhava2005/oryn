@@ -37,6 +37,7 @@ import { useSDUIStore, useSDUIEnvironment } from '@/store/sduiStore';
 import { syncSDUI } from '@/services/sduiService';
 import { NotificationPreferencesModal } from '@/components/settings/NotificationPreferencesModal';
 import { useNotificationPreferencesStore } from '@/store/notificationPreferences';
+import { useResponsive } from '@/hooks/useResponsive';
 
 function SettingRow({
   icon,
@@ -84,7 +85,13 @@ function SettingRow({
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
@@ -94,6 +101,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 export default function SettingsScreen() {
+  const { isTablet } = useResponsive();
   const { user, logout } = useAuth();
   const { runInitialSync, runIncrementalSync, isSyncing, lastSyncAt } = useSync();
   const { stats } = useEmails();
@@ -157,7 +165,10 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          isTablet && { maxWidth: 680, width: '100%', alignSelf: 'center', paddingBottom: 120 },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.headerWithLogo}>

@@ -7,7 +7,7 @@
  * Links and attachments are inline. Bottom bar is compact.
  */
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import {
   StyleSheet,
   Linking,
   Share,
+  BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -29,6 +30,7 @@ import { hapticMedium, hapticLight } from '@/utils/haptics';
 import { HtmlEmailRenderer } from '@/components/email/HtmlEmailRenderer';
 import { ClassificationFeedback } from '@/components/email/ClassificationFeedback';
 import { useEmailsStore } from '@/store/emails';
+import { usePreferencesStore } from '@/store/preferences';
 import type { Category, ParsedEmail, Attachment } from '@/types/email';
 
 // ─── Priority Badge ────────────────────────────────────────────────────────────
@@ -75,7 +77,7 @@ function CategoryPill({ category }: { category: string }) {
 
 // ─── Main Screen ───────────────────────────────────────────────────────────────
 export default function EmailDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
   const router = useRouter();
   const { getEmailById, toggleStarred, toggleUnread } = useEmails();
   const updateEmailCategory = useEmailsStore(s => s.updateEmailCategory);
@@ -86,7 +88,33 @@ export default function EmailDetailScreen() {
   const [showHtml, setShowHtml] = useState(true);
   const [insightsExpanded, setInsightsExpanded] = useState(false);
 
-  const handleBack = useCallback(() => router.back(), [router]);
+  const showInboxTab = usePreferencesStore((s) => s.showInboxTab);
+  const startScreen = usePreferencesStore((s) => s.startScreen);
+
+  const handleBack = useCallback(() => {
+    hapticLight();
+    if (from === 'today') {
+      router.replace('/(app)/today');
+    } else if (from === 'search') {
+      router.replace('/(app)/search');
+    } else if (from === 'lost-found') {
+      router.replace('/(app)/lost-found');
+    } else if (from === 'inbox' || from === 'index') {
+      router.replace('/(app)');
+    } else if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace(!showInboxTab || startScreen === 'today' ? '/(app)/today' : '/(app)');
+    }
+  }, [from, router, showInboxTab, startScreen]);
+
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      handleBack();
+      return true;
+    });
+    return () => sub.remove();
+  }, [handleBack]);
 
   const handleToggleStar = useCallback(() => {
     if (email) { hapticMedium(); toggleStarred(email.id); }
@@ -127,7 +155,7 @@ export default function EmailDetailScreen() {
           <Ionicons name="mail-unread-outline" size={48} color={Colors.textMuted} />
           <Text style={styles.notFoundText}>Email not found</Text>
           <Pressable onPress={handleBack} style={styles.backBtn}>
-            <Text style={styles.backBtnText}>Return to Inbox</Text>
+            <Text style={styles.backBtnText}>Go Back</Text>
           </Pressable>
         </View>
       </SafeAreaView>
@@ -156,7 +184,7 @@ export default function EmailDetailScreen() {
       <View style={styles.topNav}>
         <Pressable onPress={handleBack} hitSlop={12} style={styles.navBack}>
           <Ionicons name="chevron-back" size={24} color={Colors.systemBlue} />
-          <Text style={styles.navBackText}>Inbox</Text>
+          <Text style={styles.navBackText}>Back</Text>
         </Pressable>
 
         <View style={styles.navRightActions}>

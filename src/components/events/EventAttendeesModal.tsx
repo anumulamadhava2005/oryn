@@ -77,63 +77,7 @@ export function EventAttendeesModal({ visible, event, onClose }: EventAttendeesM
       } catch {}
     }
 
-    // Default sample roster if not populated yet
-    const sampleRows: AttendeeRow[] = [
-      {
-        id: '1',
-        name: 'Madhava Anumula',
-        rollNumber: 'CS23B1008',
-        department: 'Computer Science & Engineering',
-        year: 2,
-        email: 'cs23b1008@iiitdm.ac.in',
-        rsvpStatus: 'going',
-        checkedIn: true,
-        checkedInAt: '10:45 AM',
-      },
-      {
-        id: '2',
-        name: 'Rahul Sharma',
-        rollNumber: 'EC23B1042',
-        department: 'Electronics & Communication',
-        year: 2,
-        email: 'ec23b1042@iiitdm.ac.in',
-        rsvpStatus: 'going',
-        checkedIn: false,
-      },
-      {
-        id: '3',
-        name: 'Sneha Patel',
-        rollNumber: 'ME22B1015',
-        department: 'Mechanical Engineering',
-        year: 3,
-        email: 'me22b1015@iiitdm.ac.in',
-        rsvpStatus: 'going',
-        checkedIn: true,
-        checkedInAt: '11:02 AM',
-      },
-      {
-        id: '4',
-        name: 'Karthik Raja',
-        rollNumber: 'CS24B1033',
-        department: 'Computer Science & Engineering',
-        year: 1,
-        email: 'cs24b1033@iiitdm.ac.in',
-        rsvpStatus: 'interested',
-        checkedIn: false,
-      },
-      {
-        id: '5',
-        name: 'Ananya Deshmukh',
-        rollNumber: 'DS23B1012',
-        department: 'Design (Smart Manufacturing)',
-        year: 2,
-        email: 'ds23b1012@iiitdm.ac.in',
-        rsvpStatus: 'going',
-        checkedIn: false,
-      },
-    ];
-
-    setAttendees(sampleRows);
+    setAttendees([]);
   }, [event?.id]);
 
   const filteredAttendees = useMemo(() => {

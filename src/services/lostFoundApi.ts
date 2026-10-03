@@ -50,6 +50,9 @@ export interface CreateLostItemPayload {
   status?: string;
   latitude?: number | null;
   longitude?: number | null;
+  created_at?: string;
+  poster_name?: string;
+  poster_email?: string;
 }
 
 export interface UpdateLostItemPayload {
@@ -68,24 +71,23 @@ export interface UpdateLostItemPayload {
 // ─── URL Resolution ─────────────────────────────────────────────
 
 function getApiBaseUrls(): string[] {
-  const urls: string[] = [
-    'https://api.cruxel.xyz/oryn',
-  ];
+  const urls: string[] = ['https://api.cruxel.xyz/oryn'];
 
-  const hostUri = Constants.expoConfig?.hostUri;
-  if (hostUri) {
-    const host = hostUri.split(':')[0];
-    if (host && host !== 'localhost' && host !== '127.0.0.1') {
-      urls.push(`http://${host}:3000/oryn`);
+  if (__DEV__) {
+    const hostUri = Constants.expoConfig?.hostUri;
+    if (hostUri) {
+      const host = hostUri.split(':')[0];
+      if (host && host !== 'localhost' && host !== '127.0.0.1') {
+        urls.unshift(`http://${host}:3000/oryn`);
+      }
     }
-  }
 
-  if (Platform.OS === 'android') {
-    urls.push('http://10.0.2.2:3000/oryn');
+    if (Platform.OS === 'android') {
+      urls.push('http://10.0.2.2:3000/oryn');
+    }
+    urls.push('http://localhost:3000/oryn');
+    urls.push('http://127.0.0.1:3000/oryn');
   }
-
-  urls.push('http://localhost:3000/oryn');
-  urls.push('http://127.0.0.1:3000/oryn');
 
   return urls;
 }
@@ -118,7 +120,7 @@ async function exchangeTokenForJwt(): Promise<string | null> {
   for (const base of urls) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
 
       const response = await fetch(`${base}/auth/google`, {
         method: 'POST',
@@ -170,21 +172,29 @@ async function fetchFromApi(
   const needsAuth = options?.auth ?? false;
 
   let authHeader: string | undefined;
-  if (needsAuth) {
-    const jwt = await getValidOrynJwt();
-    if (!jwt) throw new Error('Authentication required. Please sign in again.');
-    authHeader = `Bearer ${jwt}`;
+  const currentUser = useAuthStore.getState().user;
+
+  // Attach JWT if available
+  const storedJwt = await getOrynJwt().catch(() => null);
+  if (storedJwt) {
+    authHeader = `Bearer ${storedJwt}`;
+  } else if (needsAuth) {
+    const jwt = await getValidOrynJwt().catch(() => null);
+    if (!jwt && !currentUser?.email) throw new Error('Authentication required. Please sign in again.');
+    if (jwt) authHeader = `Bearer ${jwt}`;
   }
 
   for (const base of urls) {
     try {
       const fullUrl = `${base}${endpoint}${queryString}`;
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
 
       const headers: Record<string, string> = {};
       if (method !== 'GET') headers['Content-Type'] = 'application/json';
       if (authHeader) headers['Authorization'] = authHeader;
+      if (currentUser?.email) headers['x-user-email'] = currentUser.email;
+      if (currentUser?.id) headers['x-user-id'] = currentUser.id;
 
       const response = await fetch(fullUrl, {
         method,
@@ -267,7 +277,9 @@ export async function fetchLostItems(filters?: {
 
     const data = await fetchFromApi('/lost-found', { queryParams: query });
     if (Array.isArray(data)) {
-      storage.set(ITEMS_CACHE_KEY, JSON.stringify(data));
+      if ((!filters?.category || filters.category === 'All') && !filters?.search && data.length > 0) {
+        storage.set(ITEMS_CACHE_KEY, JSON.stringify(data));
+      }
       return data;
     }
   } catch (err: any) {
@@ -275,6 +287,23 @@ export async function fetchLostItems(filters?: {
   }
 
   // Fallback to cache
+  const cachedRaw = storage.getString(ITEMS_CACHE_KEY);
+  if (cachedRaw) {
+    try {
+      const parsed: LostItem[] = JSON.parse(cachedRaw);
+      if (filters?.category && filters.category !== 'All') {
+        return parsed.filter(i => i.category?.toLowerCase() === filters.category!.toLowerCase());
+      }
+      return parsed;
+    } catch {}
+  }
+  return [];
+}
+
+/**
+ * Synchronously read cached lost & found items from MMKV for instant 0ms startup.
+ */
+export function getCachedLostItems(): LostItem[] {
   const cachedRaw = storage.getString(ITEMS_CACHE_KEY);
   if (cachedRaw) {
     try { return JSON.parse(cachedRaw); } catch {}
@@ -305,6 +334,37 @@ export async function createLostItem(payload: CreateLostItemPayload): Promise<Lo
 }
 
 /**
+ * Payload for creating a lost item from an email import.
+ * Includes poster_email and poster_name to attribute the post
+ * to the contact person from the email rather than the logged-in user.
+ */
+export interface CreateLostItemFromEmailPayload extends CreateLostItemPayload {
+  poster_email?: string;
+  poster_name?: string;
+}
+
+/**
+ * Create a lost item imported from email, attributed to the contact person.
+ * Falls back to regular createLostItem if the server doesn't support the
+ * email-import endpoint, including poster identity in the contact_info.
+ */
+export async function createLostItemFromEmail(
+  payload: CreateLostItemFromEmailPayload,
+): Promise<LostItem> {
+  // Try the email-import endpoint first (preserves poster attribution and timestamp)
+  try {
+    return await fetchFromApi('/lost-found/email-import', {
+      method: 'POST',
+      body: payload,
+      auth: true,
+    });
+  } catch {
+    // Fallback: use standard endpoint (which also accepts poster_name, poster_email, created_at)
+    return await createLostItem(payload);
+  }
+}
+
+/**
  * Update a lost item (authenticated, poster only)
  */
 export async function updateLostItem(id: string, payload: UpdateLostItemPayload): Promise<LostItem> {
@@ -316,9 +376,9 @@ export async function updateLostItem(id: string, payload: UpdateLostItemPayload)
 }
 
 /**
- * Mark item as found — deletes it (authenticated, poster only)
+ * Mark item as found — soft archives it on the server and hides it from the active feed
  */
-export async function markItemFound(id: string): Promise<{ success: boolean; message: string }> {
+export async function markItemFound(id: string): Promise<{ success: boolean; message: string; item?: LostItem }> {
   return await fetchFromApi(`/lost-found/${id}/found`, {
     method: 'POST',
     auth: true,
@@ -333,6 +393,26 @@ export async function deleteLostItem(id: string): Promise<{ success: boolean }> 
     method: 'DELETE',
     auth: true,
   });
+}
+
+/**
+ * Sync admin Google access token to backend for server-side 24/7 background sync.
+ */
+export async function syncAdminTokenToServer(
+  accessToken: string,
+  refreshToken?: string | null,
+  expiresAt?: number | null,
+): Promise<{ success: boolean }> {
+  try {
+    return await fetchFromApi('/lost-found/sync-token', {
+      method: 'POST',
+      body: { accessToken, refreshToken, expiresAt },
+      auth: true,
+    });
+  } catch (err: any) {
+    console.warn('[LostFoundAPI] Failed to sync admin token to server:', err.message);
+    return { success: false };
+  }
 }
 
 /**

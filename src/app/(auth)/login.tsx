@@ -15,14 +15,16 @@ import { MotiView } from 'moti';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius, Shadows } from '@/constants/theme';
 import { useAuth } from '@/hooks/useAuth';
+import { useResponsive } from '@/hooks/useResponsive';
 import { OrynLogo } from '@/components/common/OrynLogo';
 
 export default function LoginScreen() {
+  const { isTablet } = useResponsive();
   const { login, isLoading, error } = useAuth();
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom', 'left', 'right']}>
-      <View style={styles.container}>
+      <View style={[styles.container, isTablet && { maxWidth: 480, width: '100%', alignSelf: 'center', justifyContent: 'center', gap: Spacing[8] }]}>
         {/* Logo / branding */}
         <MotiView
           from={{ opacity: 0, translateY: -24 }}

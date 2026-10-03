@@ -42,12 +42,17 @@ import {
   isSameMonth,
 } from 'date-fns';
 import { useEmails } from '@/hooks/useEmails';
-import { hapticLight } from '@/utils/haptics';
+import { useMessFeedbackStore } from '@/store/messFeedbackStore';
+import { hapticLight, hapticSuccess } from '@/utils/haptics';
 import type { ParsedEmail } from '@/types/email';
+
+const RATING_TAGS = ['Delicious', 'Fresh', 'Cold Food', 'Shortage', 'Hygiene Issue', 'Crowded'];
 
 interface Props {
   selectedDate?: Date;
   onDateChange?: (date: Date) => void;
+  collapsible?: boolean;
+  defaultCollapsed?: boolean;
 }
 
 const MEALS: MealType[] = ['breakfast', 'lunch', 'snacks', 'dinner'];
@@ -96,13 +101,19 @@ function findMessChangeNotice(emails: ParsedEmail[], targetDate: Date = new Date
   return null;
 }
 
-export function MessMenuCard({ selectedDate: propSelectedDate, onDateChange }: Props) {
+export function MessMenuCard({
+  selectedDate: propSelectedDate,
+  onDateChange,
+  collapsible = false,
+  defaultCollapsed = false,
+}: Props) {
   const router = useRouter();
   const { allEmails } = useEmails();
 
   const [activeDate, setActiveDate] = useState<Date>(propSelectedDate || new Date());
   const [showDatePickerModal, setShowDatePickerModal] = useState(false);
   const [modalViewMonth, setModalViewMonth] = useState<Date>(activeDate);
+  const [isExpanded, setIsExpanded] = useState(!defaultCollapsed);
 
   // Sync with prop if provided
   useEffect(() => {
@@ -119,6 +130,27 @@ export function MessMenuCard({ selectedDate: propSelectedDate, onDateChange }: P
   const [activeMeal, setActiveMeal] = useState<MealType>(currentMeal);
   const [manualWeekType, setManualWeekType] = useState<WeekType | null>(null);
   const [remoteMenu, setRemoteMenu] = useState<any>(null);
+
+  const { submitFeedback, getFeedback, getMealCampusStats, loadCampusStats } = useMessFeedbackStore();
+  const feedbackDateStr = useMemo(() => format(activeDate, 'yyyy-MM-dd'), [activeDate]);
+  const userFeedback = getFeedback(feedbackDateStr, activeMeal);
+  const campusStats = getMealCampusStats(activeMeal);
+
+  useEffect(() => {
+    loadCampusStats(feedbackDateStr);
+  }, [feedbackDateStr, loadCampusStats]);
+
+  const handleRate = (rating: number) => {
+    hapticSuccess();
+    submitFeedback(feedbackDateStr, activeMeal, rating, userFeedback?.tags || []);
+  };
+
+  const handleToggleTag = (tag: string) => {
+    hapticLight();
+    const curTags = userFeedback?.tags || [];
+    const nextTags = curTags.includes(tag) ? curTags.filter(t => t !== tag) : [...curTags, tag];
+    submitFeedback(feedbackDateStr, activeMeal, userFeedback?.rating || 4, nextTags);
+  };
 
   // When activeDate changes, update activeMeal to currentMeal of that date
   useEffect(() => {
@@ -197,7 +229,7 @@ export function MessMenuCard({ selectedDate: propSelectedDate, onDateChange }: P
 
   const handleNoticePress = (emailId: string) => {
     hapticLight();
-    router.push(`/(app)/email/${emailId}` as const);
+    router.push(`/(app)/email/${emailId}?from=today` as any);
   };
 
   // Calendar Modal Days Matrix
@@ -206,6 +238,47 @@ export function MessMenuCard({ selectedDate: propSelectedDate, onDateChange }: P
     const end = endOfWeek(endOfMonth(modalViewMonth), { weekStartsOn: 1 });
     return eachDayOfInterval({ start, end });
   }, [modalViewMonth]);
+
+  // Compact single-line view (Point 2)
+  if (collapsible && !isExpanded) {
+    const mealLabel = MEAL_LABELS[activeMeal] || 'Meal';
+    const items = mealData?.items || [];
+    const previewItems = items.slice(0, 3).join(', ');
+    const remainingCount = items.length > 3 ? items.length - 3 : 0;
+    const previewText = previewItems
+      ? `${previewItems}${remainingCount > 0 ? ` +${remainingCount} more` : ''}`
+      : 'View daily mess schedule';
+
+    return (
+      <Pressable
+        style={({ pressed }) => [styles.compactBar, pressed && styles.pressedScale]}
+        onPress={() => {
+          hapticLight();
+          setIsExpanded(true);
+        }}
+        accessibilityRole="button"
+        accessibilityLabel={`Mess menu: ${mealLabel}, ${previewText}`}
+      >
+        <View style={styles.compactLeft}>
+          <View style={styles.compactIconBox}>
+            <Ionicons name="restaurant-outline" size={15} color={Colors.systemOrange} />
+          </View>
+          <View style={styles.compactTextCol}>
+            <Text style={styles.compactTitle} numberOfLines={1}>
+              {mealLabel}: <Text style={styles.compactItems}>{previewText}</Text>
+            </Text>
+            <Text style={styles.compactSub} numberOfLines={1}>
+              {timeLabel} · Tap to expand
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.compactRight}>
+          <Ionicons name="chevron-down" size={16} color={Colors.textSecondary} />
+        </View>
+      </Pressable>
+    );
+  }
 
   return (
     <View style={styles.cardContainer}>
@@ -223,18 +296,37 @@ export function MessMenuCard({ selectedDate: propSelectedDate, onDateChange }: P
           </View>
         </View>
 
-        {/* Week Switcher Button */}
-        <Pressable
-          onPress={handleWeekToggle}
-          style={({ pressed }) => [
-            styles.weekToggleBtn,
-            pressed && styles.pressedScale,
-          ]}
-          hitSlop={8}
-        >
-          <Text style={styles.weekToggleText}>{weekType.toUpperCase()} WEEK</Text>
-          <Ionicons name="swap-horizontal" size={13} color={Colors.systemOrange} />
-        </Pressable>
+        <View style={styles.headerActionRow}>
+          {collapsible && (
+            <Pressable
+              onPress={() => {
+                hapticLight();
+                setIsExpanded(false);
+              }}
+              style={({ pressed }) => [
+                styles.collapseBtn,
+                pressed && styles.pressedScale,
+              ]}
+              hitSlop={8}
+            >
+              <Text style={styles.collapseBtnText}>Collapse</Text>
+              <Ionicons name="chevron-up" size={12} color={Colors.textSecondary} />
+            </Pressable>
+          )}
+
+          {/* Week Switcher Button */}
+          <Pressable
+            onPress={handleWeekToggle}
+            style={({ pressed }) => [
+              styles.weekToggleBtn,
+              pressed && styles.pressedScale,
+            ]}
+            hitSlop={8}
+          >
+            <Text style={styles.weekToggleText}>{weekType.toUpperCase()} WEEK</Text>
+            <Ionicons name="swap-horizontal" size={13} color={Colors.systemOrange} />
+          </Pressable>
+        </View>
       </View>
 
       {/* Date Navigation & Stepper Bar */}
@@ -354,23 +446,41 @@ export function MessMenuCard({ selectedDate: propSelectedDate, onDateChange }: P
           <Text style={styles.timeTagText}>{timeLabel}</Text>
         </View>
 
-        {isCurrentMeal && (
-          <View style={styles.liveBadgeContainer}>
-            <MotiView
-              from={{ scale: 1, opacity: 0.7 }}
-              animate={{ scale: 1.8, opacity: 0 }}
-              transition={{
-                type: 'timing',
-                duration: 1400,
-                loop: true,
-                repeatReverse: false,
-              }}
-              style={styles.pulseAura}
-            />
-            <View style={styles.liveBadgeDot} />
-            <Text style={styles.liveBadgeText}>SERVED NOW</Text>
-          </View>
-        )}
+        <View style={styles.statusRightGroup}>
+          {campusStats && campusStats.totalRatings > 0 ? (
+            <View style={styles.campusRatingBadge}>
+              <Ionicons name="star" size={11} color={Colors.systemYellow} />
+              <Text style={styles.campusRatingText}>
+                {campusStats.averageRating} ({campusStats.totalRatings})
+              </Text>
+            </View>
+          ) : (
+            <View style={[styles.campusRatingBadge, { backgroundColor: 'rgba(255,255,255,0.06)' }]}>
+              <Ionicons name="star-outline" size={11} color={Colors.textMuted} />
+              <Text style={[styles.campusRatingText, { color: Colors.textMuted }]}>
+                Rate Meal
+              </Text>
+            </View>
+          )}
+
+          {isCurrentMeal && (
+            <View style={styles.liveBadgeContainer}>
+              <MotiView
+                from={{ scale: 1, opacity: 0.7 }}
+                animate={{ scale: 1.8, opacity: 0 }}
+                transition={{
+                  type: 'timing',
+                  duration: 1400,
+                  loop: true,
+                  repeatReverse: false,
+                }}
+                style={styles.pulseAura}
+              />
+              <View style={styles.liveBadgeDot} />
+              <Text style={styles.liveBadgeText}>SERVED NOW</Text>
+            </View>
+          )}
+        </View>
       </View>
 
       {/* Animated Meal Content Body */}
@@ -418,6 +528,65 @@ export function MessMenuCard({ selectedDate: propSelectedDate, onDateChange }: P
                   <Text style={styles.chipText}>{extra}</Text>
                 </View>
               ))}
+            </View>
+
+            {/* Anonymous Student Rating Widget */}
+            <View style={styles.ratingWidgetContainer}>
+              <View style={styles.ratingWidgetHeader}>
+                <Text style={styles.ratingWidgetTitle}>
+                  {userFeedback ? `Your Rating: ${userFeedback.rating} ★` : `Rate this ${MEAL_LABELS[activeMeal]}`}
+                </Text>
+                <Text style={styles.ratingWidgetSubtitle}>
+                  {userFeedback ? 'Anonymous to Mess Affairs' : 'Tap star to review'}
+                </Text>
+              </View>
+
+              <View style={styles.starsRow}>
+                {[1, 2, 3, 4, 5].map(star => {
+                  const isFilled = (userFeedback?.rating || 0) >= star;
+                  return (
+                    <Pressable
+                      key={star}
+                      onPress={() => handleRate(star)}
+                      style={({ pressed }) => [styles.starBtn, pressed && styles.pressedScale]}
+                      hitSlop={6}
+                    >
+                      <Ionicons
+                        name={isFilled ? 'star' : 'star-outline'}
+                        size={22}
+                        color={isFilled ? Colors.systemYellow : '#52525B'}
+                      />
+                    </Pressable>
+                  );
+                })}
+              </View>
+
+              {userFeedback && (
+                <View style={styles.ratingTagsWrap}>
+                  {RATING_TAGS.map(tag => {
+                    const isSelected = userFeedback.tags.includes(tag);
+                    return (
+                      <Pressable
+                        key={tag}
+                        onPress={() => handleToggleTag(tag)}
+                        style={[
+                          styles.ratingTagChip,
+                          isSelected && styles.ratingTagChipSelected,
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.ratingTagText,
+                            isSelected && styles.ratingTagTextSelected,
+                          ]}
+                        >
+                          {tag}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              )}
             </View>
           </>
         ) : (
@@ -592,18 +761,13 @@ export function MessMenuCard({ selectedDate: propSelectedDate, onDateChange }: P
 
 const styles = StyleSheet.create({
   cardContainer: {
-    backgroundColor: Colors.card,
-    borderRadius: Radius.lg,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    padding: Spacing[4],
     gap: Spacing[3],
-    ...Shadows.sm,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingHorizontal: 2,
   },
   titleRow: {
     flexDirection: 'row',
@@ -634,12 +798,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: Colors.surfaceHigh,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    backgroundColor: 'rgba(255, 149, 0, 0.1)',
+    paddingHorizontal: 9,
+    paddingVertical: 4.5,
     borderRadius: Radius.full,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(255, 149, 0, 0.25)',
   },
   weekToggleText: {
     fontSize: 9,
@@ -654,21 +818,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: Colors.surfaceHigh,
+    backgroundColor: 'rgba(255, 255, 255, 0.035)',
     borderRadius: Radius.md,
     paddingHorizontal: Spacing[2],
-    paddingVertical: 6,
+    paddingVertical: 5,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   dateNavBtn: {
     width: 28,
     height: 28,
     borderRadius: Radius.sm,
-    backgroundColor: Colors.card,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
     alignItems: 'center',
     justifyContent: 'center',
-    ...Shadows.sm,
   },
   dateTitleBtn: {
     flexDirection: 'row',
@@ -706,9 +869,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 6,
     borderRadius: Radius.sm,
-    backgroundColor: Colors.surfaceHigh,
+    backgroundColor: 'rgba(255, 255, 255, 0.035)',
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
     gap: 2,
   },
   dayStripPillSelected: {
@@ -717,6 +880,7 @@ const styles = StyleSheet.create({
   },
   dayStripPillToday: {
     borderColor: Colors.systemOrange,
+    backgroundColor: 'rgba(255, 149, 0, 0.08)',
   },
   dayStripSub: {
     fontSize: 9,
@@ -733,9 +897,11 @@ const styles = StyleSheet.create({
   },
   segmentedTrack: {
     flexDirection: 'row',
-    backgroundColor: Colors.surfaceHigh,
+    backgroundColor: 'rgba(255, 255, 255, 0.035)',
     borderRadius: Radius.md,
     padding: 3,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
     position: 'relative',
   },
   segmentBtn: {
@@ -748,9 +914,8 @@ const styles = StyleSheet.create({
   },
   activeSegmentIndicator: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: Colors.card,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: Radius.sm,
-    ...Shadows.sm,
   },
   segmentContent: {
     flexDirection: 'row',
@@ -828,12 +993,12 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   dishPill: {
-    backgroundColor: Colors.surfaceHigh,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
     paddingHorizontal: 11,
     paddingVertical: 6,
     borderRadius: Radius.sm,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: 'rgba(255, 255, 255, 0.07)',
   },
   dishPillText: {
     fontSize: Typography.size.sm,
@@ -850,10 +1015,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: Colors.surfaceHigh,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: Radius.sm,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
   },
   dessertChip: {
     backgroundColor: 'rgba(255, 45, 85, 0.12)',
@@ -1035,6 +1202,151 @@ const styles = StyleSheet.create({
     fontWeight: Typography.weight.bold,
   },
   calendarDayTextToday: {
+    color: Colors.systemOrange,
+    fontWeight: Typography.weight.bold,
+  },
+  // Compact Mess Menu Bar Styles (Point 2)
+  compactBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(255, 255, 255, 0.03)',
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.06)',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  compactLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    marginRight: 10,
+  },
+  compactIconBox: {
+    width: 28,
+    height: 28,
+    borderRadius: Radius.full,
+    backgroundColor: 'rgba(255, 149, 0, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  compactTextCol: {
+    flex: 1,
+  },
+  compactTitle: {
+    fontSize: 13,
+    fontWeight: Typography.weight.bold,
+    color: '#FFFFFF',
+    lineHeight: 18,
+  },
+  compactItems: {
+    color: '#D4D4D8',
+    fontWeight: Typography.weight.medium,
+  },
+  compactSub: {
+    fontSize: 11,
+    color: 'rgba(255, 255, 255, 0.50)',
+    marginTop: 1,
+  },
+  compactRight: {
+    paddingLeft: 4,
+  },
+  headerActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  collapseBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: Radius.full,
+  },
+  collapseBtnText: {
+    fontSize: 11,
+    fontWeight: Typography.weight.medium,
+    color: Colors.textSecondary,
+  },
+  statusRightGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  campusRatingBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: 'rgba(255, 214, 10, 0.12)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: Radius.full,
+  },
+  campusRatingText: {
+    fontSize: 11,
+    fontWeight: Typography.weight.bold,
+    color: Colors.systemYellow,
+  },
+  ratingWidgetContainer: {
+    backgroundColor: 'rgba(255, 255, 255, 0.025)',
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.05)',
+    padding: Spacing[3],
+    gap: Spacing[2],
+    marginTop: Spacing[1],
+  },
+  ratingWidgetHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  ratingWidgetTitle: {
+    fontSize: 12,
+    fontWeight: Typography.weight.bold,
+    color: '#FFFFFF',
+  },
+  ratingWidgetSubtitle: {
+    fontSize: 10,
+    color: Colors.textMuted,
+  },
+  starsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 2,
+  },
+  starBtn: {
+    padding: 2,
+  },
+  ratingTagsWrap: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    paddingTop: 4,
+  },
+  ratingTagChip: {
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: Radius.full,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  ratingTagChipSelected: {
+    backgroundColor: 'rgba(255, 149, 0, 0.15)',
+    borderColor: 'rgba(255, 149, 0, 0.4)',
+  },
+  ratingTagText: {
+    fontSize: 10,
+    fontWeight: Typography.weight.medium,
+    color: '#A1A1AA',
+  },
+  ratingTagTextSelected: {
     color: Colors.systemOrange,
     fontWeight: Typography.weight.bold,
   },
