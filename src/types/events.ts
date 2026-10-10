@@ -25,6 +25,7 @@ export interface DistrictEvent {
   event_time?: string | null;
   event_end_time?: string | null;
   is_featured: boolean;
+  is_pinned?: boolean;
   tags?: string[] | null;
   going_count: number | string;
   interested_count: number | string;

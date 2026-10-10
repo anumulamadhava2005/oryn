@@ -15,6 +15,7 @@ import {
 } from '@/auth/google';
 import { useAuthStore } from '@/store/auth';
 import { clearAllCache } from '@/services/cache';
+import { sendTelemetryHeartbeat, clearTelemetryUserCache } from '@/services/telemetryService';
 
 let configured = false;
 
@@ -39,11 +40,13 @@ export function useAuth() {
       .then(result => {
         if (result) {
           store.setAuthenticated(result.user, result.tokens);
+          sendTelemetryHeartbeat().catch(() => {});
         } else {
           // If silentSignIn returns null, fall back to persisted local credentials
           return Promise.all([loadUser(), loadTokens()]).then(([user, tokens]) => {
             if (user && tokens) {
               store.setAuthenticated(user, tokens);
+              sendTelemetryHeartbeat().catch(() => {});
             } else {
               store.setIdle();
             }
@@ -56,6 +59,7 @@ export function useAuth() {
           .then(([user, tokens]) => {
             if (user && tokens) {
               store.setAuthenticated(user, tokens);
+              sendTelemetryHeartbeat().catch(() => {});
             } else {
               store.setIdle();
             }
@@ -71,6 +75,7 @@ export function useAuth() {
     try {
       const { user, tokens } = await signIn();
       store.setAuthenticated(user, tokens);
+      sendTelemetryHeartbeat().catch(() => {});
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Sign-in failed';
       store.setError(msg);
@@ -82,9 +87,11 @@ export function useAuth() {
     try {
       await googleSignOut();
       clearAllCache();
+      clearTelemetryUserCache();
       store.clearAuth();
     } catch {
       clearAllCache();
+      clearTelemetryUserCache();
       store.clearAuth();
     }
   }, [store]);

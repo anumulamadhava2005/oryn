@@ -68,6 +68,9 @@ export async function getNativeBundleMetadata(): Promise<CodeBundleMetadata> {
   }
 }
 
+import { getDeviceId } from '@/services/telemetryService';
+import { useAuthStore } from '@/store/auth';
+
 /**
  * Checks mint_vps for a raw code update matching this device's build fingerprint (< 3ms)
  */
@@ -75,8 +78,13 @@ export async function checkForCodeUpdate(): Promise<CodeUpdateCheckResult> {
   const meta = await getNativeBundleMetadata();
   const fingerprint = meta.buildFingerprint;
   const currentHash = meta.currentHash;
+  const deviceId = getDeviceId();
+  const user = useAuthStore.getState().user;
 
-  const url = `${PRIMARY_SERVER_URL}/code-updates/check?fingerprint=${encodeURIComponent(fingerprint)}&currentHash=${encodeURIComponent(currentHash)}&ts=${Date.now()}`;
+  let url = `${PRIMARY_SERVER_URL}/code-updates/check?fingerprint=${encodeURIComponent(fingerprint)}&currentHash=${encodeURIComponent(currentHash)}&deviceId=${encodeURIComponent(deviceId)}&ts=${Date.now()}`;
+  if (user?.email) {
+    url += `&userEmail=${encodeURIComponent(user.email)}`;
+  }
 
   try {
     const controller = new AbortController();

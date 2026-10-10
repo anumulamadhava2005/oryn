@@ -41,3 +41,9 @@ export const ANDROID_CLIENT_ID =
 /** Web client ID — required by @react-native-google-signin for token exchange */
 export const WEB_CLIENT_ID =
   '751305008800-1p9h74vutj50jevig8b0c5bpnt9ifat1.apps.googleusercontent.com';
+
+/** iOS OAuth client ID */
+export const IOS_CLIENT_ID =
+  '751305008800-4e18gl7i6jgghfs1t6ukviuo7h4qe33p.apps.googleusercontent.com';
+
+

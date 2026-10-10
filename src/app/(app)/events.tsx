@@ -193,12 +193,59 @@ export default function EventsScreen() {
       );
     }
 
-    return list;
+    // Sort events intelligently:
+    // 1. Upcoming or live events first (nearest upcoming event at the top)
+    // 2. Past events next (most recent past event at the top)
+    const now = Date.now();
+    const sorted = [...list].sort((a, b) => {
+      const aTime = a.event_time ? new Date(a.event_time).getTime() : 0;
+      const bTime = b.event_time ? new Date(b.event_time).getTime() : 0;
+      const aEndTime = a.event_end_time ? new Date(a.event_end_time).getTime() : aTime + 2 * 3600 * 1000;
+      const bEndTime = b.event_end_time ? new Date(b.event_end_time).getTime() : bTime + 2 * 3600 * 1000;
+
+      const aUpcoming = aEndTime >= now - 12 * 3600 * 1000;
+      const bUpcoming = bEndTime >= now - 12 * 3600 * 1000;
+
+      // Upcoming/live events come first
+      if (aUpcoming && !bUpcoming) return -1;
+      if (!aUpcoming && bUpcoming) return 1;
+
+      if (aUpcoming && bUpcoming) {
+        // Pinned events come first among upcoming
+        if (a.is_pinned && !b.is_pinned) return -1;
+        if (!a.is_pinned && b.is_pinned) return 1;
+        // Nearest upcoming event first
+        return aTime - bTime;
+      }
+
+      // Both are in the past: most recently concluded event first
+      return bTime - aTime;
+    });
+
+    return sorted;
   }, [events, activeFilterPill, selectedCategory, searchQuery]);
 
-  // Spotlight event is first featured or first available event
+  // Spotlight event: prioritize an upcoming/ongoing featured event, or nearest upcoming event
   const spotlightEvent = useMemo(() => {
-    return displayedEvents.find((e) => e.is_featured) || displayedEvents[0] || null;
+    const now = Date.now();
+    // 1. First choice: active or upcoming event marked featured
+    const activeFeatured = displayedEvents.find((e) => {
+      if (!e.is_featured || !e.event_time) return false;
+      const end = e.event_end_time ? new Date(e.event_end_time).getTime() : new Date(e.event_time).getTime() + 2 * 3600 * 1000;
+      return end >= now - 12 * 3600 * 1000;
+    });
+    if (activeFeatured) return activeFeatured;
+
+    // 2. Second choice: any active or upcoming event
+    const activeAny = displayedEvents.find((e) => {
+      if (!e.event_time) return false;
+      const end = e.event_end_time ? new Date(e.event_end_time).getTime() : new Date(e.event_time).getTime() + 2 * 3600 * 1000;
+      return end >= now - 12 * 3600 * 1000;
+    });
+    if (activeAny) return activeAny;
+
+    // 3. Fallback: first event in list
+    return displayedEvents[0] || null;
   }, [displayedEvents]);
 
   // Filter clubs by search

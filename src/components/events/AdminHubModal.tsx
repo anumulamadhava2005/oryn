@@ -22,7 +22,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
 import { useEventsStore } from '@/store/eventsStore';
 import type { ClubRequest } from '@/types/events';
-import { hapticLight, hapticSuccess } from '@/utils/haptics';
+import { hapticLight, hapticSuccess, hapticMedium } from '@/utils/haptics';
+import { UserRadarModal } from '@/components/admin/UserRadarModal';
 
 interface AdminHubModalProps {
   visible: boolean;
@@ -39,6 +40,7 @@ export function AdminHubModal({ visible, onClose }: AdminHubModalProps) {
   const rejectRequest = useEventsStore((s) => s.rejectRequest);
 
   const [activeTab, setActiveTab] = useState<'pending' | 'reviewed'>('pending');
+  const [showRadarModal, setShowRadarModal] = useState(false);
 
   useEffect(() => {
     if (visible) {
@@ -118,20 +120,33 @@ export function AdminHubModal({ visible, onClose }: AdminHubModalProps) {
               <Ionicons name="shield-checkmark-outline" size={13} color={Colors.accent} />
               <Text style={styles.adminBadgeText}>SUPER ADMIN</Text>
             </View>
-            <Text style={styles.title}>Club Approvals</Text>
+            <Text style={styles.title}>Super Admin Hub</Text>
             <Text style={styles.adminEmail}>cs23b1008@iiitdm.ac.in</Text>
           </View>
-          <Pressable
-            style={styles.closeBtn}
-            onPress={() => {
-              hapticLight();
-              onClose();
-            }}
-            hitSlop={8}
-            accessibilityLabel="Close"
-          >
-            <Ionicons name="close" size={18} color={Colors.textSecondary} />
-          </Pressable>
+          <View style={styles.headerRightBtns}>
+            <Pressable
+              style={styles.radarBtn}
+              onPress={() => {
+                hapticMedium();
+                setShowRadarModal(true);
+              }}
+              accessibilityLabel="User Radar"
+            >
+              <Ionicons name="radio-outline" size={14} color={Colors.systemTeal} />
+              <Text style={styles.radarBtnText}>User Radar</Text>
+            </Pressable>
+            <Pressable
+              style={styles.closeBtn}
+              onPress={() => {
+                hapticLight();
+                onClose();
+              }}
+              hitSlop={8}
+              accessibilityLabel="Close"
+            >
+              <Ionicons name="close" size={18} color={Colors.textSecondary} />
+            </Pressable>
+          </View>
         </View>
 
         {/* Segmented Tab Switcher */}
@@ -263,6 +278,7 @@ export function AdminHubModal({ visible, onClose }: AdminHubModalProps) {
         )}
         </View>
       </View>
+      <UserRadarModal visible={showRadarModal} onClose={() => setShowRadarModal(false)} />
     </Modal>
   );
 }
@@ -332,6 +348,27 @@ const styles = StyleSheet.create({
     fontSize: Typography.size.xs,
     color: Colors.textMuted,
     marginTop: 2,
+  },
+  headerRightBtns: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing[2],
+  },
+  radarBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(0, 210, 255, 0.12)',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 210, 255, 0.3)',
+    borderRadius: Radius.full,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+  },
+  radarBtnText: {
+    fontSize: 11,
+    fontWeight: Typography.weight.bold,
+    color: Colors.systemTeal,
   },
   closeBtn: {
     width: 36,

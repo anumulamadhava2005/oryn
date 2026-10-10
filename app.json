@@ -14,12 +14,18 @@
         "UIBackgroundModes": [
           "fetch",
           "remote-notification",
+          "processing",
+          "fetch",
+          "remote-notification",
           "processing"
         ],
         "BGTaskSchedulerPermittedIdentifiers": [
           "com.expo.modules.backgroundtask.processing",
+          "ORYN_BACKGROUND_SYNC_TASK",
+          "com.expo.modules.backgroundtask.processing",
           "ORYN_BACKGROUND_SYNC_TASK"
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -31,6 +37,7 @@
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.mao1729.oryn",
+      "googleServicesFile": "./google-services.json",
       "permissions": [
         "android.permission.POST_NOTIFICATIONS",
         "android.permission.RECEIVE_BOOT_COMPLETED",
@@ -58,7 +65,7 @@
         "@react-native-google-signin/google-signin",
         {
           "googleServicesFile": "./google-services.json",
-          "iosUrlScheme": "com.googleusercontent.apps.1032601473596-963cmdb9o5vsbf1a29mbkjet58gs88em"
+          "iosUrlScheme": "com.googleusercontent.apps.751305008800-4e18gl7i6jgghfs1t6ukviuo7h4qe33p"
         }
       ],
       [
@@ -85,7 +92,12 @@
       "projectIdentityNumber": 7401,
       "projectIdentityTag": "#ORYN-7401",
       "devFingerprint": "dev_210ee3f0cd58",
-      "prodFingerprint": "prod_5fee03d910b5"
-    }
+      "prodFingerprint": "prod_5fee03d910b5",
+      "router": {},
+      "eas": {
+        "projectId": "dce4319a-073e-4ab1-90fd-e864d062a91e"
+      }
+    },
+    "owner": "mao1729"
   }
 }

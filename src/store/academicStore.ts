@@ -15,13 +15,17 @@ import {
   ProgramType,
   SEMESTER_OPTIONS,
   SemesterType,
+  BatchType,
+  BATCH_OPTIONS,
 } from '../constants/academicData';
+import { useAuthStore } from './auth';
 
 const storage = new MMKV({ id: 'oryn-academic-store' });
 
 const KEYS = {
   PROGRAM: 'academic:program',
   SEMESTER: 'academic:semester',
+  BATCH: 'academic:batch',
   ELECTIVES: 'academic:selectedElectives',
 };
 
@@ -39,6 +43,34 @@ function getInitialSemester(): SemesterType {
     return stored;
   }
   return 'Semester 3';
+}
+
+export function detectBatchFromUser(): BatchType {
+  try {
+    const user = useAuthStore.getState().user;
+    const email = user?.email || user?.name || '';
+    // Look for roll pattern e.g. cs25b2005 or CS23B1034 or ai23b2009
+    const match = email.match(/(?:CS|AI|EC|ME|EP|DS|MD|ED)\d{2}[a-zA-Z]+(\d{3,4})/i);
+    if (match) {
+      const num = parseInt(match[1], 10);
+      // 2000 series is CSE (AI): Roll 1-8 is Batch 1 (<= 2008), 9+ is Batch 2 (>= 2009)
+      if (num >= 2009 && num < 3000) {
+        return 'Batch 2';
+      }
+      if (num >= 209 && num <= 299) {
+        return 'Batch 2';
+      }
+    }
+  } catch {}
+  return 'Batch 1';
+}
+
+function getInitialBatch(): BatchType {
+  const stored = storage.getString(KEYS.BATCH) as BatchType | undefined;
+  if (stored && BATCH_OPTIONS.includes(stored)) {
+    return stored;
+  }
+  return detectBatchFromUser();
 }
 
 function getInitialSelectedElectives(): string[] {
@@ -64,12 +96,14 @@ export interface ScheduledSlotEntry {
 export interface AcademicStore {
   program: ProgramType;
   semester: SemesterType;
+  batch: BatchType;
   selectedElectiveIds: string[];
   timetableVersion: number;
 
   setProgram: (program: ProgramType) => void;
   setSemester: (semester: SemesterType) => void;
-  setAcademicProfile: (program: ProgramType, semester: SemesterType) => void;
+  setBatch: (batch: BatchType) => void;
+  setAcademicProfile: (program: ProgramType, semester: SemesterType, batch?: BatchType) => void;
 
   toggleElective: (courseId: string) => void;
   setSelectedElectives: (courseIds: string[]) => void;
@@ -235,6 +269,7 @@ export const useAcademicStore = create<AcademicStore>()((set, get) => {
   return {
     program: getInitialProgram(),
     semester: getInitialSemester(),
+    batch: getInitialBatch(),
     selectedElectiveIds: getInitialSelectedElectives(),
     timetableVersion: 0,
 
@@ -248,10 +283,20 @@ export const useAcademicStore = create<AcademicStore>()((set, get) => {
       set({ semester });
     },
 
-    setAcademicProfile: (program: ProgramType, semester: SemesterType) => {
+    setBatch: (batch: BatchType) => {
+      storage.set(KEYS.BATCH, batch);
+      set({ batch });
+    },
+
+    setAcademicProfile: (program: ProgramType, semester: SemesterType, batch?: BatchType) => {
       storage.set(KEYS.PROGRAM, program);
       storage.set(KEYS.SEMESTER, semester);
-      set({ program, semester });
+      if (batch) {
+        storage.set(KEYS.BATCH, batch);
+        set({ program, semester, batch });
+      } else {
+        set({ program, semester });
+      }
     },
 
     toggleElective: (courseId: string) => {
@@ -292,7 +337,7 @@ export const useAcademicStore = create<AcademicStore>()((set, get) => {
     },
 
     getCoreCourses: () => {
-      const { program, semester } = get();
+      const { program, semester, batch } = get();
 
       if (semester === 'Semester 1' || program === 'Common (First Sem)') {
         return ALL_COURSES.filter(
@@ -303,12 +348,36 @@ export const useAcademicStore = create<AcademicStore>()((set, get) => {
       return ALL_COURSES.filter(c => {
         if (c.program === 'Electives & Minors') return false;
         const matchesSem = c.semester === semester;
-        const matchesProg =
-          c.program === program ||
-          c.program.includes(program) ||
-          program.includes(c.program);
 
-        return matchesSem && matchesProg;
+        const isUserAI = program.includes('CSE (AI)');
+        const isCourseAI = c.program.includes('CSE (AI)');
+        const isUserCSE = program === 'B.Tech CSE';
+        const isCourseCSE = c.program === 'B.Tech CSE';
+
+        let matchesProg = false;
+        if (isUserCSE) {
+          matchesProg = isCourseCSE;
+        } else if (isUserAI) {
+          matchesProg = isCourseAI;
+        } else {
+          matchesProg =
+            c.program === program ||
+            c.program.includes(program) ||
+            program.includes(c.program);
+        }
+
+        if (!matchesProg || !matchesSem) return false;
+
+        // Batch matching:
+        if (c.batch && c.batch !== 'All') {
+          // B.Tech CSE is always Batch 1 for Semester 3
+          if (isUserCSE && semester === 'Semester 3') {
+            return c.batch === 'Batch 1';
+          }
+          return c.batch === batch;
+        }
+
+        return true;
       });
     },
 

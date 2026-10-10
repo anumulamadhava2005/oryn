@@ -51,6 +51,7 @@ const RATING_TAGS = ['Delicious', 'Fresh', 'Cold Food', 'Shortage', 'Hygiene Iss
 interface Props {
   selectedDate?: Date;
   onDateChange?: (date: Date) => void;
+  showDatePicker?: boolean;
   collapsible?: boolean;
   defaultCollapsed?: boolean;
 }
@@ -104,6 +105,7 @@ function findMessChangeNotice(emails: ParsedEmail[], targetDate: Date = new Date
 export function MessMenuCard({
   selectedDate: propSelectedDate,
   onDateChange,
+  showDatePicker = false,
   collapsible = false,
   defaultCollapsed = false,
 }: Props) {
@@ -329,77 +331,81 @@ export function MessMenuCard({
         </View>
       </View>
 
-      {/* Date Navigation & Stepper Bar */}
-      <View style={styles.dateSelectorBar}>
-        <Pressable
-          onPress={handlePrevDay}
-          style={({ pressed }) => [styles.dateNavBtn, pressed && styles.pressedScale]}
-          hitSlop={8}
-        >
-          <Ionicons name="chevron-back" size={15} color={Colors.text} />
-        </Pressable>
-
-        <Pressable
-          onPress={() => {
-            hapticLight();
-            setModalViewMonth(activeDate);
-            setShowDatePickerModal(true);
-          }}
-          style={({ pressed }) => [styles.dateTitleBtn, pressed && styles.pressedScale]}
-        >
-          <Ionicons name="calendar-outline" size={14} color={Colors.systemOrange} />
-          <Text style={styles.dateTitleText}>
-            {isTodaySelected ? `Today (${format(activeDate, 'MMM d')})` : format(activeDate, 'EEE, MMM d, yyyy')}
-          </Text>
-          <Ionicons name="chevron-down" size={12} color={Colors.textMuted} />
-        </Pressable>
-
-        <Pressable
-          onPress={handleNextDay}
-          style={({ pressed }) => [styles.dateNavBtn, pressed && styles.pressedScale]}
-          hitSlop={8}
-        >
-          <Ionicons name="chevron-forward" size={15} color={Colors.text} />
-        </Pressable>
-
-        {!isTodaySelected && (
-          <Pressable
-            onPress={handleResetToday}
-            style={({ pressed }) => [styles.todayResetBtn, pressed && styles.pressedScale]}
-            hitSlop={6}
-          >
-            <Ionicons name="today-outline" size={12} color={Colors.systemBlue} />
-            <Text style={styles.todayResetText}>Today</Text>
-          </Pressable>
-        )}
-      </View>
-
-      {/* 7-Day Quick Strip */}
-      <View style={styles.dayStrip}>
-        {stripDays.map((d) => {
-          const isSelected = isSameDay(d, activeDate);
-          const isTodayDay = isToday(d);
-          return (
+      {/* Date Navigation & Stepper Bar (if standalone) */}
+      {showDatePicker && (
+        <>
+          <View style={styles.dateSelectorBar}>
             <Pressable
-              key={d.toISOString()}
-              onPress={() => handleDateSelect(d)}
-              style={({ pressed }) => [
-                styles.dayStripPill,
-                isSelected && styles.dayStripPillSelected,
-                isTodayDay && !isSelected && styles.dayStripPillToday,
-                pressed && styles.pressedScale,
-              ]}
+              onPress={handlePrevDay}
+              style={({ pressed }) => [styles.dateNavBtn, pressed && styles.pressedScale]}
+              hitSlop={8}
             >
-              <Text style={[styles.dayStripSub, isSelected && styles.dayStripTextSelected]}>
-                {format(d, 'EEE').toUpperCase()}
-              </Text>
-              <Text style={[styles.dayStripNum, isSelected && styles.dayStripTextSelected]}>
-                {format(d, 'd')}
-              </Text>
+              <Ionicons name="chevron-back" size={15} color={Colors.text} />
             </Pressable>
-          );
-        })}
-      </View>
+
+            <Pressable
+              onPress={() => {
+                hapticLight();
+                setModalViewMonth(activeDate);
+                setShowDatePickerModal(true);
+              }}
+              style={({ pressed }) => [styles.dateTitleBtn, pressed && styles.pressedScale]}
+            >
+              <Ionicons name="calendar-outline" size={14} color={Colors.systemOrange} />
+              <Text style={styles.dateTitleText}>
+                {isTodaySelected ? `Today (${format(activeDate, 'MMM d')})` : format(activeDate, 'EEE, MMM d, yyyy')}
+              </Text>
+              <Ionicons name="chevron-down" size={12} color={Colors.textMuted} />
+            </Pressable>
+
+            <Pressable
+              onPress={handleNextDay}
+              style={({ pressed }) => [styles.dateNavBtn, pressed && styles.pressedScale]}
+              hitSlop={8}
+            >
+              <Ionicons name="chevron-forward" size={15} color={Colors.text} />
+            </Pressable>
+
+            {!isTodaySelected && (
+              <Pressable
+                onPress={handleResetToday}
+                style={({ pressed }) => [styles.todayResetBtn, pressed && styles.pressedScale]}
+                hitSlop={6}
+              >
+                <Ionicons name="today-outline" size={12} color={Colors.systemBlue} />
+                <Text style={styles.todayResetText}>Today</Text>
+              </Pressable>
+            )}
+          </View>
+
+          {/* 7-Day Quick Strip */}
+          <View style={styles.dayStrip}>
+            {stripDays.map((d) => {
+              const isSelected = isSameDay(d, activeDate);
+              const isTodayDay = isToday(d);
+              return (
+                <Pressable
+                  key={d.toISOString()}
+                  onPress={() => handleDateSelect(d)}
+                  style={({ pressed }) => [
+                    styles.dayStripPill,
+                    isSelected && styles.dayStripPillSelected,
+                    isTodayDay && !isSelected && styles.dayStripPillToday,
+                    pressed && styles.pressedScale,
+                  ]}
+                >
+                  <Text style={[styles.dayStripSub, isSelected && styles.dayStripTextSelected]}>
+                    {format(d, 'EEE').toUpperCase()}
+                  </Text>
+                  <Text style={[styles.dayStripNum, isSelected && styles.dayStripTextSelected]}>
+                    {format(d, 'd')}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </>
+      )}
 
       {/* Segmented Meal Control Bar */}
       <View style={styles.segmentedTrack}>
@@ -631,130 +637,132 @@ export function MessMenuCard({
       )}
 
       {/* Full Date Picker Modal */}
-      <Modal
-        visible={showDatePickerModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowDatePickerModal(false)}
-      >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setShowDatePickerModal(false)}
+      {showDatePicker && (
+        <Modal
+          visible={showDatePickerModal}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowDatePickerModal(false)}
         >
-          <Pressable style={styles.modalCard} onPress={(e) => e.stopPropagation()}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Select Mess Menu Date</Text>
-              <Pressable
-                onPress={() => setShowDatePickerModal(false)}
-                hitSlop={8}
-                style={styles.modalCloseBtn}
-              >
-                <Ionicons name="close" size={18} color={Colors.textMuted} />
-              </Pressable>
-            </View>
+          <Pressable
+            style={styles.modalOverlay}
+            onPress={() => setShowDatePickerModal(false)}
+          >
+            <Pressable style={styles.modalCard} onPress={(e) => e.stopPropagation()}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Select Mess Menu Date</Text>
+                <Pressable
+                  onPress={() => setShowDatePickerModal(false)}
+                  hitSlop={8}
+                  style={styles.modalCloseBtn}
+                >
+                  <Ionicons name="close" size={18} color={Colors.textMuted} />
+                </Pressable>
+              </View>
 
-            {/* Quick Preset Buttons */}
-            <View style={styles.presetRow}>
-              <Pressable
-                onPress={() => {
-                  handleDateSelect(new Date());
-                  setShowDatePickerModal(false);
-                }}
-                style={styles.presetBtn}
-              >
-                <Text style={styles.presetText}>Today</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => {
-                  handleDateSelect(addDays(new Date(), 1));
-                  setShowDatePickerModal(false);
-                }}
-                style={styles.presetBtn}
-              >
-                <Text style={styles.presetText}>Tomorrow</Text>
-              </Pressable>
-              <Pressable
-                onPress={() => {
-                  handleDateSelect(subDays(new Date(), 1));
-                  setShowDatePickerModal(false);
-                }}
-                style={styles.presetBtn}
-              >
-                <Text style={styles.presetText}>Yesterday</Text>
-              </Pressable>
-            </View>
+              {/* Quick Preset Buttons */}
+              <View style={styles.presetRow}>
+                <Pressable
+                  onPress={() => {
+                    handleDateSelect(new Date());
+                    setShowDatePickerModal(false);
+                  }}
+                  style={styles.presetBtn}
+                >
+                  <Text style={styles.presetText}>Today</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    handleDateSelect(addDays(new Date(), 1));
+                    setShowDatePickerModal(false);
+                  }}
+                  style={styles.presetBtn}
+                >
+                  <Text style={styles.presetText}>Tomorrow</Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => {
+                    handleDateSelect(subDays(new Date(), 1));
+                    setShowDatePickerModal(false);
+                  }}
+                  style={styles.presetBtn}
+                >
+                  <Text style={styles.presetText}>Yesterday</Text>
+                </Pressable>
+              </View>
 
-            {/* Month Navigation */}
-            <View style={styles.monthNavRow}>
-              <Pressable
-                onPress={() => {
-                  hapticLight();
-                  setModalViewMonth(prev => subMonths(prev, 1));
-                }}
-                hitSlop={10}
-              >
-                <Ionicons name="chevron-back" size={20} color={Colors.systemOrange} />
-              </Pressable>
-              <Text style={styles.monthNavTitle}>
-                {format(modalViewMonth, 'MMMM yyyy')}
-              </Text>
-              <Pressable
-                onPress={() => {
-                  hapticLight();
-                  setModalViewMonth(prev => addMonths(prev, 1));
-                }}
-                hitSlop={10}
-              >
-                <Ionicons name="chevron-forward" size={20} color={Colors.systemOrange} />
-              </Pressable>
-            </View>
-
-            {/* Weekday Header Labels */}
-            <View style={styles.calendarHeaderGrid}>
-              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayStr) => (
-                <Text key={dayStr} style={styles.calendarDayHeader}>
-                  {dayStr}
+              {/* Month Navigation */}
+              <View style={styles.monthNavRow}>
+                <Pressable
+                  onPress={() => {
+                    hapticLight();
+                    setModalViewMonth(prev => subMonths(prev, 1));
+                  }}
+                  hitSlop={10}
+                >
+                  <Ionicons name="chevron-back" size={20} color={Colors.systemOrange} />
+                </Pressable>
+                <Text style={styles.monthNavTitle}>
+                  {format(modalViewMonth, 'MMMM yyyy')}
                 </Text>
-              ))}
-            </View>
+                <Pressable
+                  onPress={() => {
+                    hapticLight();
+                    setModalViewMonth(prev => addMonths(prev, 1));
+                  }}
+                  hitSlop={10}
+                >
+                  <Ionicons name="chevron-forward" size={20} color={Colors.systemOrange} />
+                </Pressable>
+              </View>
 
-            {/* Calendar Days Matrix Grid */}
-            <View style={styles.calendarDaysGrid}>
-              {calendarDays.map((d) => {
-                const isSelected = isSameDay(d, activeDate);
-                const isCurrentMonth = isSameMonth(d, modalViewMonth);
-                const isTodayDay = isToday(d);
+              {/* Weekday Header Labels */}
+              <View style={styles.calendarHeaderGrid}>
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((dayStr) => (
+                  <Text key={dayStr} style={styles.calendarDayHeader}>
+                    {dayStr}
+                  </Text>
+                ))}
+              </View>
 
-                return (
-                  <Pressable
-                    key={d.toISOString()}
-                    onPress={() => {
-                      handleDateSelect(d);
-                      setShowDatePickerModal(false);
-                    }}
-                    style={[
-                      styles.calendarDayCell,
-                      isSelected && styles.calendarDayCellSelected,
-                      isTodayDay && !isSelected && styles.calendarDayCellToday,
-                    ]}
-                  >
-                    <Text
+              {/* Calendar Days Matrix Grid */}
+              <View style={styles.calendarDaysGrid}>
+                {calendarDays.map((d) => {
+                  const isSelected = isSameDay(d, activeDate);
+                  const isCurrentMonth = isSameMonth(d, modalViewMonth);
+                  const isTodayDay = isToday(d);
+
+                  return (
+                    <Pressable
+                      key={d.toISOString()}
+                      onPress={() => {
+                        handleDateSelect(d);
+                        setShowDatePickerModal(false);
+                      }}
                       style={[
-                        styles.calendarDayText,
-                        !isCurrentMonth && styles.calendarDayTextDimmed,
-                        isSelected && styles.calendarDayTextSelected,
-                        isTodayDay && !isSelected && styles.calendarDayTextToday,
+                        styles.calendarDayCell,
+                        isSelected && styles.calendarDayCellSelected,
+                        isTodayDay && !isSelected && styles.calendarDayCellToday,
                       ]}
                     >
-                      {format(d, 'd')}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
+                      <Text
+                        style={[
+                          styles.calendarDayText,
+                          !isCurrentMonth && styles.calendarDayTextDimmed,
+                          isSelected && styles.calendarDayTextSelected,
+                          isTodayDay && !isSelected && styles.calendarDayTextToday,
+                        ]}
+                      >
+                        {format(d, 'd')}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </Pressable>
           </Pressable>
-        </Pressable>
-      </Modal>
+        </Modal>
+      )}
     </View>
   );
 }

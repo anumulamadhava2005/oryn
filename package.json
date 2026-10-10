@@ -54,6 +54,7 @@
   "scripts": {
     "start": "expo start",
     "publish-code": "node scripts/publish-code-update.js",
+    "radar": "node scripts/user-radar.js",
     "postinstall": "node scripts/sdui-install-hook.js",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo run:android",

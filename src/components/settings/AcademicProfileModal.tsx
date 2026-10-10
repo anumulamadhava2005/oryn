@@ -19,8 +19,10 @@ import { Colors, Typography, Spacing, Radius } from '@/constants/theme';
 import {
   PROGRAM_OPTIONS,
   SEMESTER_OPTIONS,
+  BATCH_OPTIONS,
   ProgramType,
   SemesterType,
+  BatchType,
 } from '@/constants/academicData';
 import { useAcademicStore } from '@/store/academicStore';
 import { ElectiveSelectionModal } from '@/components/academic/ElectiveSelectionModal';
@@ -41,9 +43,11 @@ export function AcademicProfileModal({
   const {
     program,
     semester,
+    batch,
     selectedElectiveIds,
     setProgram,
     setSemester,
+    setBatch,
     isElectivesAvailable,
   } = useAcademicStore();
 
@@ -163,6 +167,60 @@ export function AcademicProfileModal({
                 })}
               </View>
             </View>
+
+            {/* Academic Batch / Lab Group Section (for Semester 3 CSE & CSE AI) */}
+            {semester === 'Semester 3' && (program.includes('CSE') || program.includes('AI')) && (
+              <View style={styles.section}>
+                <Text style={styles.sectionHeader}>Academic Batch / Lab Group</Text>
+                <View style={styles.cardGroup}>
+                  {BATCH_OPTIONS.map((b, idx) => {
+                    const isSelected = batch === b;
+                    const isLast = idx === BATCH_OPTIONS.length - 1;
+                    const subLabel =
+                      b === 'Batch 1'
+                        ? 'All CSE Students & CSE (AI) Roll 1 to 8'
+                        : 'CSE (AI) Students Roll 9 and above';
+
+                    return (
+                      <Pressable
+                        key={b}
+                        style={({ pressed }) => [
+                          styles.rowItem,
+                          isSelected && styles.selectedRow,
+                          pressed && styles.pressedRow,
+                          !isLast && styles.borderBottom,
+                        ]}
+                        onPress={() => {
+                          hapticLight();
+                          setBatch(b);
+                        }}
+                      >
+                        <View style={styles.rowLeft}>
+                          <View style={[styles.badgeIcon, isSelected && styles.badgeIconActive]}>
+                            <Ionicons
+                              name="people"
+                              size={16}
+                              color={isSelected ? Colors.white : Colors.systemGreen}
+                            />
+                          </View>
+                          <View style={styles.rowTextCol}>
+                            <Text style={[styles.rowTitle, isSelected && styles.rowTitleActive]}>
+                              {b}
+                            </Text>
+                            <Text style={styles.rowSub}>
+                              {subLabel}
+                            </Text>
+                          </View>
+                        </View>
+                        {isSelected && (
+                          <Ionicons name="checkmark-circle" size={20} color={Colors.systemGreen} />
+                        )}
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              </View>
+            )}
 
             {/* Electives Section */}
             <View style={styles.section}>
@@ -355,6 +413,14 @@ const styles = StyleSheet.create({
   rowTitleActive: {
     fontWeight: Typography.weight.bold,
     color: Colors.systemBlue,
+  },
+  rowTextCol: {
+    flex: 1,
+    gap: 2,
+  },
+  rowSub: {
+    fontSize: Typography.size.xs,
+    color: Colors.textMuted,
   },
   grid2x2: {
     flexDirection: 'row',

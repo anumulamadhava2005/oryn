@@ -29,7 +29,11 @@ import {
 } from '@/services/eventsApi';
 import { useAuthStore } from '@/store/auth';
 import { useAcademicStore } from '@/store/academicStore';
-import { syncEventsFromEmail as runEventsEmailSync } from '@/services/eventsEmailImporter';
+import {
+  syncEventsFromEmail as runEventsEmailSync,
+  getEventsFromCachedEmails,
+  getClubsFromCachedEmails,
+} from '@/services/eventsEmailImporter';
 import type {
   DistrictEvent,
   Club,
@@ -56,6 +60,62 @@ export const DISTRICT_CATEGORIES = [
 export type DistrictCategory = (typeof DISTRICT_CATEGORIES)[number];
 
 const SUPER_ADMIN_EMAIL = 'cs23b1008@iiitdm.ac.in';
+
+function normalizeTitle(t: string): string {
+  return (t || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+/**
+ * Merge remote server events with locally parsed campus email events.
+ * Server events take precedence when an event is present in both.
+ */
+function mergeEvents(remote: DistrictEvent[], local: DistrictEvent[]): DistrictEvent[] {
+  const remoteNormalizedTitles = new Set(
+    remote.map((e) => normalizeTitle(e.title)).filter(Boolean)
+  );
+
+  const combined = [...remote];
+
+  for (const localEv of local) {
+    const norm = normalizeTitle(localEv.title);
+    if (!norm || !remoteNormalizedTitles.has(norm)) {
+      if (norm) remoteNormalizedTitles.add(norm);
+      combined.push(localEv);
+    }
+  }
+
+  return combined;
+}
+
+/**
+ * Merge remote clubs with local campus organizations derived from email events.
+ */
+function mergeClubs(remote: Club[], localClubs: Club[]): Club[] {
+  const clubsMap = new Map<string, Club>();
+
+  for (const c of remote) {
+    clubsMap.set(c.name.toLowerCase().trim(), { ...c });
+  }
+
+  for (const c of localClubs) {
+    const key = c.name.toLowerCase().trim();
+    if (!clubsMap.has(key)) {
+      clubsMap.set(key, c);
+    } else {
+      const existing = clubsMap.get(key)!;
+      if (c.events && c.events.length > 0) {
+        const existingEventTitles = new Set((existing.events || []).map((e) => normalizeTitle(e.title)));
+        const newEvents = c.events.filter((e) => !existingEventTitles.has(normalizeTitle(e.title)));
+        if (newEvents.length > 0) {
+          existing.events = [...(existing.events || []), ...newEvents];
+          existing.events_count = (Number(existing.events_count) || 0) + newEvents.length;
+        }
+      }
+    }
+  }
+
+  return Array.from(clubsMap.values());
+}
 
 interface EventsState {
   events: DistrictEvent[];
@@ -106,9 +166,20 @@ interface EventsState {
   syncEventsFromEmail: () => Promise<void>;
 }
 
+function getInitialFeed() {
+  const localEvents = getEventsFromCachedEmails();
+  const localClubs = getClubsFromCachedEmails(localEvents);
+  return {
+    events: mergeEvents(getCachedDistrictEvents(), localEvents),
+    clubs: mergeClubs(getCachedClubs(), localClubs),
+  };
+}
+
+const initialFeed = getInitialFeed();
+
 export const useEventsStore = create<EventsState>()((set, get) => ({
-  events: getCachedDistrictEvents(),
-  clubs: getCachedClubs(),
+  events: initialFeed.events,
+  clubs: initialFeed.clubs,
   polls: getCachedPolls(),
   selectedCategory: 'All',
   searchQuery: '',
@@ -129,32 +200,32 @@ export const useEventsStore = create<EventsState>()((set, get) => ({
   isDemographicsLoading: false,
 
   loadFeed: async (skipEmailSync = false) => {
-    const { selectedCategory, searchQuery, events } = get();
+    const { events } = get();
     // Stale-While-Revalidate: only trigger loading skeleton if cache is completely empty
     if (events.length === 0) {
       set({ isLoading: true, error: null });
     }
 
     try {
+      // Always fetch the FULL unfiltered feed from the backend.
+      // Category/search filtering is handled client-side in the UI layer.
       const [eventsData, clubsData, pollsData] = await Promise.all([
-        fetchDistrictEvents({
-          category: selectedCategory === 'All' ? undefined : selectedCategory,
-          search: searchQuery.trim() || undefined,
-        }),
+        fetchDistrictEvents(),
         fetchClubs(),
         fetchPolls(),
       ]);
 
-      // Stale-While-Revalidate: update with fresh data; if network returned empty on transient error, preserve existing cached events
-      const updatedEvents = eventsData.length > 0 ? eventsData : (events.length > 0 ? events : eventsData);
-      const updatedClubs = clubsData.length > 0 ? clubsData : (get().clubs.length > 0 ? get().clubs : clubsData);
-      const updatedPolls = pollsData.length > 0 ? pollsData : (get().polls.length > 0 ? get().polls : pollsData);
+      const localEvents = getEventsFromCachedEmails();
+      const localClubs = getClubsFromCachedEmails(localEvents);
+      const mergedEvents = mergeEvents(eventsData.length > 0 ? eventsData : get().events, localEvents);
+      const mergedClubs = mergeClubs(clubsData.length > 0 ? clubsData : get().clubs, localClubs);
 
       set({
-        events: updatedEvents,
-        clubs: updatedClubs,
-        polls: updatedPolls,
+        events: mergedEvents,
+        clubs: mergedClubs,
+        polls: pollsData.length > 0 ? pollsData : get().polls,
         isLoading: false,
+        error: null,
       });
 
       // Background: parse new events from emails without blocking UI or causing loops
@@ -172,13 +243,23 @@ export const useEventsStore = create<EventsState>()((set, get) => ({
           });
       }
     } catch (err: any) {
-      set({ error: err.message || 'Failed to load events', isLoading: false });
+      const localEvents = getEventsFromCachedEmails();
+      const localClubs = getClubsFromCachedEmails(localEvents);
+      set({
+        events: mergeEvents(get().events, localEvents),
+        clubs: mergeClubs(get().clubs, localClubs),
+        error: err.message || 'Failed to load events',
+        isLoading: false,
+      });
     }
   },
 
   refreshFeed: async () => {
     set({ isRefreshing: true, error: null });
     try {
+      // Invalidate MMKV cache so the API fetch gets fresh data
+      invalidateDistrictCache();
+
       // Sync fresh emails first (guarded against concurrent sync)
       if (!get().isEmailSyncing) {
         set({ isEmailSyncing: true });
@@ -186,26 +267,35 @@ export const useEventsStore = create<EventsState>()((set, get) => ({
         set({ isEmailSyncing: false });
       }
 
-      const { selectedCategory, searchQuery } = get();
+      // Always fetch full unfiltered feed
       const [eventsData, clubsData, pollsData] = await Promise.all([
-        fetchDistrictEvents({
-          category: selectedCategory === 'All' ? undefined : selectedCategory,
-          search: searchQuery.trim() || undefined,
-        }),
+        fetchDistrictEvents(),
         fetchClubs(),
         fetchPolls(),
       ]);
 
+      const localEvents = getEventsFromCachedEmails();
+      const localClubs = getClubsFromCachedEmails(localEvents);
+      const mergedEvents = mergeEvents(eventsData.length > 0 ? eventsData : get().events, localEvents);
+      const mergedClubs = mergeClubs(clubsData.length > 0 ? clubsData : get().clubs, localClubs);
+
       set({
-        events: eventsData.length > 0 ? eventsData : get().events,
-        clubs: clubsData.length > 0 ? clubsData : get().clubs,
+        events: mergedEvents,
+        clubs: mergedClubs,
         polls: pollsData.length > 0 ? pollsData : get().polls,
         isRefreshing: false,
       });
       // Also check permissions in the background
       get().checkPermissions().catch(() => {});
     } catch (err: any) {
-      set({ error: err.message || 'Failed to refresh events', isRefreshing: false });
+      const localEvents = getEventsFromCachedEmails();
+      const localClubs = getClubsFromCachedEmails(localEvents);
+      set({
+        events: mergeEvents(get().events, localEvents),
+        clubs: mergeClubs(get().clubs, localClubs),
+        error: err.message || 'Failed to refresh events',
+        isRefreshing: false,
+      });
     }
   },
 
@@ -213,20 +303,28 @@ export const useEventsStore = create<EventsState>()((set, get) => ({
     set({ isRefreshing: true, isEmailSyncing: true });
     try {
       await runEventsEmailSync(true);
+      // Invalidate stale cache before re-loading so newly imported events show up
+      invalidateDistrictCache();
       await get().loadFeed(true);
     } finally {
-      set({ isRefreshing: false, isEmailSyncing: false });
+      const localEvents = getEventsFromCachedEmails();
+      const localClubs = getClubsFromCachedEmails(localEvents);
+      set({
+        events: mergeEvents(get().events, localEvents),
+        clubs: mergeClubs(get().clubs, localClubs),
+        isRefreshing: false,
+        isEmailSyncing: false,
+      });
     }
   },
 
+  // Category and search are purely client-side filters — no network requests needed
   setCategory: (category) => {
     set({ selectedCategory: category });
-    get().loadFeed();
   },
 
   setSearchQuery: (query) => {
     set({ searchQuery: query });
-    get().loadFeed();
   },
 
   toggleRsvp: async (event, targetStatus) => {

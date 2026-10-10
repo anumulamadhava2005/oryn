@@ -12,11 +12,13 @@ export interface Course {
   faculty: string;
   program: string;
   semester: string;
+  batch?: 'Batch 1' | 'Batch 2' | 'All';
   sourceFile: string;
 }
 
 export type ProgramType =
   | 'B.Tech CSE'
+  | 'B.Tech CSE (AI)'
   | 'B.Tech ECE'
   | 'B.Tech ME'
   | 'B.Tech EP'
@@ -29,8 +31,13 @@ export type ProgramType =
 
 export type SemesterType = 'Semester 1' | 'Semester 3' | 'Semester 5' | 'Semester 7';
 
+export type BatchType = 'Batch 1' | 'Batch 2';
+
+export const BATCH_OPTIONS: BatchType[] = ['Batch 1', 'Batch 2'];
+
 export const PROGRAM_OPTIONS: ProgramType[] = [
   'B.Tech CSE',
+  'B.Tech CSE (AI)',
   'B.Tech ECE',
   'B.Tech ME',
   'B.Tech EP',
@@ -179,324 +186,442 @@ export const FIRST_SEM_SLOTS: Record<string, Record<string, string>> = {
 };
 
 export const ALL_COURSES: Course[] = [
+  // ─── B.Tech CSE Semester 3 (Batch 1) ──────────────────────────────────
   {
     "code": "25MA1002",
     "name": "Linear Algebra",
     "slot": "E",
-    "hall": "H21",
-    "faculty": "Dr. Nachiketa Mishra",
+    "hall": "H21, H22",
+    "faculty": "Prof. Shalu M A / Dr. Subhasis Ghora",
     "program": "B.Tech CSE",
     "semester": "Semester 3",
+    "batch": "Batch 1",
     "sourceFile": "Timetable_CSE.md",
-    "id": "25MA1002-1"
-  },
-  {
-    "code": "25MA1002",
-    "name": "Linear Algebra",
-    "slot": "E",
-    "hall": "H22",
-    "faculty": "Prof. Shalu M A",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "Timetable_CSE.md",
-    "id": "25MA1002-2"
+    "id": "25MA1002-CSE-B1"
   },
   {
     "code": "25CS2000",
     "name": "Introduction to AI with Python",
-    "slot": "G / L3 X5",
-    "hall": "H44 / L512, L209",
-    "faculty": "Dr Jagadeesh K",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2000-3"
-  },
-  {
-    "code": "25CS2001",
-    "name": "Object Oriented Programming",
-    "slot": "F (Except Wed) / H, X1",
-    "hall": "H15 / L509",
-    "faculty": "Prof. B Sivaselvan",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2001-4"
-  },
-  {
-    "code": "25CS2002",
-    "name": "Digital Systems Design",
-    "slot": "A / J3, X3",
-    "hall": "H01 / L515",
-    "faculty": "Dr K Kannadasan",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2002-5"
-  },
-  {
-    "code": "25CS2003",
-    "name": "Design & Analysis of Algorithms",
-    "slot": "C (Fri), B / Thu D & B",
-    "hall": "H25 / L509",
-    "faculty": "Dr Syed Shahul Hameed",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2003-6"
-  },
-  {
-    "code": "25CS2004",
-    "name": "Database Systems Design",
-    "slot": "C (Tue), D / Wed D & B",
-    "hall": "H15 / L512",
-    "faculty": "Dr M Ratna Raju",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2004-7"
-  },
-  {
-    "code": "25CS2005",
-    "name": "Computing Paradigms",
-    "slot": "C (Wed & Thur)",
+    "slot": "Tue I1, Thu K1",
     "hall": "H15",
     "faculty": "Dr Preeth",
     "program": "B.Tech CSE",
     "semester": "Semester 3",
+    "batch": "Batch 1",
     "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2005-8"
+    "id": "25CS2000-CSE-B1"
   },
   {
-    "code": "25MA1002",
-    "name": "Linear Algebra",
-    "slot": "E",
-    "hall": "H22",
-    "faculty": "Prof. Shalu M A",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "Timetable_CSE.md",
-    "id": "25MA1002-9"
-  },
-  {
-    "code": "25CS2000",
-    "name": "Introduction to AI with Python",
-    "slot": "G / L3 X5",
-    "hall": "H44 / L512, L209",
-    "faculty": "Dr Jagadeesh K",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2000-10"
-  },
-  {
-    "code": "25CS2000",
-    "name": "Introduction to AI with Python",
-    "slot": "G / Wed A & F",
-    "hall": "H15 / L509, L507",
+    "code": "25CS2000P",
+    "name": "Introduction to AI with Python Practice",
+    "slot": "Fri L3, Fri X5",
+    "hall": "L209, L512",
     "faculty": "Dr Preeth",
     "program": "B.Tech CSE",
     "semester": "Semester 3",
+    "batch": "Batch 1",
     "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2000-11"
+    "id": "25CS2000P-CSE-B1"
   },
   {
     "code": "25CS2001",
     "name": "Object Oriented Programming",
-    "slot": "F (Except Wed) / H, X1",
-    "hall": "H15 / L509",
-    "faculty": "Prof. B Sivaselvan",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2001-12"
-  },
-  {
-    "code": "25CS2001",
-    "name": "Object Oriented Programming",
-    "slot": "F (Except Wed) / H, X1",
-    "hall": "H15 / L512",
+    "slot": "Mon G, Fri F",
+    "hall": "H15",
     "faculty": "Dr B Sivaselvan + Dr NSG",
     "program": "B.Tech CSE",
     "semester": "Semester 3",
+    "batch": "Batch 1",
     "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2001-13"
+    "id": "25CS2001-CSE-B1"
   },
   {
-    "code": "25CS2002",
-    "name": "Digital Systems Design",
-    "slot": "A / J3, X3",
-    "hall": "H01 / L515",
-    "faculty": "Dr K Kannadasan",
+    "code": "25CS2001P",
+    "name": "Object Oriented Programming Practice",
+    "slot": "Mon H1-H3, Mon X1",
+    "hall": "L509",
+    "faculty": "Dr B Sivaselvan + Dr NSG",
     "program": "B.Tech CSE",
     "semester": "Semester 3",
+    "batch": "Batch 1",
     "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2002-14"
+    "id": "25CS2001P-CSE-B1"
   },
   {
     "code": "25CS2002",
     "name": "Digital Systems Design",
-    "slot": "A (Except Wed) / J1, J2",
-    "hall": "H15 / L515",
+    "slot": "Tue G, Wed F, Thu G",
+    "hall": "H01, H02",
     "faculty": "Dr B Krishna Priya",
     "program": "B.Tech CSE",
     "semester": "Semester 3",
+    "batch": "Batch 1",
     "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2002-15"
+    "id": "25CS2002-CSE-B1"
+  },
+  {
+    "code": "25CS2002P",
+    "name": "Digital Systems Design Practice",
+    "slot": "Wed J3, Wed X3",
+    "hall": "L515",
+    "faculty": "Dr B Krishna Priya",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "batch": "Batch 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2002P-CSE-B1"
   },
   {
     "code": "25CS2003",
     "name": "Design & Analysis of Algorithms",
-    "slot": "C (Fri), B / Thu D & B",
-    "hall": "H25 / L509",
-    "faculty": "Dr Syed Shahul Hameed",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2003-16"
-  },
-  {
-    "code": "25CS2003",
-    "name": "Design & Analysis of Algorithms",
-    "slot": "C (Tue), D / Wed D & B",
-    "hall": "H15 / L509",
-    "faculty": "Dr Syed Shahul Hameed",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2003-17"
-  },
-  {
-    "code": "25CS2004",
-    "name": "Database Systems Design",
-    "slot": "C (Tue), D / Wed D & B",
-    "hall": "H15 / L512",
-    "faculty": "Dr M Ratna Raju",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2004-18"
-  },
-  {
-    "code": "25CS2004",
-    "name": "Database Systems Design",
-    "slot": "C (Fri), B / Thu D & B",
-    "hall": "H25 / L512",
-    "faculty": "Dr M Ratna Raju",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2004-19"
-  },
-  {
-    "code": "25CS2005",
-    "name": "Computing Paradigms",
-    "slot": "C (Wed & Thur)",
-    "hall": "H15",
-    "faculty": "Dr Preeth",
-    "program": "B.Tech CSE",
-    "semester": "Semester 3",
-    "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2005-20"
-  },
-  {
-    "code": "25CS2005",
-    "name": "Computing Paradigms",
-    "slot": "C (Wed & Thur)",
+    "slot": "Mon B, Tue B, Fri C",
     "hall": "H25",
+    "faculty": "Dr Syed Shahul Hameed",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "batch": "Batch 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2003-CSE-B1"
+  },
+  {
+    "code": "25CS2003P",
+    "name": "Design & Analysis of Algorithms Practice",
+    "slot": "Thu D, Thu B",
+    "hall": "L509",
+    "faculty": "Dr Syed Shahul Hameed",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "batch": "Batch 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2003P-CSE-B1"
+  },
+  {
+    "code": "25CS2004",
+    "name": "Database Systems Design",
+    "slot": "Mon D, Tue C, Fri D",
+    "hall": "H15",
+    "faculty": "Dr M Ratna Raju",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "batch": "Batch 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2004-CSE-B1"
+  },
+  {
+    "code": "25CS2004P",
+    "name": "Database Systems Design Practice",
+    "slot": "Wed D, Wed B",
+    "hall": "L512",
+    "faculty": "Dr M Ratna Raju",
+    "program": "B.Tech CSE",
+    "semester": "Semester 3",
+    "batch": "Batch 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2004P-CSE-B1"
+  },
+  {
+    "code": "25CS2005",
+    "name": "Computing Paradigms",
+    "slot": "Tue A, Thu C",
+    "hall": "H01, H15",
     "faculty": "Dr Raghavan",
     "program": "B.Tech CSE",
     "semester": "Semester 3",
+    "batch": "Batch 1",
     "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2005-21"
+    "id": "25CS2005-CSE-B1"
   },
+
+  // ─── Dual Degree CSE (AI) Semester 3 — Batch 1 (Roll 1 to 8) ────────
   {
     "code": "25MA1002",
     "name": "Linear Algebra",
     "slot": "E",
-    "hall": "H22",
-    "faculty": "Prof. Shalu M A",
+    "hall": "H21, H22",
+    "faculty": "Prof. Shalu M A / Dr. Subhasis Ghora",
     "program": "Dual Degree CSE (AI)",
     "semester": "Semester 3",
+    "batch": "Batch 1",
     "sourceFile": "Timetable_CSE.md",
     "id": "25MA1002-22"
   },
   {
-    "code": "25MA1002",
-    "name": "Linear Algebra",
-    "slot": "E",
-    "hall": "H23",
-    "faculty": "Dr. Subhasis Ghora",
-    "program": "Dual Degree CSE (AI)",
-    "semester": "Semester 3",
-    "sourceFile": "Timetable_CSE.md",
-    "id": "25MA1002-23"
-  },
-  {
     "code": "25CS2000",
     "name": "Introduction to AI with Python",
-    "slot": "G / Wed A & F",
-    "hall": "H15 / L509",
+    "slot": "Tue I1, Thu K1",
+    "hall": "H15",
     "faculty": "Dr Preeth",
     "program": "Dual Degree CSE (AI)",
     "semester": "Semester 3",
+    "batch": "Batch 1",
     "sourceFile": "Timetable_CSE.md",
     "id": "25CS2000-24"
   },
   {
+    "code": "25CS2000P",
+    "name": "Introduction to AI with Python Practice",
+    "slot": "Fri L3, Fri X5",
+    "hall": "L209, L512",
+    "faculty": "Dr Preeth",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2000P-24"
+  },
+  {
     "code": "25CS2001",
     "name": "Object Oriented Programming",
-    "slot": "F (Except Wed) / H, X1",
-    "hall": "H15 / L512",
+    "slot": "Mon G, Fri F",
+    "hall": "H15",
     "faculty": "Dr B Sivaselvan + Dr NSG",
     "program": "Dual Degree CSE (AI)",
     "semester": "Semester 3",
+    "batch": "Batch 1",
     "sourceFile": "Timetable_CSE.md",
     "id": "25CS2001-25"
   },
   {
+    "code": "25CS2001P",
+    "name": "Object Oriented Programming Practice",
+    "slot": "Mon H1-H3, Mon X1",
+    "hall": "L509",
+    "faculty": "Dr B Sivaselvan + Dr NSG",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2001P-25"
+  },
+  {
     "code": "25CS2002",
     "name": "Digital Systems Design",
-    "slot": "A (Except Wed) / J1, J2",
-    "hall": "H15 / L515",
+    "slot": "Tue G, Wed F, Thu G",
+    "hall": "H01, H02",
     "faculty": "Dr B Krishna Priya",
     "program": "Dual Degree CSE (AI)",
     "semester": "Semester 3",
+    "batch": "Batch 1",
     "sourceFile": "Timetable_CSE.md",
     "id": "25CS2002-26"
   },
   {
+    "code": "25CS2002P",
+    "name": "Digital Systems Design Practice",
+    "slot": "Wed J3, Wed X3",
+    "hall": "L515",
+    "faculty": "Dr B Krishna Priya",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2002P-26"
+  },
+  {
     "code": "25CS2003",
     "name": "Design & Analysis of Algorithms",
-    "slot": "C (Tue), D / Wed D & B",
-    "hall": "H15 / L509",
+    "slot": "Mon B, Tue B, Fri C",
+    "hall": "H25",
     "faculty": "Dr Syed Shahul Hameed",
     "program": "Dual Degree CSE (AI)",
     "semester": "Semester 3",
+    "batch": "Batch 1",
     "sourceFile": "Timetable_CSE.md",
     "id": "25CS2003-27"
   },
   {
+    "code": "25CS2003P",
+    "name": "Design & Analysis of Algorithms Practice",
+    "slot": "Thu D, Thu B",
+    "hall": "L509",
+    "faculty": "Dr Syed Shahul Hameed",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2003P-27"
+  },
+  {
     "code": "25CS2004",
     "name": "Database Systems Design",
-    "slot": "C (Fri), B / Thu D & B",
-    "hall": "H25 / L512",
+    "slot": "Mon D, Tue C, Fri D",
+    "hall": "H15",
     "faculty": "Dr M Ratna Raju",
     "program": "Dual Degree CSE (AI)",
     "semester": "Semester 3",
+    "batch": "Batch 1",
     "sourceFile": "Timetable_CSE.md",
     "id": "25CS2004-28"
   },
   {
+    "code": "25CS2004P",
+    "name": "Database Systems Design Practice",
+    "slot": "Wed D, Wed B",
+    "hall": "L512",
+    "faculty": "Dr M Ratna Raju",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2004P-28"
+  },
+  {
     "code": "25CS2005",
     "name": "Computing Paradigms",
-    "slot": "C (Wed & Thur)",
+    "slot": "Tue A, Thu C",
+    "hall": "H01, H15",
+    "faculty": "Dr Raghavan",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 1",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2005-29"
+  },
+
+  // ─── Dual Degree CSE (AI) Semester 3 — Batch 2 (Roll 9+) ─────────────
+  {
+    "code": "25MA1002",
+    "name": "Linear Algebra",
+    "slot": "E",
+    "hall": "H21, H22",
+    "faculty": "Prof. Shalu M A / Dr. Subhasis Ghora",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 2",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25MA1002-AI-B2"
+  },
+  {
+    "code": "25CS2000",
+    "name": "Introduction to AI with Python",
+    "slot": "Mon G, Tue G, Thu G",
+    "hall": "H15",
+    "faculty": "Dr Preeth",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 2",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2000-AI-B2"
+  },
+  {
+    "code": "25CS2000P",
+    "name": "Introduction to AI with Python Practice",
+    "slot": "Wed A, Wed F",
+    "hall": "L509",
+    "faculty": "Dr Preeth",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 2",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2000P-AI-B2"
+  },
+  {
+    "code": "25CS2001",
+    "name": "Object Oriented Programming",
+    "slot": "Mon F, Fri F",
+    "hall": "H15",
+    "faculty": "Dr B Sivaselvan + Dr NSG",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 2",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2001-AI-B2"
+  },
+  {
+    "code": "25CS2001P",
+    "name": "Object Oriented Programming Practice",
+    "slot": "Mon H1-H3, Mon X1",
+    "hall": "L512",
+    "faculty": "Dr B Sivaselvan + Dr NSG",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 2",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2001P-AI-B2"
+  },
+  {
+    "code": "25CS2002",
+    "name": "Digital Systems Design",
+    "slot": "Tue A, Fri A",
+    "hall": "H15",
+    "faculty": "Dr B Krishna Priya",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 2",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2002-AI-B2"
+  },
+  {
+    "code": "25CS2002P",
+    "name": "Digital Systems Design Practice",
+    "slot": "Wed J1, Wed J2",
+    "hall": "L515",
+    "faculty": "Dr B Krishna Priya",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 2",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2002P-AI-B2"
+  },
+  {
+    "code": "25CS2003",
+    "name": "Design & Analysis of Algorithms",
+    "slot": "Mon D, Tue C, Fri D",
+    "hall": "H15",
+    "faculty": "Dr Syed Shahul Hameed",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 2",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2003-AI-B2"
+  },
+  {
+    "code": "25CS2003P",
+    "name": "Design & Analysis of Algorithms Practice",
+    "slot": "Wed D, Wed B",
+    "hall": "L509",
+    "faculty": "Dr Syed Shahul Hameed",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 2",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2003P-AI-B2"
+  },
+  {
+    "code": "25CS2004",
+    "name": "Database Systems Design",
+    "slot": "Mon B, Tue B, Fri C",
+    "hall": "H25",
+    "faculty": "Dr M Ratna Raju",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 2",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2004-AI-B2"
+  },
+  {
+    "code": "25CS2004P",
+    "name": "Database Systems Design Practice",
+    "slot": "Thu D, Thu B",
+    "hall": "L512",
+    "faculty": "Dr M Ratna Raju",
+    "program": "Dual Degree CSE (AI)",
+    "semester": "Semester 3",
+    "batch": "Batch 2",
+    "sourceFile": "Timetable_CSE.md",
+    "id": "25CS2004P-AI-B2"
+  },
+  {
+    "code": "25CS2005",
+    "name": "Computing Paradigms",
+    "slot": "Wed C, Thu C",
     "hall": "H25",
     "faculty": "Dr Raghavan",
     "program": "Dual Degree CSE (AI)",
     "semester": "Semester 3",
+    "batch": "Batch 2",
     "sourceFile": "Timetable_CSE.md",
-    "id": "25CS2005-29"
+    "id": "25CS2005-AI-B2"
   },
   {
     "code": "CS3006",

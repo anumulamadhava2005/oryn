@@ -36,6 +36,7 @@ import { isOfficialEmail } from '@/classifiers/category';
 import { CategoryBadge } from '@/components/ui/Badge';
 import { MessMenuCard } from '@/components/today/MessMenuCard';
 import { ClassScheduleCard } from '@/components/today/ClassScheduleCard';
+import { BriefingDatePicker } from '@/components/today/BriefingDatePicker';
 import { TriageFeed } from '@/components/today/TriageFeed';
 import { getPersonalizedGreetingName } from '@/utils/userHelpers';
 import { deduplicateActionItems } from '@/utils/actionItemDeduplicator';
@@ -63,12 +64,6 @@ export default function TodayScreen() {
     }
   }, [params.tab]);
   const [selectedBriefingDate, setSelectedBriefingDate] = useState<Date>(new Date());
-  const [isWeekExpanded, setIsWeekExpanded] = useState(false);
-
-  const threeDays = useMemo(() => {
-    const today = new Date();
-    return [today, addDays(today, 1), addDays(today, 2)];
-  }, []);
 
   const [selectedCalendarDate, setSelectedCalendarDate] = useState<Date>(new Date());
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(
@@ -262,134 +257,15 @@ export default function TodayScreen() {
                   )}
               </View>
 
-              {/* Glanceable Day Focus Strip: Today + Next 2 Days with Week Toggle */}
-              <View style={styles.heroPickerContainer}>
-                <View style={styles.heroPickerHeader}>
-                  <Text style={styles.heroPickerLabel}>
-                    {isWeekExpanded ? 'THIS WEEK' : 'SCHEDULE FOCUS'}
-                  </Text>
-                  <Pressable
-                    onPress={() => {
-                      hapticLight();
-                      setIsWeekExpanded((p) => !p);
-                    }}
-                    hitSlop={8}
-                    style={styles.heroPickerToggle}
-                    accessibilityRole="button"
-                    accessibilityLabel={isWeekExpanded ? 'Show 3 days focus' : 'Expand to full week'}
-                  >
-                    <Text style={styles.heroPickerToggleText}>
-                      {isWeekExpanded ? 'Show 3 Days' : 'Full Week'}
-                    </Text>
-                    <Ionicons
-                      name={isWeekExpanded ? 'chevron-up' : 'chevron-down'}
-                      size={12}
-                      color="#A1A1AA"
-                    />
-                  </Pressable>
-                </View>
-
-                {isWeekExpanded ? (
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.heroDaysScroll}
-                  >
-                    {weekDays.map((day) => {
-                      const isSelected = isSameDay(day, selectedBriefingDate);
-                      const isTodayDate = isSameDay(day, new Date());
-                      const dayDeadlinesCount = deadlineEmails.filter((e) =>
-                        isSameDay(new Date(e.deadline!), day)
-                      ).length;
-
-                      return (
-                        <Pressable
-                          key={day.toISOString()}
-                          onPress={() => {
-                            hapticLight();
-                            setSelectedBriefingDate(day);
-                          }}
-                          style={[
-                            styles.spaciousDayCard,
-                            styles.spaciousDayCardWeek,
-                            isSelected && styles.spaciousDayCardSelected,
-                            isTodayDate && !isSelected && styles.spaciousDayCardToday,
-                          ]}
-                        >
-                          <Text style={[styles.spaciousDayName, isSelected && styles.spaciousDayTextSelected]}>
-                            {isTodayDate ? 'TODAY' : format(day, 'EEE').toUpperCase()}
-                          </Text>
-                          <Text style={[styles.spaciousDayNum, isSelected && styles.spaciousDayTextSelected]}>
-                            {format(day, 'd')}
-                          </Text>
-                          {dayDeadlinesCount > 0 ? (
-                            <View style={styles.dayBadgeDot}>
-                              <View style={[styles.dayDot, isSelected ? styles.dayDotSelected : styles.dayDotActive]} />
-                            </View>
-                          ) : (
-                            <View style={styles.dayDotPlaceholder} />
-                          )}
-                        </Pressable>
-                      );
-                    })}
-                  </ScrollView>
-                ) : (
-                  <View style={styles.heroDaysRow}>
-                    {threeDays.map((day) => {
-                      const isSelected = isSameDay(day, selectedBriefingDate);
-                      const isTodayDate = isSameDay(day, new Date());
-                      const dayDeadlinesCount = deadlineEmails.filter((e) =>
-                        isSameDay(new Date(e.deadline!), day)
-                      ).length;
-
-                      return (
-                        <Pressable
-                          key={day.toISOString()}
-                          onPress={() => {
-                            hapticLight();
-                            setSelectedBriefingDate(day);
-                          }}
-                          style={[
-                            styles.spaciousDayCard,
-                            isSelected && styles.spaciousDayCardSelected,
-                            isTodayDate && !isSelected && styles.spaciousDayCardToday,
-                          ]}
-                        >
-                          <Text style={[styles.spaciousDayName, isSelected && styles.spaciousDayTextSelected]}>
-                            {isTodayDate ? 'TODAY' : format(day, 'EEE').toUpperCase()}
-                          </Text>
-                          <Text style={[styles.spaciousDayNum, isSelected && styles.spaciousDayTextSelected]}>
-                            {format(day, 'd')}
-                          </Text>
-                          {dayDeadlinesCount > 0 ? (
-                            <View style={styles.dayBadgeDot}>
-                              <View style={[styles.dayDot, isSelected ? styles.dayDotSelected : styles.dayDotActive]} />
-                            </View>
-                          ) : (
-                            <View style={styles.dayDotPlaceholder} />
-                          )}
-                        </Pressable>
-                      );
-                    })}
-                  </View>
-                )}
-
-                {/* Quick Return to Today button if an upcoming day is selected */}
-                {!isSameDay(selectedBriefingDate, new Date()) && (
-                  <Pressable
-                    onPress={() => {
-                      hapticLight();
-                      setSelectedBriefingDate(new Date());
-                    }}
-                    style={styles.heroResetBtn}
-                  >
-                    <Ionicons name="arrow-undo-outline" size={13} color="#3B82F6" />
-                    <Text style={styles.heroResetText}>
-                      Viewing {format(selectedBriefingDate, 'EEEE, MMM d')} · Tap to return to Today
-                    </Text>
-                  </Pressable>
-                )}
-              </View>
+              {/* Unified Briefing Date Picker (Controls Schedule & Mess Menu) */}
+              <BriefingDatePicker
+                selectedDate={selectedBriefingDate}
+                onDateChange={setSelectedBriefingDate}
+                hasEventsOnDay={(d) => {
+                  const dayOfWeek = d.getDay();
+                  return dayOfWeek >= 1 && dayOfWeek <= 5;
+                }}
+              />
             </MotiView>
 
             {/* 1. Academic Schedule & Timetable (Driven by selectedBriefingDate) */}
@@ -422,7 +298,6 @@ export default function TodayScreen() {
             >
               <MessMenuCard
                 selectedDate={selectedBriefingDate}
-                onDateChange={setSelectedBriefingDate}
                 collapsible
                 defaultCollapsed={false}
               />
@@ -739,119 +614,6 @@ const styles = StyleSheet.create({
     fontSize: Typography.size.xs,
     fontWeight: Typography.weight.semibold,
     color: '#10B981',
-  },
-  heroPickerContainer: {
-    gap: Spacing[2],
-    marginTop: 2,
-  },
-  heroPickerHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 2,
-  },
-  heroPickerLabel: {
-    fontSize: 10,
-    fontWeight: Typography.weight.bold,
-    letterSpacing: 0.8,
-    color: Colors.textMuted,
-  },
-  heroPickerToggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-    paddingVertical: 2,
-    paddingHorizontal: 6,
-    borderRadius: Radius.sm,
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
-  },
-  heroPickerToggleText: {
-    fontSize: 11,
-    fontWeight: Typography.weight.semibold,
-    color: '#A1A1AA',
-  },
-  heroDaysRow: {
-    flexDirection: 'row',
-    gap: Spacing[2],
-  },
-  heroDaysScroll: {
-    gap: Spacing[2],
-    paddingVertical: 2,
-  },
-  spaciousDayCard: {
-    flex: 1,
-    minHeight: 64,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: Spacing[2],
-    paddingHorizontal: Spacing[1.5],
-    borderRadius: Radius.md,
-    backgroundColor: 'rgba(255, 255, 255, 0.03)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.06)',
-    gap: 2,
-  },
-  spaciousDayCardWeek: {
-    width: 58,
-    flex: undefined,
-  },
-  spaciousDayCardSelected: {
-    backgroundColor: Colors.systemBlue,
-    borderColor: Colors.systemBlue,
-  },
-  spaciousDayCardToday: {
-    borderColor: 'rgba(0, 122, 255, 0.45)',
-    backgroundColor: 'rgba(0, 122, 255, 0.08)',
-  },
-  spaciousDayName: {
-    fontSize: 10,
-    fontWeight: Typography.weight.semibold,
-    color: Colors.textMuted,
-    letterSpacing: 0.5,
-  },
-  spaciousDayNum: {
-    fontSize: Typography.size.lg,
-    fontWeight: Typography.weight.bold,
-    color: Colors.text,
-  },
-  spaciousDayTextSelected: {
-    color: '#FFFFFF',
-  },
-  dayBadgeDot: {
-    height: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dayDotPlaceholder: {
-    height: 6,
-  },
-  dayDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
-  },
-  dayDotActive: {
-    backgroundColor: '#EF4444',
-  },
-  dayDotSelected: {
-    backgroundColor: '#3B82F6',
-  },
-  heroResetBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 6,
-    backgroundColor: 'rgba(59, 130, 246, 0.08)',
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    borderColor: 'rgba(59, 130, 246, 0.2)',
-    marginTop: 2,
-  },
-  heroResetText: {
-    fontSize: 11,
-    fontWeight: Typography.weight.medium,
-    color: '#3B82F6',
   },
   sectionHeader: {
     flexDirection: 'row',

@@ -7,10 +7,14 @@
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 import * as Application from 'expo-application';
+import * as Notifications from 'expo-notifications';
+import { MMKV } from 'react-native-mmkv';
 import { SDUIManifest, SDUIEnvironment, validateManifest } from '@/types/sdui';
 import { useSDUIStore } from '@/store/sduiStore';
 import { usePreferencesStore } from '@/store/preferences';
 import { getNativeBuildMetadata, checkSDUICompatibility } from './sduiCompatibility';
+
+const sduiStorage = new MMKV({ id: 'oryn_sdui_cache_meta' });
 
 export function getAppVersion(): string {
   return (
@@ -129,6 +133,25 @@ export async function fetchSDUIManifest(forceEnv?: SDUIEnvironment): Promise<SDU
           // Apply remote theme override if specified
           if (validated.themeOverride) {
             usePreferencesStore.getState().setThemeMode(validated.themeOverride);
+          }
+
+          // Trigger system notification for active server announcement
+          if (validated.announcement) {
+            const notifKey = `sdui_notified_${validated.announcement.id}`;
+            if (!sduiStorage.getBoolean(notifKey)) {
+              sduiStorage.set(notifKey, true);
+              Notifications.scheduleNotificationAsync({
+                content: {
+                  title: validated.announcement.title,
+                  body: validated.announcement.message,
+                  data: {
+                    type: 'announcement',
+                    announcementId: validated.announcement.id,
+                  },
+                },
+                trigger: null,
+              }).catch(() => {});
+            }
           }
 
           return validated;

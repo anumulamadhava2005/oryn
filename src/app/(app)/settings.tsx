@@ -38,6 +38,8 @@ import { syncSDUI } from '@/services/sduiService';
 import { NotificationPreferencesModal } from '@/components/settings/NotificationPreferencesModal';
 import { useNotificationPreferencesStore } from '@/store/notificationPreferences';
 import { useResponsive } from '@/hooks/useResponsive';
+import { useAuthStore } from '@/store/auth';
+import { UserRadarModal } from '@/components/admin/UserRadarModal';
 
 function SettingRow({
   icon,
@@ -128,6 +130,8 @@ export default function SettingsScreen() {
   const setSDUIEnvOverride = useSDUIStore((s) => s.setEnvOverride);
   const sduiLastFetched = useSDUIStore((s) => s.lastFetchedAt);
   const clearSDUICache = useSDUIStore((s) => s.clearCache);
+  const [showUserRadar, setShowUserRadar] = useState(false);
+  const isSuperAdmin = (user?.email || '').toLowerCase() === 'cs23b1008@iiitdm.ac.in';
 
   const handleManualSync = useCallback(() => {
     if (!lastSyncAt) runInitialSync();
@@ -472,6 +476,23 @@ export default function SettingsScreen() {
           />
         </Section>
 
+        {/* Super Admin & Telemetry */}
+        {isSuperAdmin && (
+          <Section title="Super Admin & Telemetry">
+            <SettingRow
+              icon="radio-outline"
+              iconBg={Colors.systemTeal}
+              label="Bird's Eye View"
+              sublabel="Live installed devices, active users, batches & telemetry"
+              onPress={() => {
+                hapticMedium();
+                setShowUserRadar(true);
+              }}
+              showChevron
+            />
+          </Section>
+        )}
+
         {/* About & Developer */}
         <Section title="About & Developer">
           <SettingRow
@@ -537,6 +558,11 @@ export default function SettingsScreen() {
       <NotificationPreferencesModal
         visible={showNotifModal}
         onClose={() => setShowNotifModal(false)}
+      />
+
+      <UserRadarModal
+        visible={showUserRadar}
+        onClose={() => setShowUserRadar(false)}
       />
     </SafeAreaView>
   );

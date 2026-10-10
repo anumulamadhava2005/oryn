@@ -11,7 +11,7 @@ import {
 } from '@react-native-google-signin/google-signin';
 import * as SecureStore from 'expo-secure-store';
 
-import { WEB_CLIENT_ID, GMAIL_SCOPES } from '@/constants/gmail';
+import { WEB_CLIENT_ID, IOS_CLIENT_ID, GMAIL_SCOPES } from '@/constants/gmail';
 import type { AuthTokens, GoogleUser } from '@/types/auth';
 
 const STORE_TOKENS_KEY = 'oryn_auth_tokens';
@@ -21,6 +21,7 @@ const STORE_USER_KEY = 'oryn_auth_user';
 export function configureGoogleSignIn(): void {
   GoogleSignin.configure({
     webClientId: WEB_CLIENT_ID,
+    iosClientId: IOS_CLIENT_ID,
     scopes: GMAIL_SCOPES,
     offlineAccess: false,
   });

@@ -19,9 +19,10 @@ import {
 } from '@/services/eventsApi';
 import { getAllCachedEmails } from '@/services/cache';
 import { useAuthStore } from '@/store/auth';
+import { useEmailsStore } from '@/store/emails';
 import { getValidAccessToken, loadTokens } from '@/auth/google';
 import type { RawGmailMessage, GmailPayload, ParsedEmail } from '@/types/email';
-import type { EventPriority } from '@/types/events';
+import type { EventPriority, DistrictEvent, Club } from '@/types/events';
 
 const storage = new MMKV({ id: 'oryn-events-email-sync' });
 const PROCESSED_IDS_KEY = 'events_synced_email_ids';
@@ -57,18 +58,58 @@ function markEmailAsProcessed(emailId: string): void {
   storage.set(PROCESSED_IDS_KEY, JSON.stringify(arr));
 }
 
-// ─── Strict Campus Club Validator ───────────────────────────────
+const CAMPUS_CLUB_KEYWORDS = [
+  'club',
+  'affairs',
+  'council',
+  'society',
+  'cell',
+  'ecell',
+  'edc',
+  'meraki',
+  'footlights',
+  'tandav',
+  'dhwani',
+  'music',
+  'dance',
+  'dramatics',
+  'sports',
+  'ssg',
+  'nss',
+  'vashisht',
+  'samgatha',
+  'epic',
+  'acm',
+  'gdsc',
+  'gdg',
+  'sae',
+  'robotics',
+  'zero',
+  'placement',
+  'dean',
+  'pic',
+  'hackathon',
+  'tedx',
+  'shunya',
+  'cs23b1008',
+];
 
 /**
  * Strict club email validator:
- * ONLY emails ending with @iiitdm.ac.in AND containing 'club' or 'affairs' in username.
+ * Validates @iiitdm.ac.in addresses for clubs, affairs councils, societies, cells, and known aliases.
  */
 export function isOfficialClubEmail(email: string): boolean {
   if (!email) return false;
   const normalized = email.trim().toLowerCase();
-  if (!normalized.endsWith('@iiitdm.ac.in')) return false;
-  const username = normalized.split('@')[0];
-  return username.includes('club') || username.includes('affairs');
+  if (normalized.endsWith('@iiitdm.ac.in')) {
+    const username = normalized.split('@')[0];
+    return CAMPUS_CLUB_KEYWORDS.some((kw) => username.includes(kw));
+  }
+  // Allow official clubs with external domains if IIITDM club
+  if (normalized.includes('iiitdm') && (normalized.includes('club') || normalized.includes('society'))) {
+    return true;
+  }
+  return false;
 }
 
 // ─── Known Campus Clubs & Affiliations ──────────────────────────
@@ -120,6 +161,51 @@ const KNOWN_CLUBS: Record<string, KnownClubInfo> = {
     name: 'Placement Affairs Council',
     category: 'Technical',
     description: 'Career readiness, corporate hackathons, internships, and professional development.',
+  },
+  'ecell@iiitdm.ac.in': {
+    name: 'E-Cell (Entrepreneurship Cell)',
+    category: 'Technical',
+    description: 'Entrepreneurship Cell fostering campus startup initiatives, case studies, and business competitions.',
+  },
+  'edc@iiitdm.ac.in': {
+    name: 'Entrepreneurship Development Cell',
+    category: 'Technical',
+    description: 'EDC student body at IIITDM Kancheepuram.',
+  },
+  'footlights@iiitdm.ac.in': {
+    name: 'Footlights Dance Club',
+    category: 'Cultural',
+    description: 'Official Dance Society of IIITDM Kancheepuram.',
+  },
+  'musicclub.iiitdm@gmail.com': {
+    name: 'Dhwani Music Club',
+    category: 'Cultural',
+    description: 'Official Music Society of IIITDM Kancheepuram.',
+  },
+  'meraki@iiitdm.ac.in': {
+    name: 'Meraki Design Club',
+    category: 'Design',
+    description: 'Design and creative arts club at IIITDM Kancheepuram.',
+  },
+  'ssg@iiitdm.ac.in': {
+    name: 'Social Service Group (SSG)',
+    category: 'Community',
+    description: 'Social Service and community engagement initiatives at IIITDM.',
+  },
+  'vashisht@iiitdm.ac.in': {
+    name: 'Vashisht Technical Fest',
+    category: 'Technical',
+    description: 'Annual National Technical Festival of IIITDM Kancheepuram.',
+  },
+  'samgatha@iiitdm.ac.in': {
+    name: 'Samgatha Cultural Fest',
+    category: 'Cultural',
+    description: 'Annual Inter-Collegiate Cultural Festival of IIITDM Kancheepuram.',
+  },
+  'epic@iiitdm.ac.in': {
+    name: 'EPIC Coding Club',
+    category: 'Technical',
+    description: 'Competitive programming and technical activities society.',
   },
 };
 
@@ -311,12 +397,17 @@ export interface ExtractedEventData {
 
 /**
  * Identify if an email corresponds to a real campus event.
- * Enforces the strict rule: Sender MUST be @iiitdm.ac.in and have "club" or "affairs" in username.
+ * Exactly aligns with the classifier powering the Briefing tab's "Clubs & Activities".
  */
-export function isCampusEventEmail(subject: string, body: string, senderEmail: string): boolean {
-  if (!isOfficialClubEmail(senderEmail)) {
-    return false;
-  }
+export function isCampusEventEmail(
+  subject: string,
+  body: string,
+  senderEmail: string,
+  category?: string,
+  categoryGroup?: string,
+): boolean {
+  const cat = (category || '').toLowerCase();
+  const group = (categoryGroup || '').toLowerCase();
 
   // Negative filters: routine circulars, marks, fee dues, mess menus, lost & found
   if (
@@ -330,9 +421,31 @@ export function isCampusEventEmail(subject: string, body: string, senderEmail: s
     return false;
   }
 
+  // 1. Direct classifier match (exact same logic as Today tab's Clubs & Activities)
+  if (
+    group === 'events' ||
+    group === 'technical' ||
+    [
+      'cultural_affairs',
+      'sports_affairs',
+      'fest',
+      'club_event',
+      'tech_club',
+      'hackathon',
+      'workshop',
+    ].includes(cat)
+  ) {
+    return true;
+  }
+
+  // 2. Sender is campus club or council
+  if (isOfficialClubEmail(senderEmail)) {
+    return true;
+  }
+
   const combined = `${subject} ${body}`.toLowerCase();
 
-  // Event keywords
+  // 3. Event keywords
   const eventSignalRe =
     /\b(workshop|hackathon|seminar|webinar|bootcamp|coding\s*contest|competition|tournament|cultural\s*night|guest\s*lecture|orientation\s*(?:session|program)?|recruitment\s*drive|session|talk|meetup|symposium|fest|conference|sports\s*meet|chaturthi|ganesh|onam|janmashtami|movie\s*night|musical\s*chairs?|anthakshari|tug\s*of\s*war|ramp\s*walk|open\s*mic|open\s*stage|fandomverse|quiz|showcase|round|recruitment|match|race)\b/i;
 
@@ -343,94 +456,146 @@ export function isCampusEventEmail(subject: string, body: string, senderEmail: s
 }
 
 /**
- * Identify the club and official email from the email metadata.
+ * Check if an email represents a club activity or campus event.
+ * Exactly matches the categorization of the Briefing tab's "Clubs & Activities".
  */
+export function isEmailClubActivity(email: {
+  category?: string;
+  categoryGroup?: string;
+  subject?: string;
+  body?: string;
+  senderEmail?: string;
+}): boolean {
+  return isCampusEventEmail(
+    email.subject || '',
+    email.body || '',
+    email.senderEmail || '',
+    email.category,
+    email.categoryGroup,
+  );
+}
+
 /**
  * Identify the club and official email from the email metadata.
- * Strictly adheres to the official @iiitdm.ac.in domain and (club/affairs) username rule.
+ * Strictly adheres to the official @iiitdm.ac.in domain and (club/affairs) username rule for backend persistence.
  */
 export function extractClubDetails(
   fromHeader: string,
   subject: string,
   body: string,
+  category?: string,
+  categoryGroup?: string,
 ): { name: string; email: string; category: string; description: string } {
   const { name: senderName, email: senderEmail } = parseAddress(fromHeader || '');
   const lowerEmail = senderEmail.toLowerCase();
   const combined = `${subject} ${body}`.toLowerCase();
 
   let clubName = '';
-  let category = 'Technical';
+  let cat = 'Technical';
 
   // 1. Council-specific sub-club identification
   if (lowerEmail === 'hostel.affairs@iiitdm.ac.in') {
-    // All events sent by hostel affairs (Ganesh Chaturthi, Onam, Movie Nights, Tug of War, Ramp Walk)
-    // are official SAC Hostel Affairs Council events.
     clubName = 'SAC Hostel Affairs Council';
-    category = 'Cultural';
+    cat = 'Cultural';
   } else if (lowerEmail === 'placement.affairs@iiitdm.ac.in') {
     clubName = 'Placement Affairs Council';
-    category = 'Technical';
+    cat = 'Technical';
   } else if (lowerEmail === 'academic.affairs@iiitdm.ac.in') {
     clubName = 'SAC Academic Affairs Council';
-    category = 'Technical';
+    cat = 'Technical';
   } else if (lowerEmail === 'alumni.affairs@iiitdm.ac.in') {
     clubName = 'SAC Alumni Affairs Council';
-    category = 'Community';
+    cat = 'Community';
   } else if (lowerEmail === 'general.affairs@iiitdm.ac.in') {
     if (/\b(social\s*service\s*group|ssg)\b/i.test(combined)) {
       clubName = 'Social Service Group (SSG)';
-      category = 'Community';
+      cat = 'Community';
     } else {
       clubName = 'SAC General Affairs Council';
-      category = 'Community';
+      cat = 'Community';
     }
   } else if (lowerEmail === 'technical.affairs@iiitdm.ac.in') {
     if (/\b(systems?\s*coding\s*club|scc)\b/i.test(combined)) {
       clubName = 'Systems Coding Club';
-      category = 'Technical';
+      cat = 'Technical';
     } else if (/\b(designer'?s\s*club|cae\s*and\s*design)\b/i.test(combined)) {
       clubName = "Designer's Club";
-      category = 'Design';
+      cat = 'Design';
     } else if (/\b(e-cell|entrepreneurship\s*cell|nec)\b/i.test(combined)) {
       clubName = 'Entrepreneurship Cell (E-Cell)';
-      category = 'Technical';
+      cat = 'Technical';
     } else if (/\b(robotics\s*club)\b/i.test(combined)) {
       clubName = 'Robotics Club';
-      category = 'Technical';
+      cat = 'Technical';
     } else if (/\b(computer\s*science\s*guild|csg)\b/i.test(combined)) {
       clubName = 'Computer Science Guild (CSG)';
-      category = 'Technical';
+      cat = 'Technical';
     } else {
       clubName = 'SAC Technical Affairs Council';
-      category = 'Technical';
+      cat = 'Technical';
     }
   } else if (lowerEmail === 'cultural.affairs@iiitdm.ac.in') {
     if (/\bgrapix\b/i.test(combined)) {
       clubName = 'GRAPIX Design Club';
-      category = 'Design';
+      cat = 'Design';
     } else if (/\b(tandav|dance\s*session|dance\s*club)\b/i.test(combined)) {
       clubName = 'Dance Club (Tandav)';
-      category = 'Cultural';
+      cat = 'Cultural';
     } else if (/\b(dhwani|open\s*mic|music\s*club)\b/i.test(combined)) {
       clubName = 'Music Club (Dhwani)';
-      category = 'Cultural';
+      cat = 'Cultural';
     } else if (/\b(imagix|photography\s*club|game\s*of\s*frames)\b/i.test(combined)) {
       clubName = 'Photography Club (Imagix)';
-      category = 'Design';
+      cat = 'Design';
     } else {
       clubName = 'SAC Cultural Affairs Council';
-      category = 'Cultural';
+      cat = 'Cultural';
     }
+  } else if (lowerEmail === 'sports.affairs@iiitdm.ac.in') {
+    clubName = 'SAC Sports Affairs Council';
+    cat = 'Sports';
   }
 
-  // 2. Direct match with known campus affairs councils if no sub-club detected
+  // 2. Direct match with known campus affairs councils / clubs
   if (!clubName && KNOWN_CLUBS[lowerEmail]) {
     const info = KNOWN_CLUBS[lowerEmail];
     clubName = info.name;
-    category = info.category;
+    cat = info.category;
   }
 
-  // 3. Fallback based on sender name or email username
+  // 3. Match from subject/body if forwarded or sent on behalf of a club
+  if (!clubName) {
+    if (/\b(footlights|tandav)\b/i.test(combined)) {
+      clubName = 'Footlights Dance Club';
+      cat = 'Cultural';
+    } else if (/\b(dhwani|music\s*club|open\s*mic)\b/i.test(combined)) {
+      clubName = 'Music Club (Dhwani)';
+      cat = 'Cultural';
+    } else if (/\b(e-cell|entrepreneurship|edc)\b/i.test(combined)) {
+      clubName = 'E-Cell (Entrepreneurship Cell)';
+      cat = 'Technical';
+    } else if (/\b(vashisht)\b/i.test(combined)) {
+      clubName = 'Vashisht Technical Fest';
+      cat = 'Technical';
+    } else if (/\b(samgatha)\b/i.test(combined)) {
+      clubName = 'Samgatha Cultural Fest';
+      cat = 'Cultural';
+    } else if (/\b(meraki|grapix|design)\b/i.test(combined)) {
+      clubName = 'Meraki Design Club';
+      cat = 'Design';
+    } else if (/\b(epic|coding\s*club|hackathon)\b/i.test(combined)) {
+      clubName = 'EPIC Coding Club';
+      cat = 'Technical';
+    } else if (/\b(ssg|social\s*service)\b/i.test(combined)) {
+      clubName = 'Social Service Group (SSG)';
+      cat = 'Community';
+    } else if (category === 'sports_affairs' || categoryGroup === 'sports' || /\b(sports|badminton|cricket|football|basketball|volleyball)\b/i.test(combined)) {
+      clubName = 'SAC Sports Affairs Council';
+      cat = 'Sports';
+    }
+  }
+
+  // 4. Fallback based on sender name or email username
   if (!clubName) {
     if (senderName && !senderName.includes('@')) {
       clubName = senderName.replace(/IIITDM\s*(?:Kancheepuram)?/gi, '').trim();
@@ -442,16 +607,36 @@ export function extractClubDetails(
         .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
         .join(' ');
       if (!clubName.toLowerCase().includes('club') && !clubName.toLowerCase().includes('council')) {
-        clubName += ' Council';
+        clubName += ' Club';
       }
+    }
+  }
+
+  // Align category with caller suggestion if provided
+  if (category === 'cultural_affairs' || category === 'fest') cat = 'Cultural';
+  else if (category === 'sports_affairs') cat = 'Sports';
+  else if (category === 'hackathon' || category === 'technical_affairs' || category === 'tech_club') cat = 'Technical';
+  else if (category === 'workshop') cat = 'Workshops';
+
+  // Ensure apiClubEmail is compliant with backend requirements (must have club/affairs in username)
+  let apiClubEmail = lowerEmail;
+  if (!apiClubEmail.endsWith('@iiitdm.ac.in') || (!apiClubEmail.includes('club') && !apiClubEmail.includes('affairs'))) {
+    if (cat === 'Sports') {
+      apiClubEmail = 'sports.affairs@iiitdm.ac.in';
+    } else if (cat === 'Cultural' || cat === 'Design') {
+      apiClubEmail = 'cultural.affairs@iiitdm.ac.in';
+    } else if (cat === 'Community') {
+      apiClubEmail = 'general.affairs@iiitdm.ac.in';
+    } else {
+      apiClubEmail = 'technical.affairs@iiitdm.ac.in';
     }
   }
 
   const finalName = clubName || 'Campus Student Organization';
   return {
     name: finalName,
-    email: senderEmail,
-    category,
+    email: apiClubEmail,
+    category: cat,
     description: `Official campus club ${finalName} at IIITDM Kancheepuram.`,
   };
 }
@@ -952,13 +1137,15 @@ export function parseEventFromEmail(
   body: string,
   fromHeader: string,
   dateHeaderOrMs: string | number,
+  category?: string,
+  categoryGroup?: string,
 ): ExtractedEventData | null {
   const { email: senderEmail } = parseAddress(fromHeader || '');
-  if (!isCampusEventEmail(subject, body, senderEmail)) {
+  if (!isCampusEventEmail(subject, body, senderEmail, category, categoryGroup)) {
     return null;
   }
 
-  const club = extractClubDetails(fromHeader, subject, body);
+  const club = extractClubDetails(fromHeader, subject, body, category, categoryGroup);
   const title = extractCleanEventTitle(subject, body);
   const perks = extractEventPerks(body);
   const venue = extractEventVenue(body);
@@ -1016,6 +1203,125 @@ export function parseEventFromEmail(
   };
 }
 
+/**
+ * Extract campus events directly from cached and loaded emails.
+ * Guarantees that any club/activity event shown in Today's Briefing
+ * is immediately available and displayed in the Events section.
+ */
+export function getEventsFromCachedEmails(): DistrictEvent[] {
+  const memoryEmails = useEmailsStore.getState().emails || [];
+  const diskEmails = getAllCachedEmails() || [];
+
+  // Deduplicate emails by ID
+  const emailMap = new Map<string, ParsedEmail>();
+  for (const e of memoryEmails) {
+    if (e && e.id) emailMap.set(e.id, e);
+  }
+  for (const e of diskEmails) {
+    if (e && e.id && !emailMap.has(e.id)) emailMap.set(e.id, e);
+  }
+
+  const allEmails = Array.from(emailMap.values());
+  const seenEventKeys = new Set<string>();
+  const events: DistrictEvent[] = [];
+
+  for (const email of allEmails) {
+    if (!isEmailClubActivity(email)) continue;
+
+    const fromHeader = `${email.sender || ''} <${email.senderEmail || ''}>`;
+    const bodyText = email.body || stripHtmlTags(email.htmlBody || '');
+    const extracted = parseEventFromEmail(
+      email.subject || '',
+      bodyText,
+      fromHeader,
+      email.date || Date.now(),
+      email.category,
+      email.categoryGroup,
+    );
+
+    if (!extracted || !extracted.isEvent) continue;
+
+    // Deduplicate by normalized event title
+    const normKey = extracted.event.title.toLowerCase().replace(/[^a-z0-9]/g, '');
+    if (!normKey || seenEventKeys.has(normKey)) continue;
+    seenEventKeys.add(normKey);
+
+    // Extract image URL from htmlBody if present
+    let posterUrl: string | null = null;
+    if (email.htmlBody) {
+      const urls = extractImageUrlsFromHtml(email.htmlBody);
+      if (urls.length > 0) {
+        posterUrl = urls[0];
+      }
+    }
+
+    const eventId = `email-${email.id}`;
+    const districtEvent: DistrictEvent = {
+      id: eventId,
+      campus_id: 'iiitdm-kancheepuram',
+      organization_id: `org-${extracted.club.name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`,
+      organization_name: extracted.club.name,
+      organization_category: extracted.club.category,
+      organization_verified: true,
+      title: extracted.event.title,
+      summary: extracted.event.summary,
+      description: extracted.event.description,
+      poster_url: posterUrl,
+      priority: extracted.event.priority,
+      location: extracted.event.location || null,
+      building: extracted.event.building || null,
+      room_number: extracted.event.room_number || null,
+      event_time: extracted.event.event_time,
+      event_end_time: extracted.event.event_end_time,
+      is_featured: extracted.event.priority === 'Critical',
+      tags: extracted.event.tags,
+      going_count: 0,
+      interested_count: 0,
+      requires_action: extracted.event.requires_action,
+      action_label: extracted.event.action_label,
+      action_url: extracted.event.action_url,
+      created_at: new Date(email.date).toISOString(),
+    };
+
+    events.push(districtEvent);
+  }
+
+  return events;
+}
+
+/**
+ * Build registered Club entities from the extracted email events.
+ */
+export function getClubsFromCachedEmails(events: DistrictEvent[]): Club[] {
+  const clubsMap = new Map<string, Club>();
+
+  for (const ev of events) {
+    const orgName = ev.organization_name?.trim();
+    if (!orgName) continue;
+    const key = orgName.toLowerCase();
+    const existing = clubsMap.get(key);
+    if (!existing) {
+      clubsMap.set(key, {
+        id: ev.organization_id || `org-${key.replace(/[^a-z0-9]/g, '-')}`,
+        name: orgName,
+        category: ev.organization_category || 'Technical',
+        description: `Official student organization at IIITDM Kancheepuram.`,
+        verified: true,
+        followers_count: 0,
+        events_count: 1,
+        events: [ev],
+      });
+    } else {
+      if (existing.events && !existing.events.some((e) => e.id === ev.id)) {
+        existing.events.push(ev);
+        existing.events_count = (Number(existing.events_count) || 0) + 1;
+      }
+    }
+  }
+
+  return Array.from(clubsMap.values());
+}
+
 // ─── Main Pipeline ──────────────────────────────────────────────
 
 export interface EventsSyncResult {
@@ -1065,8 +1371,8 @@ export async function syncEventsFromEmail(forceReprocess = false): Promise<Event
   for (const email of cachedEmails) {
     if (processedIds.has(email.id)) continue;
 
-    // Strict club filter: must be @iiitdm.ac.in and have "club" or "affairs" in username
-    if (!isOfficialClubEmail(email.senderEmail)) {
+    // Filter using campus event/activity classifier (aligned with Today's Briefing)
+    if (!isEmailClubActivity(email)) {
       markEmailAsProcessed(email.id);
       continue;
     }
@@ -1077,6 +1383,8 @@ export async function syncEventsFromEmail(forceReprocess = false): Promise<Event
         email.body || stripHtmlTags(email.htmlBody),
         `${email.sender} <${email.senderEmail}>`,
         email.date,
+        email.category,
+        email.categoryGroup,
       );
 
       if (extracted && extracted.isEvent) {

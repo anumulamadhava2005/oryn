@@ -60,6 +60,8 @@ export function TimetableModal({
   const {
     program,
     semester,
+    batch,
+    setBatch,
     selectedElectiveIds,
     setSemester,
     isElectivesAvailable,
@@ -123,7 +125,7 @@ export function TimetableModal({
                 }}
               >
                 <Text style={styles.profileBadgeText}>
-                  {program}
+                  {program}{semester === 'Semester 3' ? ` • ${batch}` : ''}
                 </Text>
                 <Ionicons name="settings-outline" size={12} color={Colors.systemBlue} />
               </Pressable>
@@ -158,6 +160,28 @@ export function TimetableModal({
                   </Pressable>
                 );
               })}
+
+              {semester === 'Semester 3' && (program.includes('CSE') || program.includes('AI')) && (
+                <View style={styles.batchDivider} />
+              )}
+              {semester === 'Semester 3' && (program.includes('CSE') || program.includes('AI')) &&
+                (['Batch 1', 'Batch 2'] as const).map((b) => {
+                  const isSelected = batch === b;
+                  return (
+                    <Pressable
+                      key={b}
+                      style={[styles.batchPill, isSelected && styles.batchPillActive]}
+                      onPress={() => {
+                        hapticLight();
+                        setBatch(b);
+                      }}
+                    >
+                      <Text style={[styles.batchPillText, isSelected && styles.batchPillTextActive]}>
+                        {b}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
             </ScrollView>
 
             {canChooseElectives && (
@@ -536,6 +560,32 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
   },
   semPillTextActive: {
+    color: Colors.white,
+  },
+  batchDivider: {
+    width: 1,
+    height: 18,
+    backgroundColor: Colors.border,
+    marginHorizontal: 4,
+  },
+  batchPill: {
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    borderRadius: Radius.full,
+    backgroundColor: 'rgba(52, 199, 89, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(52, 199, 89, 0.25)',
+  },
+  batchPillActive: {
+    backgroundColor: Colors.systemGreen,
+    borderColor: Colors.systemGreen,
+  },
+  batchPillText: {
+    fontSize: Typography.size.xs,
+    fontWeight: Typography.weight.semibold,
+    color: Colors.systemGreen,
+  },
+  batchPillTextActive: {
     color: Colors.white,
   },
   electiveHeaderBtn: {

@@ -36,6 +36,11 @@ import {
   rollbackToFactoryDefault,
   CodeBundleMetadata,
 } from '@/services/codeUpdateService';
+import { sendTelemetryHeartbeat } from '@/services/telemetryService';
+import * as Notifications from 'expo-notifications';
+import { MMKV } from 'react-native-mmkv';
+
+const engineStorage = new MMKV({ id: 'oryn_engine_notifs' });
 
 interface CodeUpdateContextValue {
   metadata: CodeBundleMetadata | null;
@@ -145,8 +150,25 @@ export function OrynLiveCodeEngine({ children }: Props) {
       markBootSuccess().catch(() => {});
     }, 4000);
 
-    // Instant update check on launch (0ms delay)
+    // Instant update check on launch (0ms delay) & telemetry heartbeat
     runUpdateCheck(true);
+    sendTelemetryHeartbeat().catch(() => {});
+
+    // Notify student about CSE 3rd sem timetable update (once per device)
+    // try {
+    //   const notifKey = 'notif_tt_cse_sem3_v98';
+    //   if (!engineStorage.getBoolean(notifKey)) {
+    //     engineStorage.set(notifKey, true);
+    //     Notifications.scheduleNotificationAsync({
+    //       content: {
+    //         title: '📅 Timetable Updated: CSE 3rd Sem',
+    //         body: 'The academic timetable for CSE & CSE (AI) Semester 3 (Batch 1 & 2) has been updated with verified course slots and hall allocations.',
+    //         data: { type: 'timetable_update' },
+    //       },
+    //       trigger: null,
+    //     }).catch(() => {});
+    //   }
+    // } catch {}
 
     return () => {
       clearTimeout(bootTimer);
@@ -158,6 +180,7 @@ export function OrynLiveCodeEngine({ children }: Props) {
     const sub = AppState.addEventListener('change', (state: AppStateStatus) => {
       if (state === 'active') {
         runUpdateCheck(true);
+        sendTelemetryHeartbeat().catch(() => {});
       }
     });
     return () => sub.remove();

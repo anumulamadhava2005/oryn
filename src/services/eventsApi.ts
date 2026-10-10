@@ -32,6 +32,8 @@ const ORYN_JWT_KEY = 'oryn_backend_jwt';
 
 // ─── Base URL Resolution ────────────────────────────────────────
 
+let activeBaseUrl: string | null = null;
+
 function getApiBaseUrls(): string[] {
   const urls: string[] = ['https://api.cruxel.xyz/oryn'];
 
@@ -40,7 +42,7 @@ function getApiBaseUrls(): string[] {
     if (hostUri) {
       const host = hostUri.split(':')[0];
       if (host && host !== 'localhost' && host !== '127.0.0.1') {
-        urls.unshift(`http://${host}:3000/oryn`);
+        urls.push(`http://${host}:3000/oryn`);
       }
     }
 
@@ -49,6 +51,11 @@ function getApiBaseUrls(): string[] {
     }
     urls.push('http://localhost:3000/oryn');
     urls.push('http://127.0.0.1:3000/oryn');
+  }
+
+  // If a base URL has already succeeded in this session, prioritize it
+  if (activeBaseUrl && urls.includes(activeBaseUrl)) {
+    return [activeBaseUrl, ...urls.filter((u) => u !== activeBaseUrl)];
   }
 
   return urls;
@@ -84,8 +91,10 @@ async function exchangeTokenForJwt(): Promise<string | null> {
   const urls = getApiBaseUrls();
   for (const base of urls) {
     try {
+      const isLocal = base.includes('localhost') || base.includes('127.0.0.1') || base.includes('10.0.2.2') || base.startsWith('http://192.') || base.startsWith('http://172.');
+      const timeoutMs = isLocal ? 3000 : 8000;
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
       const response = await fetch(`${base}/auth/google`, {
         method: 'POST',
@@ -98,6 +107,7 @@ async function exchangeTokenForJwt(): Promise<string | null> {
       if (response.ok) {
         const data = await response.json();
         if (data.token) {
+          activeBaseUrl = base;
           await saveOrynJwt(data.token);
           return data.token;
         }
@@ -153,8 +163,10 @@ async function fetchFromApi(
     try {
       const fullUrl = `${base}${endpoint}${queryString}`;
       const controller = new AbortController();
-      // Generous 15s timeout to support Cloudflare tunnel DNS and cellular connections
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      // Fast timeout for local candidates, 12s for remote API
+      const isLocal = base.includes('localhost') || base.includes('127.0.0.1') || base.includes('10.0.2.2') || base.startsWith('http://192.') || base.startsWith('http://172.');
+      const timeoutMs = isLocal ? 3500 : 12000;
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
       const headers: Record<string, string> = {};
       if (method !== 'GET') headers['Content-Type'] = 'application/json';
@@ -171,6 +183,7 @@ async function fetchFromApi(
       clearTimeout(timeoutId);
 
       if (response.ok) {
+        activeBaseUrl = base;
         return await response.json();
       }
 
@@ -238,7 +251,7 @@ export async function fetchDistrictEvents(filters?: {
     if (filters?.search) query.append('search', filters.search);
     if (filters?.featured) query.append('featured', 'true');
     if (filters?.organization_id) query.append('organization_id', filters.organization_id);
-    if (filters?.limit) query.append('limit', String(filters.limit));
+    query.append('limit', String(filters?.limit || 200));
     if (filters?.offset) query.append('offset', String(filters.offset));
 
     const data = await fetchFromApi('/events/district', { queryParams: query, auth: false });
